@@ -13,6 +13,7 @@ RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo te
 RUN sudo apt-get update
 RUN sudo apt-get -y install git curl 
 RUN sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
+RUN ls -ahl
 RUN ./make-dependencies.sh
 RUN cmake -DCMAKE_INSTALL_PREFIX=/home/compiler/rawrtc/build/prefix -DCMAKE_TOOLCHAIN_FILE=/home/compiler/rawrtc/gcc-arm.cmake .
 RUN make install
