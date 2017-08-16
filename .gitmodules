@@ -1,4 +1,4 @@
 [submodule "container/ev3wrtc/rawrtc"]
 	path = container/ev3wrtc/rawrtc
 	url = git@github.com:JesApp/rawrtc.git
-	branch = crc32c
+	branch = crc32c_arm
