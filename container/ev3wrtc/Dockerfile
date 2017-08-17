@@ -11,8 +11,8 @@ RUN sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
 RUN mkdir libs
 RUN git clone -b crc32c_arm https://github.com/JesApp/rawrtc.git
 WORKDIR rawrtc
-ENV PKG_CONFIG_PATH=$(pwd)/build/prefix/lib/pkgconfig
 RUN ./make-dependencies.sh
+ENV PKG_CONFIG_PATH=$(pwd)/build/prefix/lib/pkgconfig
 WORKDIR build
 RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/prefix -DCMAKE_TOOLCHAIN_FILE=/../gcc-arm.cmake ..
 RUN make install
