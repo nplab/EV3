@@ -13,9 +13,10 @@ RUN git clone -b crc32c_arm https://github.com/JesApp/rawrtc.git
 WORKDIR rawrtc
 ENV PKG_CONFIG_PATH=$(pwd)/build/prefix/lib/pkgconfig
 RUN ./make-dependencies.sh
-RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/build/prefix -DCMAKE_TOOLCHAIN_FILE=/home/compiler/rawrtc/gcc-arm.cmake .
+WORKDIR build
+RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/prefix -DCMAKE_TOOLCHAIN_FILE=/../gcc-arm.cmake ..
 RUN make install
-RUN cp -r build/prefix/lib/* /home/compiler/libs
+RUN cp -r prefix/lib/* /home/compiler/libs
 WORKDIR /home/compiler
 RUN rm -fr rawrtc
 ENV PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:/home/compiler/libs/pkgconfig PKG_CONFIG_PATH=""
