@@ -16,5 +16,7 @@ WORKDIR rawrtc
 RUN ./make-dependencies.sh
 RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/build/prefix -DCMAKE_TOOLCHAIN_FILE=/home/compiler/rawrtc/gcc-arm.cmake .
 RUN make install
+RUN cp -r build/prefix/lib/* /home/compiler/libs
 WORKDIR /home/compiler
-ENV PKG_CONFIG_PATH=/home/compiler/rawrtc/lib/pkgconfig:/usr/lib/arm-linux-gnueabi/pkgconfig
+RUN rm -fr rawrtc
+ENV PKG_CONFIG_PATH=/home/compiler/libs/pkgconfig:/usr/lib/arm-linux-gnueabi/pkgconfig
