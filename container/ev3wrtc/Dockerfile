@@ -1,8 +1,6 @@
 FROM ev3dev/debian-jessie-cross
 
-ENV CC=arm-linux-gnueabi-gcc
-ENV CXX=arm-linux-gnueabi-g++
-ENV PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabi/pkgconfig:/home/compiler/rawrtc/build/prefix/lib/pkgconfig
+ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/lib/arm-linux-gnueabi/pkgconfig 
 
 WORKDIR /home/compiler
 
@@ -13,10 +11,11 @@ RUN sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
 RUN mkdir libs
 RUN git clone -b crc32c_arm https://github.com/JesApp/rawrtc.git
 WORKDIR rawrtc
+ENV PKG_CONFIG_PATH=$(pwd)/build/prefix/lib/pkgconfig
 RUN ./make-dependencies.sh
 RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/build/prefix -DCMAKE_TOOLCHAIN_FILE=/home/compiler/rawrtc/gcc-arm.cmake .
 RUN make install
 RUN cp -r build/prefix/lib/* /home/compiler/libs
 WORKDIR /home/compiler
 RUN rm -fr rawrtc
-ENV PKG_CONFIG_PATH=/home/compiler/libs/pkgconfig:/usr/lib/arm-linux-gnueabi/pkgconfig
+ENV PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:/home/compiler/libs/pkgconfig PKG_CONFIG_PATH=""
