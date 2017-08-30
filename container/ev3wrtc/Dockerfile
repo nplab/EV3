@@ -22,7 +22,7 @@ RUN ./make-dependencies.sh
 ENV PKG_CONFIG_PATH=/home/compiler/rawrtc/build/prefix/lib/pkgconfig
 WORKDIR build
 #cross-compile rawrtc
-RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/prefix -DCMAKE_TOOLCHAIN_FILE=/../gcc-arm.cmake ..
+RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/prefix ..
 RUN make install
 #copy the result into target dir
 RUN cp -r prefix/lib/* /home/compiler/libs
