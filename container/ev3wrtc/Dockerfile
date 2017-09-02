@@ -15,7 +15,7 @@ RUN sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
 #create target dir for librawrtc
 RUN mkdir libs
 #get rawrtc sources (preliminary, switch to upstream once merged)
-RUN git clone -b crc32c_arm https://github.com/JesApp/rawrtc.git
+RUN git clone https://github.com/rawrtc/rawrtc.git
 WORKDIR rawrtc
 #compile rawrtc
 RUN ./make-dependencies.sh
