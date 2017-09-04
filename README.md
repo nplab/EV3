@@ -8,6 +8,14 @@ Robot demonstrator for WebRTC datachannels.
   * Control Lego Mindstorms Robot through a WebApp using WebRTC.
   * Show off how cool that is by building a neat demonstrator.
 
+## Setup ##
+
+### Robot ###
+
+### Webserver ###
+
+Coming soon.
+
 ## Links ##
 
 [RAWRTC](https://github.com/rawrtc/rawrtc)
