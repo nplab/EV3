@@ -6,7 +6,7 @@ ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/li
 
 #we are working only in the home directory
 WORKDIR /home/compiler
-ADD automate.sh /home/compiler/
+COPY automate.sh /home/compiler/
 
 #install the necessary packages
 RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list
@@ -16,7 +16,7 @@ RUN sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
 #create target dir for librawrtc
 RUN mkdir libs
 #get rawrtc sources (preliminary, switch to upstream once merged)
-RUN git clone -b crc32c_arm https://github.com/JesApp/rawrtc.git
+RUN git clone https://github.com/rawrtc/rawrtc.git
 WORKDIR rawrtc
 #compile rawrtc
 RUN ./make-dependencies.sh
@@ -32,4 +32,4 @@ WORKDIR /home/compiler
 RUN rm -fr rawrtc
 ENV PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:/home/compiler/libs/pkgconfig PKG_CONFIG_PATH=""
 
-CMD ./automate.sh
+CMD /home/compiler/automate.sh
