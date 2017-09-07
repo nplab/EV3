@@ -6,6 +6,7 @@ ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/li
 
 #we are working only in the home directory
 WORKDIR /home/compiler
+ADD automate.sh /home/compiler/
 
 #install the necessary packages
 RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list
@@ -30,3 +31,5 @@ RUN cp -r prefix/lib/* /home/compiler/libs
 WORKDIR /home/compiler
 RUN rm -fr rawrtc
 ENV PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:/home/compiler/libs/pkgconfig PKG_CONFIG_PATH=""
+
+CMD ./automate.sh
