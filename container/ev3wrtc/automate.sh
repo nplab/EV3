@@ -4,5 +4,5 @@
 mkdir build
 cd build
 cmake -DCMAKE_INSTALL_PREFIX=$PWD ..
-make
+make VERBOSE=1
 make install
