@@ -118,6 +118,14 @@ Eigene CSS Eigenschaften
 
 }
 
+.offset-span12-text {
+    padding-left: 1%;
+    margin-top: -1.5%;
+    padding-top: 1%;
+    position: relative;
+}
+
+
 .offset-span6 {
     padding-left: 1%;
     margin-top: -1.5%;
