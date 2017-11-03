@@ -57,6 +57,20 @@ Eigene CSS Eigenschaften
     padding-bottom: 1.5%;
 }
 
+.backgroundBox-text {
+    background-color: #9fa2a2;
+    margin-left: 6%;
+    margin-right: 8%;
+    padding-top: 1.5%;
+    padding-bottom: 1.5%;
+    padding-left: 2%;
+}
+
+.p-text {
+    font-size: inherit;
+    line-height: 180%;
+}
+
 .captionbox{
     padding-left: 2%;
     margin-right: 14%;
@@ -116,13 +130,6 @@ Eigene CSS Eigenschaften
     margin-bottom: 0%;
     padding-bottom: 0%;
 
-}
-
-.offset-span12-text {
-    padding-left: 1%;
-    margin-top: -1.5%;
-    padding-top: 1%;
-    position: relative;
 }
 
 
