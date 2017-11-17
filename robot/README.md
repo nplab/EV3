@@ -23,6 +23,10 @@ In order to set up ev3dev (the operating systems for the robot), execute the fol
 1. Insert your USB-WiFi adapter into the EV3 brick. 
 1. Use the EV3 bricks buttons to navigate to `Wireless and Networks -> WiFi` to power up the adapter and log into your WiFi network.
 
+### Access
+
+After you have completed the steps above you can log into ev3dev via ssh with the username `robot` and the password `maker`.
+
 # Building
 
 The robot software is built inside a docker container. 
