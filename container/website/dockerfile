@@ -1,0 +1,21 @@
+# based on nginx
+FROM nginx:1.12
+
+# install necessary packages
+USER root
+RUN apt-get -y update
+RUN apt-get -y install git
+USER nginx 
+
+# nginx config 
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+# get data
+RUN git clone https://fb970419:ChKnnMrKnP12@git.fh-muenster.de/ja753563/WebRTCDemonstrator.git
+WORKDIR WebRTCDemonstrator
+RUN git checkout 5-layout-implementieren
+
+# copy data
+RUN cp -r website/src/html/* /usr/share/nginx/html
+RUN cp -r website/src/* /usr/share/nginx/html
+
