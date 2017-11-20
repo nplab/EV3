@@ -27,7 +27,7 @@ In order to set up ev3dev (the operating systems for the robot), execute the fol
 
 After you have completed the steps above you can log into ev3dev via ssh with the username `robot` and the password `maker`.
 
-You can also setup an NFS share by following [this guide](http://www.ev3dev.org/docs/tutorials/setting-up-an-nfs-file-share/#how-to-do-it---linux).
+You can also setup an NFS share by following [this guide](http://www.ev3dev.org/docs/tutorials/setting-up-an-nfs-file-share/).
 
 # Building
 
