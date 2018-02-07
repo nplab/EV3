@@ -8,24 +8,17 @@ ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/li
 WORKDIR /home/compiler
 
 #install the necessary packages
-RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list
-RUN sudo apt-get update
-RUN sudo apt-get -y install git curl 
-RUN sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
-#create target dir for librawrtc
-RUN mkdir libs
-#get rawrtc sources (preliminary, switch to upstream once merged)
-RUN git clone https://github.com/rawrtc/rawrtc.git
+RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list && \
+  sudo apt-get update && sudo apt-get -y install git curl && sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
+#create target dir for librawrtc and get rawrtc sources (preliminary, switch to upstream once merged)
+RUN mkdir libs && git clone https://github.com/rawrtc/rawrtc.git
 WORKDIR rawrtc
 #compile rawrtc
 RUN ./make-dependencies.sh
 ENV PKG_CONFIG_PATH=/home/compiler/rawrtc/build/prefix/lib/pkgconfig
 WORKDIR build
-#cross-compile rawrtc
-RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/prefix ..
-RUN make install
-#copy the result into target dir
-RUN cp -r prefix/lib/* /home/compiler/libs
+#cross-compile rawrtc and copy the result into target dir
+RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/prefix .. && make install && cp -r prefix/lib/* /home/compiler/libs
 #clean up
 WORKDIR /home/compiler
 RUN rm -fr rawrtc
