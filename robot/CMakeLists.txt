@@ -6,6 +6,24 @@ project (WebRTCDemo-Robot)
 set (WebRTCDemo-Robot_VERSION_MAJOR 0)
 set (WebRTCDemo-Robot_VERSION_MINOR 1)
 
+### external libraries
+include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
+set_directory_properties(PROPERTIES EP_BASE "lib")
+
+ExternalProject_Add(ev3dev-c_project
+  GIT_REPOSITORY https://github.com/in4lio/ev3dev-c.git
+  CONFIGURE_COMMAND ""
+  BUILD_IN_SOURCE 1
+  BUILD_COMMAND make -f source/ev3/makefile
+  INSTALL_COMMAND mkdir -p <INSTALL_DIR>/lib && mkdir -p <INSTALL_DIR>/include && make D_INSTALL=<INSTALL_DIR> D_INSTALL_H_FROM=<SOURCE_DIR>/source/ev3 -f source/ev3/makefile install
+)
+
+ExternalProject_Get_Property(ev3dev-c_project install_dir)
+add_library(ev3dev-c STATIC IMPORTED)
+set_property(TARGET ev3dev-c PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libev3dev-c.a)
+add_dependencies(ev3dev-c ev3dev-c_project)
+include_directories(${install_dir}/include)
+
 #compilation settings
 set (CMAKE_C_FLAGS "-Wall -Wextra -Werror -std=c11")
 set (CMAKE_C_FLAGS_DEBUG "-g")

@@ -53,3 +53,5 @@ dkms.conf
 
 #CMake build folders
 */build/*
+#binary artifacts folder
+robot/bin
