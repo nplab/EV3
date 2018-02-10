@@ -19,6 +19,3 @@ COPY website/src/html/ /usr/share/nginx/html/
 COPY website/src/ usr/share/nginx/html/
 
 
-
-
-
