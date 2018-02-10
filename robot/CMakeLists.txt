@@ -14,8 +14,8 @@ ExternalProject_Add(ev3dev-c_project
   GIT_REPOSITORY https://github.com/in4lio/ev3dev-c.git
   CONFIGURE_COMMAND ""
   BUILD_IN_SOURCE 1
-  BUILD_COMMAND make -f source/ev3/makefile
-  INSTALL_COMMAND mkdir -p <INSTALL_DIR>/lib && mkdir -p <INSTALL_DIR>/include && make D_INSTALL=<INSTALL_DIR> D_INSTALL_H_FROM=<SOURCE_DIR>/source/ev3 -f source/ev3/makefile install
+  BUILD_COMMAND cd source/ev3 && make
+  INSTALL_COMMAND cd source/ev3 && mkdir -p <INSTALL_DIR>/lib && mkdir -p <INSTALL_DIR>/include && make D_INSTALL=<INSTALL_DIR> D_INSTALL_H_FROM=<SOURCE_DIR>/source/ev3 install
 )
 
 ExternalProject_Get_Property(ev3dev-c_project install_dir)
@@ -30,6 +30,5 @@ set (CMAKE_C_FLAGS_DEBUG "-g")
 set (CMAKE_C_FLAGS_RELEASE "-O3")
 
 #directories
-include_directories (${CMAKE_CURRENT_SOURCE_DIR})
+# include_directories (${CMAKE_CURRENT_SOURCE_DIR})
 add_subdirectory (src)
-
