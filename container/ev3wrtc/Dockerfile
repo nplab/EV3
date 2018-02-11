@@ -4,12 +4,22 @@ FROM ev3dev/debian-jessie-cross
 #set the environments neccesary for compilation
 ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/lib/arm-linux-gnueabi/pkgconfig 
 
+#copy needed project files into container
+COPY build_robot.sh /usr/local/bin
+
 #we are working only in the home directory
 WORKDIR /home/compiler
 
 #install the necessary packages
 RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list && \
-  sudo apt-get update && sudo apt-get -y install git curl && sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
+  sudo apt-get update &&\
+  sudo apt-get -y install git curl &&\
+  sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
+
+#configure git (needed for automatically building some dependencies)
+RUN git config --global user.email "robot@builder.com" &&\
+git config --global user.name "Robot Builder"
+
 #create target dir for librawrtc and get rawrtc sources (preliminary, switch to upstream once merged)
 RUN mkdir libs && git clone https://github.com/rawrtc/rawrtc.git
 WORKDIR rawrtc
