@@ -29,7 +29,9 @@ This project requires:
 
 ### Webserver ###
 
-Coming soon.
+1. Change dir to website/src
+1. Start Website with "python3 -m http.server 8001"
+1. Go to page "localhome:8001"
 
 ## Links ##
 
