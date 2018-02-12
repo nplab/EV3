@@ -2,7 +2,7 @@
 FROM ev3dev/debian-jessie-cross
 
 #set the environments neccesary for compilation
-ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/lib/arm-linux-gnueabi/pkgconfig 
+ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/lib/arm-linux-gnueabi/pkgconfig RAWRTC_V=v0.2.0
 
 #copy needed project files into container
 COPY build_robot.sh /usr/local/bin
@@ -21,7 +21,7 @@ RUN git config --global user.email "robot@builder.com" &&\
 git config --global user.name "Robot Builder"
 
 #create target dir for librawrtc and get rawrtc sources (preliminary, switch to upstream once merged)
-RUN mkdir libs && git clone https://github.com/rawrtc/rawrtc.git
+RUN mkdir libs && git clone --branch $RAWRTC_V https://github.com/rawrtc/rawrtc.git --depth 1
 WORKDIR rawrtc
 #compile rawrtc
 RUN ./make-dependencies.sh
