@@ -5,6 +5,8 @@ var canvas = document.getElementById('canvasSteuerung');
 var canvasContext = canvas.getContext('2d');
 var centerX = 150;
 var centerY = 73;
+var distance = null;
+var angle = null;
 
 window.onlaod = startup();
 
@@ -28,12 +30,27 @@ function startup() {
 }
 
 
+function getDistanceAngle(mouseX, mouseY) {
+  var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)
+  var angle = 0;
+  if (mouseY < 0) {
+    var angle = Math.acos(mouseX/distance) * 180 / Math.PI;
+  } else {
+    var angle = Math.acos(-mouseX/distance) * 180 / Math.PI + 180;
+  }
+
+  // console.log("Winkel:" + angle);
+  // console.log("Abstand:" + distance);
+
+}
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
   var x = evt.clientX - rect.left - 267;
   var y = evt.clientY - rect.top - 128;
-  // console.log(x);
-  // console.log(y);
+  // console.log("x" + x);
+  // console.log("y" + y);
+  // console.log(evt.clientX - rect.left);
+  // console.log(evt.clientY);
   return {
     x: x,
     y: y
@@ -45,4 +62,5 @@ Listener
  **********/
 canvas.addEventListener('mousemove', function(evt) {
   var mousePos = getMousePos(canvas, evt);
+  getDistanceAngle(mousePos.x, mousePos.y);
 }, false);
