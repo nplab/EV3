@@ -3,7 +3,11 @@
 
 .emptyLine {
   padding: 0.5cm;
+}
 
+.canvasSteuerung {
+  width: 100%;
+  height: 100%;
 }
 
 .main {

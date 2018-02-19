@@ -25,11 +25,11 @@
       <div class="row">
         <div class="col-xs-5">
           <ol class="top-breadcrumb">
-            <li><a href="index.html"><i class="fa fa-home" aria-hidden="true"></i>Home</a></li>
-            <li><a href="anleitung.html"><i class="fa fa-handshake-o" aria-hidden="true"></i>Anleitung</a></li>
-            <li><a href="steuerung.html"><i class="fa fa-rocket" aria-hidden="true"></i>Steuerung</a></li>
-            <li><a href="entwicklung.html"><i class="fa fa-file-text-o" aria-hidden="true"></i>Entwicklung</a></li>
-            <li><a href="funktionsweise.html"><i class="fa fa-bandcamp" aria-hidden="true"></i>Funktionsweise</a></li>
+            <li><a href="index.html"><i class="fa fa-home" aria-hidden="true"></i> Home</a></li>
+            <li><a href="anleitung.html"><i class="fa fa-handshake-o" aria-hidden="true"></i> Anleitung</a></li>
+            <li><a href="steuerung.html"><i class="fa fa-rocket" aria-hidden="true"></i> Steuerung</a></li>
+            <li><a href="entwicklung.html"><i class="fa fa-file-text-o" aria-hidden="true"></i> Entwicklung</a></li>
+            <li><a href="funktionsweise.html"><i class="fa fa-bandcamp" aria-hidden="true"></i> Funktionsweise</a></li>
           </ol>
         </div>
       </div>
@@ -67,11 +67,22 @@
     <div class="row">
       <div class="col-md-6 offset-md6">
         <div class="backgroundBox-left">
-          <canvas id="myCanvas" width="578" height="200"></canvas>
+          <div class="canvas">
+            <canvas id="canvasSteuerung" class="canvasSteuerung"></canvas>
+          </div>
         </div>
       </div>
       <div class="col-md-5">
         <div class="backgroundBox-right">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="offset-section">
+                <h5>
+                  Sensoren
+                </h5>
+              </div>
+            </div>
+          </div>
           <div class="row">
             <div class="col-md-6 col-6-offset">
               <div class="offset-section">
@@ -82,8 +93,7 @@
             </div>
             <div class="col-md-6 col-6-offset">
               <div class="offset-input">
-                <textarea class="form-control" id="sensorFarb" type="text" placeholder="Farbe" disabled>
-                </textarea><br>
+                <input class="form-control" id="sensorAbstandVorne" type="text" placeholder="Wandabstand" disabled>
               </div>
             </div>
           </div>
