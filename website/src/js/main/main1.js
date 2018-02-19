@@ -23,10 +23,15 @@ function startup() {
   canvasContext.fill();
   canvasContext.lineWidth = 1;
   canvasContext.strokeStyle = '#6f6f6f';
+  canvasContext.moveTo(80, 75 );
+  canvasContext.lineTo(220, 75);
+  canvasContext.stroke();
+  canvasContext.moveTo(150, 2 );
+  canvasContext.lineTo(150, 145);
   canvasContext.stroke();
   canvasContext.font = '18pt Calibri';
   canvasContext.fillStyle = '#fbba00';
-  canvasContext.fillText("R", centerX-11, centerY+6)
+  canvasContext.fillText("R", centerX-10, centerY+10)
 }
 
 
