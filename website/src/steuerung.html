@@ -67,114 +67,11 @@
     <div class="row">
       <div class="col-md-6 offset-md6">
         <div class="backgroundBox-left">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="offset-section">
-                <h5>
-                  Vorwärtsfahren
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-section">
-                <p class="p-2">
-                  Motor 1
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <button type="button" class="btn btn-success">
-                Los, los, los
-              </button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-section">
-                <p class="p-2">
-                  Motor 2
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <button type="button" class="btn btn-success">
-                Los, los, los
-              </button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-section">
-                <p class="p-2">
-                  Motor 1 & 2
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <button type="button" class="btn btn-success">
-                Los, los, los
-              </button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="offset-section">
-                <h5>
-                  Rückwärtsfahren
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-section">
-                <p class="p-2">
-                  Motor 1
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <button type="button" class="btn btn-success">
-                Los, los, los
-              </button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-section">
-                <p class="p-2">
-                  Motor 2
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <button type="button" class="btn btn-success">
-                Los, los, los
-              </button>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-section">
-                <p class="p-2">
-                  Motor 1 & 2
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <button type="button" class="btn btn-success">
-                Los, los, los
-              </button>
-            </div>
-          </div>
-
+          <canvas id="myCanvas" width="578" height="200"></canvas>
         </div>
       </div>
       <div class="col-md-5">
         <div class="backgroundBox-right">
-
           <div class="row">
             <div class="col-md-6 col-6-offset">
               <div class="offset-section">
@@ -201,20 +98,6 @@
             <div class="col-md-6 col-6-offset">
               <div class="offset-input">
                 <input class="form-control" id="sensorAbstandVorne" type="text" placeholder="Wandabstand" disabled>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-section">
-                <p class="p-2">
-                  Abstandssensor (Hinten)
-                </p>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-input">
-                <input class="form-control" id="sensorAbstandHinten" type="text" placeholder="Wandabstand" disabled>
               </div>
             </div>
           </div>
@@ -272,69 +155,23 @@
         </div>
       </div>
     </div>
+  <div class="row">
+    <div class="emptyLine">
 
-    <div class="row-fluid">
-      <div class="span6">
-        <div class="captionbox">
-          <div class="backgroundBox-header">
-            Automatisches Fahren
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <div class="col-md-6 offset-md6">
-        <div class="backgroundBox-left">
-          <div class="row">
-            <div class="col-md-6">
-              <div class="offset-section">
-                <h5>
-                  Motor- und Abstandsauswahl
-                </h5>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-6">
-              <div class="offset-section">
-                <div class="radio">
-                  <label><input type="radio" name="optradio"> Motor 1</label>
-                </div>
-                <div class="radio">
-                  <label><input type="radio" name="optradio"> Motor 2</label>
-                </div>
-                <div class="radio">
-                  <label><input type="radio" name="optradio" checked> Motor 1 & 2</label>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6 col-6-offset">
-              <div class="offset-input">
-                <div class="form-group">
-                  <label for="abstandSeber">Abstand</label>
-                  <input type="email" class="form-control" id="abstandSeber" placeholder="Abstand">
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
     </div>
   </div>
+</div>
+
   <div class="footer">
     <div class="cont-center">
       <p class="text-center">&copy; Jesko Appenfeller & Frederik Broer & Labor für Netzwerkprogrammierung</p>
     </div>
   </div>
 
-
 <script src="js/bootstrap/bootstrap.js"></script>
 <script src="js/bootstrap/npm.js"></script>
 <script src="js/jquery/jquery-slim.min.js"></script>
-<script scr="js/main/main.js"></script>
-
+<script src="js/main/main1.js"></script>
 
 </body>
 
