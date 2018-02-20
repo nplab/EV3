@@ -8,14 +8,11 @@ var centerY = 73;
 var distance = null;
 var angle = null;
 
-window.onlaod = startup();
-
 
 /**********
 Funktionen
  **********/
-function startup() {
-  // Canvas
+function startupCanvas() {
   var radius = 70;
   canvasContext.beginPath();
   canvasContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
@@ -31,9 +28,17 @@ function startup() {
   canvasContext.stroke();
   canvasContext.font = '18pt Calibri';
   canvasContext.fillStyle = '#fbba00';
-  canvasContext.fillText("R", centerX-10, centerY+10)
+  canvasContext.fillText("R", centerX-10, centerY+10);
 }
 
+// Wenn der Stoßsensor aktiv wird
+function runIntoWall() {
+  var oldhtml = document.getElementById('background');
+  oldhtml.style.background="red";
+  setTimeout(function() {
+    oldhtml.style.background="#dedede";
+  }, 1000);
+}
 
 function getDistanceAngle(mouseX, mouseY) {
   var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)
@@ -43,11 +48,11 @@ function getDistanceAngle(mouseX, mouseY) {
   } else {
     var angle = Math.acos(-mouseX/distance) * 180 / Math.PI + 180;
   }
-
   // console.log("Winkel:" + angle);
   // console.log("Abstand:" + distance);
-
 }
+
+
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
   var x = evt.clientX - rect.left - 267;
@@ -65,6 +70,7 @@ function getMousePos(canvas, evt) {
 /**********
 Listener
  **********/
+window.addEventListener('load', startupCanvas, false);
 canvas.addEventListener('mousemove', function(evt) {
   var mousePos = getMousePos(canvas, evt);
   getDistanceAngle(mousePos.x, mousePos.y);
