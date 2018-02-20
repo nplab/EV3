@@ -9,6 +9,7 @@ COPY build_robot.sh /usr/local/bin
 
 #we are working only in the home directory
 WORKDIR /home/compiler
+COPY automate.sh /home/compiler/
 
 #install the necessary packages
 RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list && \
@@ -33,3 +34,5 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=$(pwd)/prefix .. && make install && cp -r prefi
 WORKDIR /home/compiler
 RUN rm -fr rawrtc
 ENV PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:/home/compiler/libs/pkgconfig PKG_CONFIG_PATH=""
+
+CMD /home/compiler/automate.sh
