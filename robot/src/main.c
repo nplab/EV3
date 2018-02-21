@@ -8,8 +8,11 @@ int main(int argc, const char *argv[]) {
   for (int i; i < argc; i++) {
     printf("%s", argv[i]);
   }
+  printf("\n");
 
   sigserv_connect();
+
+  sigserv_disconnect();
 
   return 0;
 }

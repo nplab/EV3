@@ -4,13 +4,16 @@
 #include <stdbool.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 #include "signaling.h"
 #include "utils.h"
 
+static int sigserv_sock_d;
+
 int sigserv_connect() {
-  int sock_d = socket(AF_INET, SOCK_STREAM, 0); // open IPv4 TCP socket
-  if (sock_d < 0) {
+  sigserv_sock_d = socket(AF_INET, SOCK_STREAM, 0); // open IPv4 TCP socket
+  if (sigserv_sock_d < 0) {
     handle_errno("Could not create socket for connecting to signaling server",
                  true);
   }
@@ -22,8 +25,8 @@ int sigserv_connect() {
     handle_errno("Could not parse given IP address", true);
   }
 
-  if (connect(sock_d, (struct sockaddr *)&sigserv_addr, sizeof(sigserv_addr)) <
-      0) {
+  if (connect(sigserv_sock_d, (struct sockaddr *)&sigserv_addr,
+              sizeof(sigserv_addr)) < 0) {
     handle_errno("Socket could not connect to signaling server", true);
   }
 
@@ -34,4 +37,9 @@ int sigserv_send() { return WRTCR_SUCCESS; }
 
 int sigserv_receive() { return WRTCR_SUCCESS; }
 
-int sigserv_disconnect() { return WRTCR_SUCCESS; }
+int sigserv_disconnect() {
+  if(close(sigserv_sock_d) < 0){
+    handle_errno("Could not close connection to signaling server", false);
+  }
+  return WRTCR_SUCCESS;
+}
