@@ -36,3 +36,4 @@ RUN rm -fr rawrtc
 ENV PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR:/home/compiler/libs/pkgconfig PKG_CONFIG_PATH=""
 
 CMD /home/compiler/automate.sh
+
