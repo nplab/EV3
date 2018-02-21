@@ -2,6 +2,7 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdbool.h>
+#include <string.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -30,15 +31,31 @@ int sigserv_connect() {
     handle_errno("Socket could not connect to signaling server", true);
   }
 
+  unsigned int room_nr = htonl(1);
+  ssize_t sent_len = send(sigserv_sock_d, &room_nr, sizeof(unsigned int), 0);
+  if (sent_len < 0) {
+    handle_errno("Could not join room on signaling server", false);
+  } 
+
   return WRTCR_SUCCESS;
 }
 
-int sigserv_send() { return WRTCR_SUCCESS; }
+int sigserv_send(char *msg) {
+  ssize_t sent_len = send(sigserv_sock_d, msg, strlen(msg) + 1, 0);
+  if (sent_len < 0) {
+    handle_errno("Could not send message to signaling server", false);
+    return WRTCR_FAILURE;
+  } else if ((unsigned int)sent_len != strlen(msg) + 1) {
+    handle_errno("Could not send complete message to signaling server", false);
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_SUCCESS;
+}
 
 int sigserv_receive() { return WRTCR_SUCCESS; }
 
 int sigserv_disconnect() {
-  if(close(sigserv_sock_d) < 0){
+  if (close(sigserv_sock_d) < 0) {
     handle_errno("Could not close connection to signaling server", false);
   }
   return WRTCR_SUCCESS;

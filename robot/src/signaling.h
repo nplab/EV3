@@ -2,7 +2,7 @@
 
 int sigserv_connect();
 
-int sigserv_send();
+int sigserv_send(char *msg);
 
 int sigserv_receive();
 

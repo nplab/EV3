@@ -12,6 +12,8 @@ int main(int argc, const char *argv[]) {
 
   sigserv_connect();
 
+  sigserv_send("Test");
+
   sigserv_disconnect();
 
   return 0;
