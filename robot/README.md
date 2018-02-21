@@ -1,12 +1,8 @@
-# EV3 #
+# Robot
 
-Robot demonstrator for WebRTC datachannels.
+This folder contains:
 
-## Goals ##
-
-  * Get [RAWRTC](https://github.com/rawrtc/rawrtc) to compile and run on Lego Mindstorms EV3 Controller.
-  * Control Lego Mindstorms Robot through a WebApp using WebRTC.
-  * Show off how cool that is by building a neat demonstrator.
+- `src`: source files needed for building the robot components of this project.
 
 ## Setup ##
 
@@ -16,7 +12,7 @@ This project requires:
   * A µSD-Card of at least 4GB
   * A compatible USB-WiFi adapter
 
-### Robot ###
+In order to set up ev3dev (the operating systems for the robot), execute the following steps:
 
 1. Download the latest `ev3dev-jessie-ev3-generic-<date>.zip` file from the [ev3dev release page](https://github.com/ev3dev/ev3dev/releases).
 1. Unzip the contained `ev3dev-jessie-ev3-generic-<date>.img` file.
@@ -27,12 +23,12 @@ This project requires:
 1. Insert your USB-WiFi adapter into the EV3 brick. 
 1. Use the EV3 bricks buttons to navigate to `Wireless and Networks -> WiFi` to power up the adapter and log into your WiFi network.
 
-### Webserver ###
+### Access
 
-1. Change dir to website/src
-1. Start Website with "python3 -m http.server 8001"
-1. Go to page "localhome:8001"
+After you have completed the steps above you can log into ev3dev via ssh with the username `robot` and the password `maker`.
 
-## Links ##
+You can also setup an NFS share by following [this guide](http://www.ev3dev.org/docs/tutorials/setting-up-an-nfs-file-share/).
 
-[RAWRTC](https://github.com/rawrtc/rawrtc)
+# Building
+
+The robot software is built inside a docker container. 

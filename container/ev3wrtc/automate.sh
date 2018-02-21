@@ -3,5 +3,6 @@
 #Script to automate building of the WebRTCDemonstrator robot software and optionally copy the result to the robot.
 mkdir build
 cd build
-cmake ..
-make
+cmake -DCMAKE_INSTALL_PREFIX=$PWD ..
+make VERBOSE=1
+make install
