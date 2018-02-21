@@ -35,14 +35,15 @@ int sigserv_connect() {
   ssize_t sent_len = send(sigserv_sock_d, &room_nr, sizeof(unsigned int), 0);
   if (sent_len < 0) {
     handle_errno("Could not join room on signaling server", false);
-  } 
+  }
 
-  char recv_buf[8];
+  char recv_buf[16];
   ssize_t recv_len = recv(sigserv_sock_d, &recv_buf, sizeof(recv_buf), 0);
   if (recv_len < 0) {
     handle_errno("Did not get READY### message from signaling server", true);
-  } 
-  if( !strncmp(recv_buf, "READY###", recv_len) ){
+  }
+  printf("%d\n", recv_len);
+  if (!strncmp(recv_buf, "READY###", recv_len)) {
     handle_errno("Signaling servers first message was not READY###", true);
   }
 
@@ -61,8 +62,18 @@ int sigserv_send(char *msg) {
   return WRTCR_SUCCESS;
 }
 
-int sigserv_receive() {
-  return WRTCR_SUCCESS; }
+int sigserv_receive(char **msg) {
+  uint8_t recv_buf[2047];
+  ssize_t recv_len = recv(sigserv_sock_d, &recv_buf, sizeof(recv_buf), 0);
+  if (recv_len < 0) {
+    handle_errno("Failed to receive message from signaling server", false);
+    return WRTCR_FAILURE;
+  }
+  *msg = (char*)malloc((recv_len+1)*sizeof(char));
+  snprintf(*msg, recv_len, "%s", recv_buf);
+
+  return WRTCR_SUCCESS;
+}
 
 int sigserv_disconnect() {
   if (close(sigserv_sock_d) < 0) {
