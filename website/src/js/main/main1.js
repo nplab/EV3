@@ -75,3 +75,42 @@ canvas.addEventListener('mousemove', function(evt) {
   var mousePos = getMousePos(canvas, evt);
   getDistanceAngle(mousePos.x, mousePos.y);
 }, false);
+
+
+
+
+
+var data = 'data123';
+var socket = io('http://localhost:5001');
+socket.on('news', function (data) {
+  console.log(data);
+    ocket.emit('my other event', { my: 'data' });
+});
+
+
+var socket = io('http://localhost:5001');
+  socket.on('connect', function () {
+    socket.send('hi');
+
+    socket.on('message', function (msg) {
+      // my msg
+    });
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
