@@ -12,11 +12,13 @@ int main(int argc, const char *argv[]) {
 
   sigserv_connect();
 
-  char *msg;
+  char *msg = NULL;
   if(sigserv_receive(&msg) == WRTCR_SUCCESS)
     printf("%s\n", msg);
 
   sigserv_disconnect();
+
+  free(msg);
 
   return 0;
 }

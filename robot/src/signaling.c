@@ -10,6 +10,7 @@
 #include "signaling.h"
 #include "utils.h"
 
+//socket for connection to signaling server
 static int sigserv_sock_d;
 
 int sigserv_connect() {
@@ -19,6 +20,7 @@ int sigserv_connect() {
                  true);
   }
 
+  //set up address of signaling server (currently hardcoded)
   struct sockaddr_in sigserv_addr;
   sigserv_addr.sin_family = AF_INET;
   sigserv_addr.sin_port = htons(5001);
@@ -31,12 +33,14 @@ int sigserv_connect() {
     handle_errno("Socket could not connect to signaling server", true);
   }
 
+  //join room on signaling server
   unsigned int room_nr = htonl(822738944);
   ssize_t sent_len = send(sigserv_sock_d, &room_nr, sizeof(unsigned int), 0);
   if (sent_len < 0) {
     handle_errno("Could not join room on signaling server", false);
   }
 
+  //check for READY### message
   char recv_buf[16];
   ssize_t recv_len = recv(sigserv_sock_d, &recv_buf, sizeof(recv_buf), 0);
   if (recv_len < 0) {
@@ -63,14 +67,14 @@ int sigserv_send(char *msg) {
 }
 
 int sigserv_receive(char **msg) {
-  uint8_t recv_buf[2047];
+  uint8_t recv_buf[2047]; //create a (hopefully) large enough buffer (2047 so resulting msg is at most 2048 byte long)
   ssize_t recv_len = recv(sigserv_sock_d, &recv_buf, sizeof(recv_buf), 0);
   if (recv_len < 0) {
     handle_errno("Failed to receive message from signaling server", false);
     return WRTCR_FAILURE;
   }
-  *msg = (char*)malloc((recv_len+1)*sizeof(char));
-  snprintf(*msg, recv_len, "%s", recv_buf);
+  *msg = (char*)malloc((recv_len+1)*sizeof(char)); //allocate memory for received message
+  snprintf(*msg, recv_len, "%s", recv_buf); //move relevant message to the message buffer and add terminating \0
 
   return WRTCR_SUCCESS;
 }
