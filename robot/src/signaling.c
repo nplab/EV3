@@ -31,11 +31,20 @@ int sigserv_connect() {
     handle_errno("Socket could not connect to signaling server", true);
   }
 
-  unsigned int room_nr = htonl(1);
+  unsigned int room_nr = htonl(822738944);
   ssize_t sent_len = send(sigserv_sock_d, &room_nr, sizeof(unsigned int), 0);
   if (sent_len < 0) {
     handle_errno("Could not join room on signaling server", false);
   } 
+
+  char recv_buf[8];
+  ssize_t recv_len = recv(sigserv_sock_d, &recv_buf, sizeof(recv_buf), 0);
+  if (recv_len < 0) {
+    handle_errno("Did not get READY### message from signaling server", true);
+  } 
+  if( !strncmp(recv_buf, "READY###", recv_len) ){
+    handle_errno("Signaling servers first message was not READY###", true);
+  }
 
   return WRTCR_SUCCESS;
 }
@@ -52,7 +61,8 @@ int sigserv_send(char *msg) {
   return WRTCR_SUCCESS;
 }
 
-int sigserv_receive() { return WRTCR_SUCCESS; }
+int sigserv_receive() {
+  return WRTCR_SUCCESS; }
 
 int sigserv_disconnect() {
   if (close(sigserv_sock_d) < 0) {
