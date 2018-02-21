@@ -31,4 +31,19 @@ You can also setup an NFS share by following [this guide](http://www.ev3dev.org/
 
 # Building
 
-The robot software is built inside a docker container. 
+The robot software is built inside a docker container, which can be downloaded via `docker pull git.fh-muenster.de:4567/ja753563/webrtcdemonstrator/ev3wrtc:latest`. 
+In order to build, please execute the following:
+
+``` shell
+    cd robot
+    ../container/run_ev3wrtc.sh
+    mkdir -p build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX=../bin ..
+    make install
+```
+
+Feel free to replace the `-DCMAKE_INSTALL_PREFIX=<target_dir>` with whatever directory works for you.
+
+**Note:** In order for the binary the run, the target system must have at least OpenSSL version 1.0.3. On *ev3dev*, this means installing OpenSSL from the `jessie-backports` repository.
+
