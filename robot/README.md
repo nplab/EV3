@@ -29,7 +29,9 @@ After you have completed the steps above you can log into ev3dev via ssh with th
 
 You can also setup an NFS share by following [this guide](http://www.ev3dev.org/docs/tutorials/setting-up-an-nfs-file-share/).
 
-# Building
+# Software
+
+## Building
 
 The robot software is built inside a docker container, which can be downloaded via `docker pull git.fh-muenster.de:4567/ja753563/webrtcdemonstrator/ev3wrtc:latest`. 
 In order to build, please execute the following:
@@ -47,3 +49,22 @@ Feel free to replace the `-DCMAKE_INSTALL_PREFIX=<target_dir>` with whatever dir
 
 **Note:** In order for the binary the run, the target system must have at least OpenSSL version 1.0.3. On *ev3dev*, this means installing OpenSSL from the `jessie-backports` repository.
 
+## Structure
+
+The software is structured into four main areas:
+
+### Signaling
+
+In order to set up a WebRTC connection, informatio about the end points must be exchanged via the signaling server.
+
+### WebRTC Datachannel
+
+For the actual real-time communication, a WebRTC data channel is established and used to send commands and sensor data back and forth.
+
+### Sensors
+
+The robots sensors are read, their data encoded and then send to the website.
+
+### Actors
+
+Data coming from the website is received, parsed and then applied to the motors.
