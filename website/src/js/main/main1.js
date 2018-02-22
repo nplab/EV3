@@ -77,27 +77,26 @@ canvas.addEventListener('mousemove', function(evt) {
 }, false);
 
 
+// SIGNALING
 
+// Connect to Signaling Server
+var socket = io.connect('http://localhost:5000');
 
+// Join so room
+socket.emit('roomJoin', 132);
 
-var data = 'data123';
-var socket = io('http://localhost:5001');
-socket.on('news', function (data) {
+// get and print info Message
+socket.on('info', function (data) {
   console.log(data);
-    ocket.emit('my other event', { my: 'data' });
+})
+
+// get all messages from room
+socket.on('signaling', function(data) {
+  console.log(data);
 });
 
-
-var socket = io('http://localhost:5001');
-  socket.on('connect', function () {
-    socket.send('hi');
-
-    socket.on('message', function (msg) {
-      // my msg
-    });
-  });
-
-
+// send message to room
+socket.emit('signaling', "READY###123312<");
 
 
 
