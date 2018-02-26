@@ -8,7 +8,6 @@ var centerY = 73;
 var distance = null;
 var angle = null;
 
-
 /**********
 Funktionen
  **********/
@@ -75,3 +74,98 @@ canvas.addEventListener('mousemove', function(evt) {
   var mousePos = getMousePos(canvas, evt);
   getDistanceAngle(mousePos.x, mousePos.y);
 }, false);
+
+
+// SIGNALING
+
+// Connect to Signaling Server
+var socket = io.connect('https://localhost:3001');
+
+console.log(123);
+
+// Join so room
+socket.emit('roomJoin', 825373450);
+
+// get and print info Message
+socket.on('info', function (data) {
+  console.log(data);
+})
+
+// get all messages from room
+socket.on('signaling', function(data) {
+  console.log(data);
+});
+
+// send message to room
+socket.emit('signaling', "READY###123312<");
+
+
+
+
+function sendMessage(message){
+    console.log('Client sending message: ', message);
+    socket.emit('signaling', message);
+}
+
+
+
+
+
+
+
+
+
+
+// var socket = io.connect('http://localhost:5001');
+//
+//
+//
+// socket.emit('room', 123)
+//
+//
+//
+//
+//
+//
+// function ntohl(b) {
+//     return ((0xff & b[0]) >> 24) |
+//            ((0xff & b[1]) >> 16) |
+//            ((0xff & b[2]) >> 8) |
+//            ((0xff & b[3]));
+// };
+
+
+
+
+
+
+// // WEB RTC
+// var peerConn;
+// var dataChannel;
+//
+// document.getElementById('connectButton').onclick = connectWebRTC;
+//
+//
+// function connectWebRTC(event) {
+//   console.log('Creating Peer connection: Starting');
+//   peerConn = new RTCPeerConnection();
+//
+//   peerConn.onicecandidate = gotIceCandidate;
+//
+//
+//   console.log(peerConn.onicecandidate);
+//
+// }
+//
+//
+// function gotIceCandidate(event) {
+//     if(event.candidate != null) {
+//         serverConnection.send(JSON.stringify({'ice': event.candidate}));
+//     }
+// }
+//
+//
+//
+//
+//
+// //
