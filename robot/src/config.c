@@ -44,33 +44,40 @@ int delete_config(){
   return WRTCR_SUCCESS;
 }
 
+
+//traverse JSON config tree to find specified item
 cJSON* get_conf_item(char *key){
+  //make copy of key, since strtok needs to modify it
+  char *mod_key = (char*)malloc((strlen(key)+1)*sizeof(char));
+  strcpy(mod_key, key);
+  //start at the root of the config tree
   cJSON *cur_item = conf_root;
-  char *cur_token = strtok(key, '.');
-  while(cur_token != NULL){
-    cur_item = cJSON_getObjectItem(cur_item, cur_token);
-    char *cur_token = strtok(key, '.');
+  //get first token from .-delimited config key
+  char *cur_token = strtok(mod_key, ".");
+  while(cur_token != NULL){ //while we haven't reached the end of the key
+    cur_item = cJSON_GetObjectItem(cur_item, cur_token); //try to find an item whose name is the current token in the level below the current
+    cur_token = strtok(NULL, "."); //get next token
   }
-  return cur_item;
+  return cur_item; //return item (might be NULL if none was found)
 }
 
 int get_int(char *key, int *value){
-  cJSON *item = get_conf_item(key);
-  if( item == NULL || !cJSON_IsNumber(item)){
+  cJSON *item = get_conf_item(key); //get item or NULL
+  if( item == NULL || !cJSON_IsNumber(item)){ //if we didn't get anything or it's not an integer return failure
     return WRTCR_FAILURE;
   }
-  else{
+  else{ //else return integer value of found item
     *value = item->valueint;
     return WRTCR_SUCCESS;
   }
 }
 
 int get_string(char *key, char **value){
-  cJSON *item = get_conf_item(key);
-  if( item == NULL || !cJSON_IsString(item)){
+  cJSON *item = get_conf_item(key);//get item or NULL
+  if( item == NULL || !cJSON_IsString(item)){//if we didn't get anything or it's not a string return failure
     return WRTCR_FAILURE;
   }
-  else{
+  else{//else return string value of found item
     *value = item->valuestring;
     return WRTCR_SUCCESS;
   }

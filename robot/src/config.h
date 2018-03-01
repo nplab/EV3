@@ -12,4 +12,4 @@ int delete_config();
 int get_int(char *key, int *value);
 
 //get char pointer <value> for key <key> 
-int get_string(char *key, char *value);
+int get_string(char *key, char **value);

@@ -35,8 +35,8 @@ int setup(int argc, char *argv[]){
     conf_file_name = def_conf_file_name;
   }
 
+  //start setup of components
   read_config(conf_file_name);
-  
   sigserv_connect();
 
   return WRTCR_SUCCESS;
