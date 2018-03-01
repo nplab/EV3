@@ -23,6 +23,8 @@ In order to set up ev3dev (the operating systems for the robot), execute the fol
 1. Insert your USB-WiFi adapter into the EV3 brick. 
 1. Use the EV3 bricks buttons to navigate to `Wireless and Networks -> WiFi` to power up the adapter and log into your WiFi network.
 
+Also see section **Futher Setup** below.
+
 ### Access
 
 After you have completed the steps above you can log into ev3dev via ssh with the username `robot` and the password `maker`.
@@ -47,7 +49,15 @@ In order to build, please execute the following:
 
 Feel free to replace the `-DCMAKE_INSTALL_PREFIX=<target_dir>` with whatever directory works for you.
 
-**Note:** In order for the binary the run, the target system must have at least OpenSSL version 1.0.3. On *ev3dev*, this means installing OpenSSL from the `jessie-backports` repository.
+## Further Setup
+
+### DNS
+If you would like to use Hostnames instead of IP addresses in the config file, change the `host: ` line in `/etc/nsswitch.conf` to `hosts: files [NOTFOUND=continue UNAVAIL=continue FOUND=return] dns [NOTFOUND=return UNAVAIL=return TRYAGAIN=return FOUND=return] files`.
+
+### OpenSSL
+The target system must have at least OpenSSL version 1.0.3. On *ev3dev*, this means installing OpenSSL from the `jessie-backports` repository.
+
+Add `deb http://ftp.debian.org/debian jessie-backports main` to `/etc/apt/sources.list`. Then run `apt-get -t jessie-backports install openssl`.
 
 ## Structure
 
