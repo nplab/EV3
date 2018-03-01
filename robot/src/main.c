@@ -1,25 +1,15 @@
 #include <stdio.h>
-#include <cJSON.h>
 
-#include "signaling.h"
-#include "utils.h"
+#include "setup.h"
 
 int main(int argc, const char *argv[]) {
-  printf("%d: ", argc);
-  for (int i; i < argc; i++) {
-    printf("%s", argv[i]);
-  }
-  printf("\n");
 
-  sigserv_connect();
+  if( setup(argc, argv) != WRTCR_SUCCESS )
+    return WRTCR_FAILURE;
 
-  char *msg = NULL;
-  if(sigserv_receive(&msg) == WRTCR_SUCCESS)
-    printf("%s\n", msg);
 
-  sigserv_disconnect();
+  if( teardown() != WRTCR_SUCCESS )
+    return WRTCR_FAILURE;
 
-  free(msg);
-
-  return 0;
+  return WRTCR_SUCCESS;
 }
