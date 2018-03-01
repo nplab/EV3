@@ -39,9 +39,9 @@ add_dependencies(cJSON cJSON_project)
 include_directories(${install_dir}/include/cjson/)
 
 #compilation settings
-set (CMAKE_C_FLAGS "-Wall -Wextra -Werror -std=c11")
+set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
 set (CMAKE_C_FLAGS_DEBUG "-g")
-set (CMAKE_C_FLAGS_RELEASE "-O3")
+set (CMAKE_C_FLAGS_RELEASE "-O3 -Werror")
 
 #directories
 add_subdirectory (src)

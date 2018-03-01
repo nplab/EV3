@@ -1,14 +1,38 @@
-#include "setup.h"
+#include <getopt.h>
 
-int setup(const int argc, const char *argv[]){
-  char def_conf_file_name = "wrtcr_conf.json"
+#include "setup.h"
+#include "utils.h"
+
+int setup(int argc, char *argv[]){
+  char *def_conf_file_name = "wrtcr_conf.json";
   char *conf_file_name = NULL;
 
-  //replace this with getopt!!!
-  if( argc == 1){ //if there are no arguments, go to defaults
-    conf_file_name = &def_conf_file_name;
-  }else{ //parse command line arguments for config file
-    
+  //parse arguments
+  opterr = 0;
+  int c;
+  while ((c = getopt (argc, argv, "c:")) != -1)
+    switch (c)
+      {
+      case 'c':
+        conf_file_name = optarg;
+        break;
+      case '?':
+        if (optopt == 'c')
+          fprintf (stderr, "Option -c <config-file> requires the config file as an argument.\n");
+        else if (isprint (optopt))
+          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+        else
+          fprintf (stderr,
+                   "Unknown option character `\\x%x'.\n",
+                   optopt);
+        /* return WRTCR_FAILURE; */
+      default:
+        abort();
+      }
+
+  //set defaults
+  if( !conf_file_name){
+    conf_file_name = def_conf_file_name;
   }
 
   read_config(conf_file_name);

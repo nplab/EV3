@@ -2,7 +2,7 @@
 
 #include "setup.h"
 
-int main(int argc, const char *argv[]) {
+int main(int argc, char *argv[]) {
 
   if( setup(argc, argv) != WRTCR_SUCCESS )
     return WRTCR_FAILURE;
