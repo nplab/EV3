@@ -9,7 +9,7 @@ int read_config(char *filename);
 int delete_config();
 
 //get integer <value> for key <key>
-int get_int(char *key, int *value);
+int conf_get_int(char *key, int *value);
 
 //get char pointer <value> for key <key> 
-int get_string(char *key, char **value);
+int conf_get_string(char *key, char **value);

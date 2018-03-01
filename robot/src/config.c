@@ -5,6 +5,7 @@
 #include "config.h"
 #include "utils.h"
 
+const char *no_item_msg = "Could not find %s value for config key %s!\n";
 static cJSON *conf_root = NULL;
 
 int read_config(char *filename){
@@ -61,9 +62,10 @@ cJSON* get_conf_item(char *key){
   return cur_item; //return item (might be NULL if none was found)
 }
 
-int get_int(char *key, int *value){
+int conf_get_int(char *key, int *value){
   cJSON *item = get_conf_item(key); //get item or NULL
   if( item == NULL || !cJSON_IsNumber(item)){ //if we didn't get anything or it's not an integer return failure
+    fprintf(stderr, no_item_msg, "integer", key);
     return WRTCR_FAILURE;
   }
   else{ //else return integer value of found item
@@ -72,9 +74,10 @@ int get_int(char *key, int *value){
   }
 }
 
-int get_string(char *key, char **value){
+int conf_get_string(char *key, char **value){
   cJSON *item = get_conf_item(key);//get item or NULL
   if( item == NULL || !cJSON_IsString(item)){//if we didn't get anything or it's not a string return failure
+    fprintf(stderr, no_item_msg, "string", key);
     return WRTCR_FAILURE;
   }
   else{//else return string value of found item
