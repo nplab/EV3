@@ -1,0 +1,7 @@
+{
+    "sig_serv": {
+        "host": "jeskoslt.local",
+        "port": 5001,
+        "room": 10
+    }
+}
