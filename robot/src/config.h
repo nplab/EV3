@@ -5,6 +5,9 @@
 //read and parse the JSON config file
 int read_config(char *filename);
 
+//delete parsed configuration
+int delete_config();
+
 //get integer <value> for key <key>
 int get_int(char *key, int *value);
 

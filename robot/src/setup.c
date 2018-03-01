@@ -44,6 +44,7 @@ int setup(int argc, char *argv[]){
 
 int teardown(){
   sigserv_disconnect();
+  delete_config();
 
   return WRTCR_SUCCESS;
 }
