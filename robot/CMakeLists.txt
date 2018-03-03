@@ -8,6 +8,7 @@ set (WebRTCDemo-Robot_VERSION_MINOR 1)
 
 ### external libraries
 include(${CMAKE_ROOT}/Modules/ExternalProject.cmake)
+include(${CMAKE_ROOT}/Modules/FindPkgConfig.cmake)
 set_directory_properties(PROPERTIES EP_BASE "lib")
 
 #ev3dev-c
@@ -38,8 +39,10 @@ set_property(TARGET cJSON PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libcjson
 add_dependencies(cJSON cJSON_project)
 include_directories(${install_dir}/include/cjson/)
 
-#compilation settings
-set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
+pkg_check_modules(LIB_RAWRTC REQUIRED "librawrtc >= 0.2.1")
+include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
+link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
+
 set (CMAKE_C_FLAGS_DEBUG "-g")
 set (CMAKE_C_FLAGS_RELEASE "-O3 -Werror")
 
