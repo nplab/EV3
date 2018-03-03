@@ -4,8 +4,10 @@
 #include <stdlib.h>
 #include <sys/types.h>
 
-#define WRTCR_SUCCESS 0
-#define WRTCR_FAILURE -1
+typedef enum WebRTCRobot_ReturnCode {
+  SUCCESS,
+  FAILURE
+} wrtcr_rc;
 
 extern int errno;
 
