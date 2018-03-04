@@ -43,6 +43,7 @@ pkg_check_modules(LIB_RAWRTC REQUIRED "librawrtc >= 0.2.1")
 include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
 link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
 
+set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
 set (CMAKE_C_FLAGS_DEBUG "-g")
 set (CMAKE_C_FLAGS_RELEASE "-O3 -Werror")
 
