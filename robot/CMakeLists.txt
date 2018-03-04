@@ -39,9 +39,12 @@ set_property(TARGET cJSON PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libcjson
 add_dependencies(cJSON cJSON_project)
 include_directories(${install_dir}/include/cjson/)
 
+#find rawrtc and make sure we are linking to the static lib
 pkg_check_modules(LIB_RAWRTC REQUIRED "librawrtc >= 0.2.1")
+add_library(rawrtc_static STATIC IMPORTED)
+set_target_properties(rawrtc_static PROPERTIES IMPORTED_LOCATION  /home/compiler/rawrtc/build/prefix/lib/librawrtc-static.a)
 include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
-link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
+# link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
 
 set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
 set (CMAKE_C_FLAGS_DEBUG "-g")
