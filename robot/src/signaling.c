@@ -77,7 +77,6 @@ int sigserv_connect() {
   if (recv_len < 0) {
     handle_errno("Did not get READY### message from signaling server", true);
   }
-  printf("%d\n", recv_len);
   if (!strncmp(recv_buf, "READY###", recv_len)) {
     handle_errno("Signaling servers first message was not READY###", true);
   }

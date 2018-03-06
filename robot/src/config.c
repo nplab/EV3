@@ -87,25 +87,26 @@ int conf_get_string(char *key, char **value){
   }
 }
 
-wrtcr_rc conf_get_string_array(char *key, char **array, int *length){
+wrtcr_rc conf_get_string_array(char *key, char **array[], unsigned int *length){
   cJSON *found_item = get_conf_item(key);
   if( found_item == NULL || !cJSON_IsArray(found_item)){//if we didn't get anything or it's not an array return failure
-    fprintf(stderr, no_found_item_msg, "array", key);
-    return wrtcr_rc.FAILURE;
+    fprintf(stderr, no_item_msg, "array", key);
+    return WRTCR_FAILURE;
   }
   else{//else write array and its length and return success
     *length = cJSON_GetArraySize(found_item);
-    *array = (char*)malloc(*length*sizeof(char *));
-    for(int i=0; i<*length; i++){ //Note: cJSON has a function that iterates over array efficiently, but these are short so it doesn't matter
+    *array = (char**)malloc((*length)*sizeof(char*));
+    for(unsigned int i=0; i<*length; i++){ //Note: cJSON has a function that iterates over array efficiently, but these are short so it doesn't matter
       cJSON *entry = cJSON_GetArrayItem(found_item, i);
       if( !cJSON_IsString(entry)){ //check if all items are strings
         fprintf(stderr, faulty_array_msg, key, "string");
-        return wrtcr_rc.FAILURE;
+        return WRTCR_FAILURE;
       }else{
-        *array[i] = entry->valuestring;
+        (*array)[i] = (char*)malloc((strlen(entry->valuestring)+1)*sizeof(char));
+        strcpy((*array)[i], entry->valuestring);
       }
     }
-    return wrtcr_rc.SUCCESS;
+    return WRTCR_SUCCESS;
   }
 
 }

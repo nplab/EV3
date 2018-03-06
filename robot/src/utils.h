@@ -5,8 +5,8 @@
 #include <sys/types.h>
 
 typedef enum WebRTCRobot_ReturnCode {
-  SUCCESS,
-  FAILURE
+  WRTCR_SUCCESS,
+  WRTCR_FAILURE
 } wrtcr_rc;
 
 extern int errno;
