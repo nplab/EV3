@@ -46,6 +46,14 @@ set_target_properties(rawrtc_static PROPERTIES IMPORTED_LOCATION  /home/compiler
 include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
 # link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
 
+#find RawRTC dependencies
+pkg_check_modules(LIB_RE REQUIRED "libre >= 0.5.7")
+include_directories(${LIB_RE_STATIC_INCLUDE_DIRS})
+link_directories(${LIB_RE_STATIC_LIBRARY_DIRS})
+add_library(libre STATIC IMPORTED)
+# set_target_properties(libre PROPERTIES IMPORTED_LOCATION )
+list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RE_STATIC_LIBRARIES})
+
 set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
 set (CMAKE_C_FLAGS_DEBUG "-ggdb -O0")
 set (CMAKE_C_FLAGS_RELEASE "-O3 -Werror")
