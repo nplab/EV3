@@ -13,7 +13,7 @@ WORKDIR /home/compiler
 #install the necessary packages
 RUN sudo echo "deb http://ftp.debian.org/debian jessie-backports main" | sudo tee -a /etc/apt/sources.list && \
   sudo apt-get update &&\
-  sudo apt-get -y install git curl &&\
+  sudo apt-get -y install git curl gdb-multiarch &&\
   sudo apt-get -y -t jessie-backports install libssl-dev:armel cmake
 
 #configure git (needed for automatically building some dependencies)
