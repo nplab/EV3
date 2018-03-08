@@ -7,11 +7,8 @@
 //client side meta info
 struct peer_connection_client {
   char* name;
-  char** ice_candidate_types;
-  size_t n_ice_candidate_types;
   bool offering;
   struct rawrtc_peer_connection_configuration* configuration;
-  struct rawrtc_peer_connection* connection;
   struct data_channel_helper* data_channel_negotiated;
   struct data_channel_helper* data_channel;
 };
