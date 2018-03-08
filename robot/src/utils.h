@@ -26,9 +26,9 @@ typedef enum WebRTCRobot_ReturnCode {
 //on non-zero return code log error message, print errno and exit
 #define PONZ(rc, msg) if( rc != 0){handle_errno(msg, false);}
 //on non-successful rawrtc return code log error message without printing errno and exit
-#define EORE(rc, msg) if( rc != RAWRTC_SUCCESS){handle_err(msg, true);}
+#define EORE(rc, msg) if( rc != RAWRTC_CODE_SUCCESS){handle_err(msg, true);}
 //on non-successful rawrtc return code log error message without printing errno and do not exit
-#define PORE(rc, msg) if( rc != RAWRTC_SUCCESS){handle_err(msg, false);}
+#define PORE(rc, msg) if( rc != RAWRTC_CODE_SUCCESS){handle_err(msg, false);}
 
 extern int errno;
 extern int h_errno;

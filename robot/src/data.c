@@ -23,27 +23,19 @@ wrtcr_rc data_channel_setup(){
   conf_get_string_array("turn_urls", &turn_urls, &turn_urls_length);
 
   //initialize RawRTC
-  if( rawrtc_init() != RAWRTC_CODE_SUCCESS ){
-    handle_err("RawRTC Initialisaton failed", true);
-  }
+  EORE(rawrtc_init()),"RawRTC Initialisaton failed");
 
   //set up configuration
-  if( rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL) != RAWRTC_CODE_SUCCESS ){
-    handle_err("Could not create RawRTC configuration", true);
-  }
+  EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
 
-  if( rawrtc_peer_connection_configuration_add_ice_server(
+  EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                           configuration, stun_urls, stun_urls_length,
-                                                          NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE) != RAWRTC_CODE_SUCCESS){
-    handle_err("Could not add STUN servers to RawRTC configuration", true);
-  }
+                                                          NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add STUN servers to RawRTC configuration");
 
-  if( rawrtc_peer_connection_configuration_add_ice_server(
+  EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                           configuration, turn_urls, turn_urls_length,
                                                           "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
-                                                          RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD) != RAWRTC_CODE_SUCCESS){
-    handle_err("Could not add TURN servers to  RawRTC configuration", true);
-  }
+                                                          RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD), "Could not add TURN servers to  RawRTC configuration");
 
   //set up client information
   client_info.name = "WebRTCRobot";
@@ -63,34 +55,28 @@ wrtcr_rc data_channel_shutdown(){
 wrtcr_rc initialise_client(){
   struct rawrtc_data_channel_parameters* dc_parameters;
   //create peer connection
-  if( rawrtc_peer_connection_create(
+  EORE(rawrtc_peer_connection_create(
                                     &client_info.connection, configuration,
                                     negotiation_needed_handler, default_peer_connection_local_candidate_handler,
                                     default_peer_connection_local_candidate_error_handler,
                                     default_signaling_state_change_handler, default_ice_transport_state_change_handler,
                                     default_ice_gatherer_state_change_handler, connection_state_change_handler,
-                                    default_data_channel_handler, client) != RAWRTC_CODE_SUCCESS ){
-    handle_err("Could not create peer connection", true);
-  }
+                                    default_data_channel_handler, client), "Could not create peer connection");
 
   //create parameters for data channel
   data_channel_helper_create(&client_info->data_channel_negotiated, (struct client *) client_info, "wrtc_robot");
 
-  if(rawrtc_data_channel_parameters_create(
+  EORE(rawrtc_data_channel_parameters_create(
                                            &dc_parameters, client_info.data_channel_negotiated->label,
-                                           RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0) != RAWRTC_CODE_SUCCESS){
-    handle_err("Could not create data channel parameters", true);
-  }
+                                           RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0), "Could not create data channel parameters");
 
   //create actual data channel
-  if(rawrtc_peer_connection_create_data_channel(
+  EORE(rawrtc_peer_connection_create_data_channel(
                                                 &client_info.data_channel_negotiated->channel, client_info.connection,
                                                 dc_parameters, NULL,
                                                 default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
-                                                default_data_channel_message_handler, client_info->data_channel_negotiated) != RAWRTC_CODE_SUCCESS){
-    handle_err("Could not create data channel", true);
-  }
+                                                default_data_channel_message_handler, client_info->data_channel_negotiated), "Could not create data channel");
 
   //clean up
   mem_deref(dc_parameters);
@@ -120,12 +106,8 @@ static void negotiation_needed_handler(void* const arg) {
   // Offering: Create and set local description
   if (client->offering) {
     struct rawrtc_peer_connection_description* description;
-    if(rawrtc_peer_connection_create_offer(&description, client->connection, false) != RAWRTC_CODE_SUCCESS){
-      handle_err("Could not create offer", true);
-    }
-    if(rawrtc_peer_connection_set_local_description(client->connection, description) != RAWRTC_CODE_SUCCES){
-      handle_err("Could not create offer", true);
-    }
+    EORE(rawrtc_peer_connection_create_offer(&description, client->connection, false), "Could not create offer");
+    EORE(rawrtc_peer_connection_set_local_description(client->connection, description), "Could not create offer");
     mem_deref(description);
   }
 }
@@ -146,14 +128,10 @@ static void connection_state_change_handler(enum rawrtc_peer_connection_state co
                 &client->data_channel, (struct client *) client, label);
 
         // Create data channel parameters
-        if(rawrtc_data_channel_parameters_create(&dc_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0) != RAWRTC_CODE_SUCCESS){
-          handle_err("Could not create data channel parameters", true);
-        }
+        EORE(rawrtc_data_channel_parameters_create(&dc_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters");
 
         // Create data channel
-        if(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, dc_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel) != RAWRTC_CODE_SUCCESS){
-          handle_err("Could not create data channel", true);
-        }
+        EORE(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, dc_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel), "Could not create data channel");
 
         // Un-reference data channel parameters
         mem_deref(dc_parameters);
