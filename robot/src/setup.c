@@ -18,13 +18,11 @@ int setup(int argc, char *argv[]){
         break;
       case '?':
         if (optopt == 'c')
-          fprintf (stderr, "Option -c <config-file> requires the config file as an argument.\n");
+          ZF_LOGF("Option -c <config-file> requires the config file as an argument.");
         else if (isprint (optopt))
-          fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+          ZF_LOGF("Unknown option `-%c'.", optopt);
         else
-          fprintf (stderr,
-                   "Unknown option character `\\x%x'.\n",
-                   optopt);
+          ZF_LOGF("Unknown option character `\\x%x'.", optopt);
         /* return WRTCR_FAILURE; */
       default:
         abort();
