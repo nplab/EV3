@@ -38,6 +38,19 @@ set_property(TARGET cJSON PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libcjson
 add_dependencies(cJSON cJSON_project)
 include_directories(${install_dir}/include/cjson/)
 
+#zf_log
+ExternalProject_Add(zflog_project 
+  GIT_REPOSITORY https://github.com/wonder-mice/zf_log.git
+  GIT_TAG v0.4.0
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+)
+
+ExternalProject_Get_Property(zflog_project install_dir)
+add_library(zflog STATIC IMPORTED)
+set_property(TARGET zflog PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libzf_log.a)
+add_dependencies(zflog zflog_project)
+include_directories(${install_dir}/include/)
+
 #compilation settings
 set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
 set (CMAKE_C_FLAGS_DEBUG "-g")

@@ -38,17 +38,11 @@ int sigserv_connect() {
 
   //get values for sig_server connection from config
   int port = 0;
-  if(conf_get_int("sig_serv.port", &port) != WRTCR_SUCCESS){
-    abort();
-  }
+  EOE(conf_get_int("sig_serv.port", &port), "Could not load signaling server port from config.")
   char *host_name_or_addr = NULL;
-  if(conf_get_string("sig_serv.host", &host_name_or_addr) != WRTCR_SUCCESS){
-    abort();
-  }
+  EOE(conf_get_string("sig_serv.host", &host_name_or_addr), "Could not load signaling server host from config.");
   unsigned int room = 0;
-  if(conf_get_int("sig_serv.room", (int *)&room) != WRTCR_SUCCESS){
-    abort();
-  }
+  EOE(conf_get_int("sig_serv.room", (int *)&room), "Could not load signaling server room from config.");
 
   //set up address of signaling server 
   struct hostent *host_inf = get_hostinf(host_name_or_addr);
@@ -59,10 +53,8 @@ int sigserv_connect() {
   sigserv_addr.sin_family = host_inf->h_addrtype;
   sigserv_addr.sin_addr = *(struct in_addr *)host_inf->h_addr_list[0];
   sigserv_addr.sin_port = htons(port);
-  if (connect(sigserv_sock_d, (struct sockaddr *)&sigserv_addr,
-              sizeof(sigserv_addr)) < 0) {
-    handle_errno("Socket could not connect to signaling server", true);
-  }
+  EONZ(connect(sigserv_sock_d, (struct sockaddr *)&sigserv_addr,
+               sizeof(sigserv_addr)), "Socket could not connect to signaling server");
 
   //join room on signaling server
   room = htonl(room);
@@ -77,10 +69,7 @@ int sigserv_connect() {
   if (recv_len < 0) {
     handle_errno("Did not get READY### message from signaling server", true);
   }
-  printf("%d\n", recv_len);
-  if (!strncmp(recv_buf, "READY###", recv_len)) {
-    handle_errno("Signaling servers first message was not READY###", true);
-  }
+  EONZ(strncmp(recv_buf, "READY###", recv_len), "Signaling servers first message was not READY###");
 
   return WRTCR_SUCCESS;
 }

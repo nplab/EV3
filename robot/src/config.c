@@ -28,7 +28,10 @@ int read_config(char *filename){
   if( conf_root == NULL){
     const char *problem = cJSON_GetErrorPtr();
     if( problem != NULL ){
-      fprintf(stderr, "Parsing of JSON in config file failed  before: %s\n", problem);
+      ZF_LOGF("Parsing of JSON in config file failed  before: %s\n", problem);
+      abort();
+    } else {
+      ZF_LOGF("Parsing of JSON in config file failed");
       abort();
     }
   }
@@ -65,7 +68,7 @@ cJSON* get_conf_item(char *key){
 int conf_get_int(char *key, int *value){
   cJSON *item = get_conf_item(key); //get item or NULL
   if( item == NULL || !cJSON_IsNumber(item)){ //if we didn't get anything or it's not an integer return failure
-    fprintf(stderr, no_item_msg, "integer", key);
+    ZF_LOGE(no_item_msg, "integer", key);
     return WRTCR_FAILURE;
   }
   else{ //else return integer value of found item
@@ -77,7 +80,7 @@ int conf_get_int(char *key, int *value){
 int conf_get_string(char *key, char **value){
   cJSON *item = get_conf_item(key);//get item or NULL
   if( item == NULL || !cJSON_IsString(item)){//if we didn't get anything or it's not a string return failure
-    fprintf(stderr, no_item_msg, "string", key);
+    ZF_LOGE(no_item_msg, "string", key);
     return WRTCR_FAILURE;
   }
   else{//else return string value of found item
