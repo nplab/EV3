@@ -14,6 +14,7 @@ set_directory_properties(PROPERTIES EP_BASE "lib")
 #ev3dev-c
 ExternalProject_Add(ev3dev-c_project
   GIT_REPOSITORY https://github.com/JesApp/ev3dev-c.git
+  UPDATE_DISCONNECTED 1
   CONFIGURE_COMMAND ""
   BUILD_IN_SOURCE 1
   BUILD_COMMAND cd source/ev3 && make
