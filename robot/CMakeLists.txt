@@ -47,14 +47,6 @@ set_target_properties(rawrtc_static PROPERTIES IMPORTED_LOCATION  /home/compiler
 include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
 # link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
 
-#find RawRTC dependencies
-pkg_check_modules(LIB_RE REQUIRED "libre >= 0.5.7")
-include_directories(${LIB_RE_STATIC_INCLUDE_DIRS})
-link_directories(${LIB_RE_STATIC_LIBRARY_DIRS})
-add_library(libre STATIC IMPORTED)
-# set_target_properties(libre PROPERTIES IMPORTED_LOCATION )
-list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RE_STATIC_LIBRARIES})
-
 #zf_log
 ExternalProject_Add(zflog_project 
   GIT_REPOSITORY https://github.com/wonder-mice/zf_log.git
@@ -67,6 +59,30 @@ add_library(zflog STATIC IMPORTED)
 set_property(TARGET zflog PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libzf_log.a)
 add_dependencies(zflog zflog_project)
 include_directories(${install_dir}/include/)
+
+## find RawRTC dependencies
+#libre
+pkg_check_modules(LIB_RE REQUIRED "libre >= 0.5.7")
+include_directories(${LIB_RE_STATIC_INCLUDE_DIRS})
+link_directories(${LIB_RE_STATIC_LIBRARY_DIRS})
+list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RE_STATIC_LIBRARIES})
+message(STATUS "Libre: ${LIB_RE_STATIC_LIBRARIES}")
+
+#librew
+pkg_check_modules(LIB_REW REQUIRED "librew >= 0.5.0")
+include_directories(${LIB_REW_STATIC_INCLUDE_DIRS})
+link_directories(${LIB_REW_STATIC_LIBRARY_DIRS})
+list(APPEND rawrtc_DEP_LIBRARIES ${LIB_REW_STATIC_LIBRARIES})
+
+#usrsctp
+find_library(LIB_USRSCTP_LIBRARIES NAMES usrsctp.a libusrsctp.a )
+find_path(LIB_USRSCTP_INCLUDE_DIRS usrsctp.h)
+get_filename_component(LIB_USRSCTP_LIBRARY_DIRS ${LIB_USRSCTP_LIBRARIES} DIRECTORY)
+include_directories(${LIB_USRSCTP_INCLUDE_DIRS})
+link_directories(${LIB_USRSCTP_LIBRARY_DIRS})
+list(APPEND rawrtc_DEP_LIBRARIES ${LIB_USRSCTP_LIBRARIES})
+
+
 
 #compilation settings
 set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
