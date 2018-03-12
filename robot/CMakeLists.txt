@@ -59,24 +59,17 @@ add_dependencies(zflog zflog_project)
 include_directories(${install_dir}/include/)
 
 ## find RawRTC dependencies
-#libre
-pkg_check_modules(LIB_RE REQUIRED "libre >= 0.5.7")
-include_directories(${LIB_RE_STATIC_INCLUDE_DIRS})
-link_directories(${LIB_RE_STATIC_LIBRARY_DIRS})
-list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RE_STATIC_LIBRARIES})
-
-#librew
+#librew NOTE: This needs to be before libre, or it produces linker errors
 pkg_check_modules(LIB_REW REQUIRED "librew >= 0.5.0")
 include_directories(${LIB_REW_STATIC_INCLUDE_DIRS})
 link_directories(${LIB_REW_STATIC_LIBRARY_DIRS})
 list(APPEND rawrtc_DEP_LIBRARIES ${LIB_REW_STATIC_LIBRARIES})
 
-#find rawrtc and make sure we are linking to the static lib
-pkg_check_modules(LIB_RAWRTC REQUIRED "librawrtc >= 0.2.1")
-include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
-link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
-include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
-list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RAWRTC_STATIC_LIBRARIES})
+#libre
+pkg_check_modules(LIB_RE REQUIRED "libre >= 0.5.7")
+include_directories(${LIB_RE_STATIC_INCLUDE_DIRS})
+link_directories(${LIB_RE_STATIC_LIBRARY_DIRS})
+list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RE_STATIC_LIBRARIES})
 
 #usrsctp
 find_library(LIB_USRSCTP_LIBRARIES NAMES usrsctp.a libusrsctp.a )
@@ -86,9 +79,12 @@ include_directories(${LIB_USRSCTP_INCLUDE_DIRS})
 link_directories(${LIB_USRSCTP_LIBRARY_DIRS})
 list(APPEND rawrtc_DEP_LIBRARIES ${LIB_USRSCTP_LIBRARIES})
 
-# set(PKG_CONFIG_CFLAGS "-I\${includedir} -I${LIB_USRSCTP_INCLUDE_DIRS}")
-
-
+#find rawrtc and make sure we are linking to the static lib
+pkg_check_modules(LIB_RAWRTC REQUIRED "librawrtc >= 0.2.1")
+include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
+link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
+find_library(rawrtc_static_lib rawrtc-static)
+message(STATUS "Deps ${rawrtc_DEP_LIBRARIES}")
 
 #compilation settings
 set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
