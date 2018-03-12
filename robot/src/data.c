@@ -63,6 +63,9 @@ wrtcr_rc data_channel_setup(){
 
   //set up client information
   client_info.name = "WebRTCRobot";
+  client_info.ice_candidate_types = NULL;
+  client_info.n_ice_candidate_types = 0;
+  client_info.configuration = &configuration;
   client_info.offering = true;
 
   initialise_client();
