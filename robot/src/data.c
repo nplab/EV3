@@ -32,6 +32,9 @@ void default_signaling_state_change_handler(enum rawrtc_signaling_state const st
 void default_signal_handler(int sig); 
 void stop_on_return_handler(int flags, void* arg);
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client);
+void data_channel_helper_create(struct data_channel_helper** const channel_helperp, struct client* const client, char* const label);
+static void data_channel_helper_destroy(void* arg);
+bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 
 wrtcr_rc data_channel_setup(){
   unsigned int stun_urls_length;
@@ -148,7 +151,7 @@ static void connection_state_change_handler(enum rawrtc_peer_connection_state co
                 &client->data_channel, (struct client *) client, "wrtc_robot_2");
 
         // Create data channel parameters
-        EORE(rawrtc_data_channel_parameters_create(channel_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters");
+        EORE(rawrtc_data_channel_parameters_create(&channel_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters");
 
         // Create data channel
         EORE(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, channel_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel), "Could not create data channel");
@@ -435,4 +438,61 @@ void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char cons
     } else {
         ZF_LOGI("(%s) ICE gatherer last local candidate\n", client->name);
     }
+}
+
+//Create a data channel helper instance.
+void data_channel_helper_create(struct data_channel_helper** const channel_helperp, struct client* const client, char* const label) {
+  // Allocate
+  struct data_channel_helper* const channel =
+    mem_zalloc(sizeof(*channel), data_channel_helper_destroy);
+  if (!channel) {
+    EORE(RAWRTC_CODE_NO_MEMORY, "Could not allocate memory for data channel helper.");
+    return;
+  }
+
+  // Set fields
+  channel->client = client;
+  EORE(rawrtc_strdup(&channel->label, label), "Coudl not copy label into new data channel helper");
+
+  // Set pointer & done
+  *channel_helperp = channel;
+}
+
+//Destroy a data channel helper instance.
+static void data_channel_helper_destroy(void* arg) {
+  struct data_channel_helper* const channel = arg;
+
+  // Unset handler argument & handlers of the channel
+  if (channel->channel) {
+    EORE(rawrtc_data_channel_unset_handlers(channel->channel), "Could not unset handlers while destroying data channel helper");
+  }
+
+  // Remove from list
+  list_unlink(&channel->le);
+
+  // Un-reference
+  mem_deref(channel->arg);
+  mem_deref(channel->label);
+  mem_deref(channel->channel);
+}
+
+//Check if the ICE candidate type is enabled.
+bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type) {
+  char const* const type_str = rawrtc_ice_candidate_type_to_str(type);
+  size_t i;
+
+  // All enabled?
+  if (client->n_ice_candidate_types == 0) {
+    return true;
+  }
+
+  // Specifically enabled?
+  for (i = 0; i < client->n_ice_candidate_types; ++i) {
+    if (str_cmp(client->ice_candidate_types[i], type_str) == 0) {
+      return true;
+    }
+  }
+
+  // Nope
+  return false;
 }

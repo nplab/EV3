@@ -2,6 +2,11 @@
 cmake_minimum_required (VERSION 3.6)
 project (WebRTCDemo-Robot)
 
+if (${CMAKE_BUILD_TYPE} MATCHES "DEBUG")
+    message(STATUS "enabling verbose outout")
+    set(CMAKE_VERBOSE_MAKEFILE on)
+endif ()
+
 #version numbers
 set (WebRTCDemo-Robot_VERSION_MAJOR 0)
 set (WebRTCDemo-Robot_VERSION_MINOR 1)
@@ -40,13 +45,6 @@ set_property(TARGET cJSON PROPERTY IMPORTED_LOCATION ${install_dir}/lib/libcjson
 add_dependencies(cJSON cJSON_project)
 include_directories(${install_dir}/include/cjson/)
 
-#find rawrtc and make sure we are linking to the static lib
-pkg_check_modules(LIB_RAWRTC REQUIRED "librawrtc >= 0.2.1")
-add_library(rawrtc_static STATIC IMPORTED)
-set_target_properties(rawrtc_static PROPERTIES IMPORTED_LOCATION  /home/compiler/rawrtc/build/prefix/lib/librawrtc-static.a)
-include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
-# link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
-
 #zf_log
 ExternalProject_Add(zflog_project 
   GIT_REPOSITORY https://github.com/wonder-mice/zf_log.git
@@ -66,13 +64,19 @@ pkg_check_modules(LIB_RE REQUIRED "libre >= 0.5.7")
 include_directories(${LIB_RE_STATIC_INCLUDE_DIRS})
 link_directories(${LIB_RE_STATIC_LIBRARY_DIRS})
 list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RE_STATIC_LIBRARIES})
-message(STATUS "Libre: ${LIB_RE_STATIC_LIBRARIES}")
 
 #librew
 pkg_check_modules(LIB_REW REQUIRED "librew >= 0.5.0")
 include_directories(${LIB_REW_STATIC_INCLUDE_DIRS})
 link_directories(${LIB_REW_STATIC_LIBRARY_DIRS})
 list(APPEND rawrtc_DEP_LIBRARIES ${LIB_REW_STATIC_LIBRARIES})
+
+#find rawrtc and make sure we are linking to the static lib
+pkg_check_modules(LIB_RAWRTC REQUIRED "librawrtc >= 0.2.1")
+include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
+link_directories(${LIB_RAWRTC_STATIC_LIBRARY_DIRS})
+include_directories(${LIB_RAWRTC_STATIC_INCLUDE_DIRS})
+list(APPEND rawrtc_DEP_LIBRARIES ${LIB_RAWRTC_STATIC_LIBRARIES})
 
 #usrsctp
 find_library(LIB_USRSCTP_LIBRARIES NAMES usrsctp.a libusrsctp.a )
@@ -81,6 +85,8 @@ get_filename_component(LIB_USRSCTP_LIBRARY_DIRS ${LIB_USRSCTP_LIBRARIES} DIRECTO
 include_directories(${LIB_USRSCTP_INCLUDE_DIRS})
 link_directories(${LIB_USRSCTP_LIBRARY_DIRS})
 list(APPEND rawrtc_DEP_LIBRARIES ${LIB_USRSCTP_LIBRARIES})
+
+# set(PKG_CONFIG_CFLAGS "-I\${includedir} -I${LIB_USRSCTP_INCLUDE_DIRS}")
 
 
 
