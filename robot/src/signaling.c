@@ -64,13 +64,11 @@ int sigserv_connect() {
   }
 
   //check for READY### message
-  char recv_buf[16];
-  ssize_t recv_len = recv(sigserv_sock_d, &recv_buf, sizeof(recv_buf), 0);
-  if (recv_len < 0) {
-    handle_errno("Did not get READY### message from signaling server", true);
-  }
-  EONZ(strncmp(recv_buf, "READY###", recv_len), "Signaling servers first message was not READY###");
+  char *msg = NULL;
+  EOE(sigserv_receive(&msg), "Could not get first message from signaling server");
+  EONZ(strncmp(msg, "READY###", 8), "Signaling servers first message was not READY###");
 
+  free(msg);
   return WRTCR_SUCCESS;
 }
 
@@ -87,15 +85,27 @@ int sigserv_send(char *msg) {
 }
 
 int sigserv_receive(char **msg) {
-  uint8_t recv_buf[2047]; //create a (hopefully) large enough buffer (2047 so resulting msg is at most 2048 byte long)
-  ssize_t recv_len = recv(sigserv_sock_d, &recv_buf, sizeof(recv_buf), 0);
-  if (recv_len < 0) {
-    handle_errno("Failed to receive message from signaling server", false);
+  uint8_t *recv_buf = NULL;
+  uint32_t msg_len;
+
+  ssize_t recv_len = recv(sigserv_sock_d, &msg_len, sizeof(msg_len), 0);
+  if (recv_len != sizeof(msg_len)) {
+    handle_errno("Failed to get length field of message from signaling server", false);
+    return WRTCR_FAILURE;
+  }
+  msg_len = ntohl(msg_len);
+
+  recv_buf = (uint8_t*)malloc(msg_len * sizeof(uint8_t));
+  recv_len = recv(sigserv_sock_d, recv_buf, msg_len, 0);
+  if (recv_len < 0 || (unsigned int)recv_len != msg_len) {
+    handle_errno("Failed to get specified number of bytes from signaling server", false);
+    free(recv_buf);
     return WRTCR_FAILURE;
   }
   *msg = (char*)malloc((recv_len+1)*sizeof(char)); //allocate memory for received message
-  snprintf(*msg, recv_len, "%s", recv_buf); //move relevant message to the message buffer and add terminating \0
+  snprintf(*msg, recv_len+1, "%s", recv_buf); //move relevant message to the message buffer and add terminating \0
 
+  free(recv_buf);
   return WRTCR_SUCCESS;
 }
 
