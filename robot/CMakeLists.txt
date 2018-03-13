@@ -89,7 +89,7 @@ message(STATUS "Deps ${rawrtc_DEP_LIBRARIES}")
 #compilation settings
 set (CMAKE_C_FLAGS "-Wall -Wextra -std=c11")
 set (CMAKE_C_FLAGS_DEBUG "-ggdb -O0")
-set (CMAKE_C_FLAGS_RELEASE "-O3 -Werror")
+set (CMAKE_C_FLAGS_RELEASE "-O3 -s -Werror")
 
 #directories
 add_subdirectory (src)
