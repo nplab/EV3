@@ -2,10 +2,11 @@
 FROM ev3dev/debian-jessie-cross
 
 #set the environments neccesary for compilation
-ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/lib/arm-linux-gnueabi/pkgconfig RAWRTC_V=v0.2.1
+ENV CC=arm-linux-gnueabi-gcc CXX=arm-linux-gnueabi-g++ PKG_CONFIG_LIBDIR=/usr/lib/arm-linux-gnueabi/pkgconfig RAWRTC_V=v0.2.1 GDBREMOTE=192.168.0.153:3333
 
 #copy needed project files into container
 COPY build_robot.sh /usr/local/bin
+COPY debug_robot.sh /usr/local/bin
 
 #we are working only in the home directory
 WORKDIR /home/compiler
