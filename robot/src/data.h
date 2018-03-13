@@ -2,6 +2,7 @@
 
 #include <rawrtc.h>
 #include <stdbool.h>
+#include "default_handlers.h"
 #include "config.h"
 #include "utils.h"
 

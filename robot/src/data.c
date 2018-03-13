@@ -10,31 +10,12 @@ wrtcr_rc client_stop();
 //signal handlers
 static void negotiation_needed_handler(void* const arg);
 static void connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg);
-void default_ice_gatherer_state_change_handler(enum rawrtc_ice_gatherer_state const state, void* const arg);
-void default_ice_gatherer_error_handler(struct rawrtc_ice_candidate* const host_candidate, char const * const url, uint16_t const error_code, char const * const error_text, void* const arg);
-void default_ice_gatherer_local_candidate_handler(struct rawrtc_ice_candidate* const candidate, char const * const url, void* const arg);
-void default_ice_transport_state_change_handler(enum rawrtc_ice_transport_state const state, void* const arg);
-void default_ice_transport_candidate_pair_change_handler(struct rawrtc_ice_candidate* const local, struct rawrtc_ice_candidate* const remote, void* const arg);
-void default_dtls_transport_state_change_handler(enum rawrtc_dtls_transport_state const state, void* const arg);
-void default_dtls_transport_error_handler(void* const arg);
-void default_sctp_transport_state_change_handler(enum rawrtc_sctp_transport_state const state, void* const arg);
-void default_data_channel_handler(struct rawrtc_data_channel* const data_channel, void* const arg);
-void default_data_channel_open_handler(void* const arg);
-void default_data_channel_buffered_amount_low_handler(void* const arg);
-void default_data_channel_error_handler(void* const arg);
-void default_data_channel_close_handler(void* const arg);
-void default_data_channel_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
-void default_negotiation_needed_handler(void* const arg);
-void default_peer_connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg);
-void default_peer_connection_local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg);
-void default_peer_connection_local_candidate_error_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, uint16_t const error_code, char const * const error_text, void* const arg);
-void default_signaling_state_change_handler(enum rawrtc_signaling_state const state, void* const arg);
-void default_signal_handler(int sig); 
 void stop_on_return_handler(int flags, void* arg);
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client);
 void data_channel_helper_create(struct data_channel_helper** const channel_helperp, struct client* const client, char* const label);
 static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
+static void parse_remote_description(int flags, void* arg);
 
 wrtcr_rc data_channel_setup(){
   unsigned int stun_urls_length;
@@ -65,7 +46,7 @@ wrtcr_rc data_channel_setup(){
   client_info.name = "WebRTCRobot";
   client_info.ice_candidate_types = NULL;
   client_info.n_ice_candidate_types = 0;
-  client_info.configuration = &configuration;
+  client_info.configuration = configuration;
   client_info.offering = true;
 
   initialise_client();
@@ -164,164 +145,6 @@ static void connection_state_change_handler(enum rawrtc_peer_connection_state co
     }
 }
 
-// Print the ICE gatherer's state.
-void default_ice_gatherer_state_change_handler(enum rawrtc_ice_gatherer_state const state, void* const arg) {
-    struct client* const client = arg;
-    char const * const state_name = rawrtc_ice_gatherer_state_to_name(state);
-    (void) arg;
-    ZF_LOGD("(%s) ICE gatherer state: %s\n", client->name, state_name);
-}
-
-// Print the ICE gatherer's error event.
-void default_ice_gatherer_error_handler(struct rawrtc_ice_candidate* const candidate, char const * const url, uint16_t const error_code, char const * const error_text, void* const arg) {
-    struct client* const client = arg;
-    (void) candidate; (void) error_code; (void) arg;
-    ZF_LOGI("(%s) ICE gatherer error, URL: %s, reason: %s\n", client->name, url, error_text);
-}
-
-// Print the newly gathered local candidate.
-void default_ice_gatherer_local_candidate_handler(struct rawrtc_ice_candidate* const candidate, char const * const url, void* const arg) {
-    struct client* const client = arg;
-    (void) arg;
-    print_ice_candidate(candidate, url, NULL, client);
-}
-
-
-// Print the ICE transport's state.
-void default_ice_transport_state_change_handler(enum rawrtc_ice_transport_state const state, void* const arg) {
-    struct client* const client = arg;
-    char const * const state_name = rawrtc_ice_transport_state_to_name(state);
-    (void) arg;
-    ZF_LOGD("(%s) ICE transport state: %s\n", client->name, state_name);
-}
-
-// Print the ICE candidate pair change event.
-void default_ice_transport_candidate_pair_change_handler(struct rawrtc_ice_candidate* const local, struct rawrtc_ice_candidate* const remote, void* const arg) {
-    struct client* const client = arg;
-    (void) local; (void) remote;
-    ZF_LOGD("(%s) ICE transport candidate pair change\n", client->name);
-}
-
-// Print the DTLS transport's state.
-void default_dtls_transport_state_change_handler(enum rawrtc_dtls_transport_state const state, void* const arg) {
-    struct client* const client = arg;
-    char const * const state_name = rawrtc_dtls_transport_state_to_name(state);
-    ZF_LOGD("(%s) DTLS transport state change: %s\n", client->name, state_name);
-}
-
-// Print the DTLS transport's error event.
-void default_dtls_transport_error_handler(void* const arg) {
-    struct client* const client = arg;
-    ZF_LOGW("(%s) DTLS transport error: %s\n", client->name, "???");
-}
-
-// Print the SCTP transport's state.
-void default_sctp_transport_state_change_handler(enum rawrtc_sctp_transport_state const state, void* const arg) {
-    struct client* const client = arg;
-    char const * const state_name = rawrtc_sctp_transport_state_to_name(state);
-    ZF_LOGD("(%s) SCTP transport state change: %s\n", client->name, state_name);
-}
-
-
-// Print the newly created data channel's parameter.
-void default_data_channel_handler(struct rawrtc_data_channel* const channel, void* const arg) {
-    struct client* const client = arg;
-    struct rawrtc_data_channel_parameters* parameters;
-    char* label = NULL;
-
-    // Get data channel label and protocol
-    EORE(rawrtc_data_channel_get_parameters(&parameters, channel), "Could not get data channel parameters");
-    EORE(rawrtc_data_channel_parameters_get_label(&label, parameters), "Could not get data channel label");
-    ZF_LOGI("(%s) New data channel instance: %s\n", client->name, label ? label : "n/a");
-    mem_deref(label);
-    mem_deref(parameters);
-}
-
-// Print the data channel open event.
-void default_data_channel_open_handler(void* const arg) {
-    struct data_channel_helper* const channel = arg;
-    struct client* const client = channel->client;
-    ZF_LOGD("(%s) Data channel open: %s\n", client->name, channel->label);
-}
-
-
-// Print the data channel buffered amount low event.
-void default_data_channel_buffered_amount_low_handler(void* const arg) {
-    struct data_channel_helper* const channel = arg;
-    struct client* const client = channel->client;
-    ZF_LOGD("(%s) Data channel buffered amount low: %s\n", client->name, channel->label);
-}
-
-// Print the data channel error event.
-void default_data_channel_error_handler(void* const arg) {
-    struct data_channel_helper* const channel = arg;
-    struct client* const client = channel->client;
-    ZF_LOGW("(%s) Data channel error: %s\n", client->name, channel->label);
-}
-
-// Print the data channel close event.
-void default_data_channel_close_handler(void* const arg) {
-    struct data_channel_helper* const channel = arg;
-    struct client* const client = channel->client;
-    ZF_LOGD("(%s) Data channel closed: %s\n", client->name, channel->label);
-}
-
-// Print the data channel's received message's size.
-void default_data_channel_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg) {
-    struct data_channel_helper* const channel = arg;
-    struct client* const client = channel->client;
-    (void) flags;
-    ZF_LOGD("(%s) Incoming message for data channel %s: %zu bytes\n",
-                 client->name, channel->label, mbuf_get_left(buffer));
-}
-
-// Print negotiation needed (duh!)
-void default_negotiation_needed_handler(void* const arg) {
-    struct client* const client = arg;
-    ZF_LOGD("(%s) Negotiation needed\n", client->name);
-}
-
-// Print the peer connection's state.
-void default_peer_connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg) {
-    struct client* const client = arg;
-    char const * const state_name = rawrtc_peer_connection_state_to_name(state);
-    ZF_LOGD("(%s) Peer connection state change: %s\n", client->name, state_name);
-}
-
-// Print the newly gathered local candidate (peer connection variant).
-void default_peer_connection_local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg) {
-    struct client* const client = arg;
-    struct rawrtc_ice_candidate* ortc_candidate = NULL;
-
-    // Get underlying ORTC ICE candidate (if any)
-    if (candidate) {
-      EORE(rawrtc_peer_connection_ice_candidate_get_ortc_candidate(&ortc_candidate, candidate), "Could not get ORTC ICE candidate");
-    }
-
-    // Print local candidate
-    print_ice_candidate(ortc_candidate, url, candidate, client);
-    mem_deref(ortc_candidate);
-}
-
-// Print the peer connections local candidate error event.
-void default_peer_connection_local_candidate_error_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, uint16_t const error_code, char const * const error_text, void* const arg) {
-    struct client* const client = arg;
-    (void) candidate; (void) error_code; (void) arg;
-    ZF_LOGI("(%s) ICE candidate error, URL: %s, reason: %s\n", client->name, url, error_text);
-}
-
-// Print the signaling state.
-void default_signaling_state_change_handler(enum rawrtc_signaling_state const state, void* const arg) {
-    struct client* const client = arg;
-    char const * const state_name = rawrtc_signaling_state_to_name(state);
-    ZF_LOGD("(%s) Signaling state change: %s\n", client->name, state_name);
-}
-
-// Stop the main loop.
-void default_signal_handler(int sig) {
-    ZF_LOGI("Got signal: %d, terminating...\n", sig);
-    re_cancel();
-}
 
 // FD-listener that stops the main loop in case the input buffer contains a line feed or a carriage return.
 void stop_on_return_handler(
@@ -498,4 +321,71 @@ bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_can
 
   // Nope
   return false;
+}
+
+static void parse_remote_description(int flags, void* arg) {
+/*     struct peer_connection_client* const client = arg; */
+/*     enum rawrtc_code error; */
+/*     bool do_exit = false; */
+/*     struct odict* dict = NULL; */
+/*     char* type_str; */
+/*     char* sdp; */
+/*     enum rawrtc_sdp_type type; */
+/*     struct rawrtc_peer_connection_description* remote_description = NULL; */
+/*     (void) flags; */
+
+/*     // Get dict from JSON */
+/*     error = get_json_stdin(&dict); */
+/*     if (error) { */
+/*         do_exit = error == RAWRTC_CODE_NO_VALUE; */
+/*         goto out; */
+/*     } */
+
+/*     // Decode JSON */
+/*     error |= dict_get_entry(&type_str, dict, "type", ODICT_STRING, true); */
+/*     error |= dict_get_entry(&sdp, dict, "sdp", ODICT_STRING, true); */
+/*     if (error) { */
+/*         DEBUG_WARNING("Invalid remote description\n"); */
+/*         goto out; */
+/*     } */
+
+/*     // Convert to description */
+/*     error = rawrtc_str_to_sdp_type(&type, type_str); */
+/*     if (error) { */
+/*         DEBUG_WARNING("Invalid SDP type in remote description: '%s'\n", type_str); */
+/*         goto out; */
+/*     } */
+/*     error = rawrtc_peer_connection_description_create(&remote_description, type, sdp); */
+/*     if (error) { */
+/*         DEBUG_WARNING("Cannot parse remote description: %s\n", rawrtc_code_to_str(error)); */
+/*         goto out; */
+/*     } */
+
+/*     // Set remote description */
+/*     DEBUG_INFO("Applying remote description\n"); */
+/*     EOE(rawrtc_peer_connection_set_remote_description(client->connection, remote_description)); */
+
+/*     // Answering: Create and set local description */
+/*     if (!client->offering) { */
+/*         struct rawrtc_peer_connection_description* local_description; */
+/*         EOE(rawrtc_peer_connection_create_answer(&local_description, client->connection)); */
+/*         EOE(rawrtc_peer_connection_set_local_description(client->connection, local_description)); */
+/*         mem_deref(local_description); */
+/*     } */
+
+/* out: */
+/*     // Un-reference */
+/*     mem_deref(remote_description); */
+/*     mem_deref(dict); */
+
+/*     // Exit? */
+/*     if (do_exit) { */
+/*         DEBUG_NOTICE("Exiting\n"); */
+
+/*         // Stop client & bye */
+/*         client_stop(client); */
+/*         tmr_cancel(&timer); */
+/*         before_exit(); */
+/*         exit(0); */
+/*     } */
 }
