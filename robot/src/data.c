@@ -209,24 +209,31 @@ void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char cons
                 EORE(error, err_msg);
                 break;
         }
-        EORE(rawrtc_ice_candidate_get_related_address(&related_address, candidate), err_msg);
-        EORE(rawrtc_ice_candidate_get_related_port(&related_port, candidate), err_msg);
+        error = rawrtc_ice_candidate_get_related_address(&related_address, candidate);
+        if( !(error == RAWRTC_CODE_SUCCESS || error == RAWRTC_CODE_NO_VALUE))
+          handle_err(err_msg, true);
+        error = rawrtc_ice_candidate_get_related_port(&related_port, candidate);
+        if( !(error == RAWRTC_CODE_SUCCESS || error == RAWRTC_CODE_NO_VALUE))
+          handle_err(err_msg, true);
         if (pc_candidate) {
-            EORE(rawrtc_peer_connection_ice_candidate_get_sdp_mid(&mid, pc_candidate), err_msg);
-            error = rawrtc_peer_connection_ice_candidate_get_sdp_media_line_index(
-                    &media_line_index, pc_candidate);
-            switch (error) {
-                case RAWRTC_CODE_SUCCESS:
-                    EORE(rawrtc_sdprintf(&media_line_index_str, "%"PRIu8, media_line_index), err_msg);
-                    break;
-                case RAWRTC_CODE_NO_VALUE:
-                    break;
-                default:
-                    EORE(error, err_msg);
-                    break;
-            }
-            EORE(rawrtc_peer_connection_ice_candidate_get_username_fragment(
-                    &username_fragment, pc_candidate), err_msg);
+          error = rawrtc_peer_connection_ice_candidate_get_sdp_mid(&mid, pc_candidate);
+          if( !(error == RAWRTC_CODE_SUCCESS || error == RAWRTC_CODE_NO_VALUE))
+            handle_err(err_msg, true);
+          error = rawrtc_peer_connection_ice_candidate_get_sdp_media_line_index(
+                  &media_line_index, pc_candidate);
+          switch (error) {
+              case RAWRTC_CODE_SUCCESS:
+                  EORE(rawrtc_sdprintf(&media_line_index_str, "%"PRIu8, media_line_index), err_msg);
+                  break;
+              case RAWRTC_CODE_NO_VALUE:
+                  break;
+              default:
+                  EORE(error, err_msg);
+                  break;
+          }
+          error = rawrtc_peer_connection_ice_candidate_get_username_fragment(&username_fragment, pc_candidate);
+          if( !(error == RAWRTC_CODE_SUCCESS || error == RAWRTC_CODE_NO_VALUE))
+            handle_err(err_msg, true);
         }
         is_enabled = ice_candidate_type_enabled(client, type);
 
