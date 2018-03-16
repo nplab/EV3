@@ -5,7 +5,6 @@
 #include "default_handlers.h"
 #include "config.h"
 #include "utils.h"
-#include "signaling.h"
 
 //client side meta info
 struct client {

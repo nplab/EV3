@@ -173,8 +173,6 @@ void stop_on_return_handler(
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client) {
     if (candidate) {
         const char *err_msg = "Could not print ice candidate!";
-        char print_buf[1024];
-        unsigned int print_len;
         enum rawrtc_code error;
         char* foundation;
         enum rawrtc_ice_protocol protocol;
@@ -241,7 +239,7 @@ void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char cons
 
         // Print candidate (meh, lot's of repeated code... feel free to suggest an alternative)
         if (!pc_candidate) {
-          print_len = snprintf(print_buf, 1024,
+            ZF_LOGI(
                     "(%s) ICE candidate: foundation=%s, protocol=%s"
                     ", priority=%"PRIu32", ip=%s, port=%"PRIu16", type=%s, tcp-type=%s"
                     ", related-address=%s, related-port=%"PRIu16"; URL: %s; %s\n",
@@ -250,7 +248,7 @@ void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char cons
                     related_address ? related_address : "n/a", related_port, url ? url : "n/a",
                     is_enabled ? "enabled" : "disabled");
         } else {
-          print_len = snprintf(print_buf, 1024,
+            ZF_LOGI(
                     "(%s) ICE candidate: foundation=%s, protocol=%s"
                     ", priority=%"PRIu32", ip=%s, port=%"PRIu16", type=%s, tcp-type=%s"
                     ", related-address=%s, related-port=%"PRIu16"; URL: %s"
@@ -261,11 +259,6 @@ void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char cons
                     mid ? mid : "n/a", media_line_index_str ? media_line_index_str : "n/a",
                     username_fragment ? username_fragment : "n/a",
                     is_enabled ? "enabled" : "disabled");
-        }
-        if( print_len > 1024){
-          handle_err("ICE candidate description is too long to print", true);
-        }else{
-          EOE(sigserv_send(print_buf), "Could not send ICE candidate to signaling server");
         }
 
         // Unreference
