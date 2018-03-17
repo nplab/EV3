@@ -11,6 +11,8 @@ wrtcr_rc client_stop();
 static void negotiation_needed_handler(void* const arg);
 static void connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg);
 void stop_on_return_handler(int flags, void* arg);
+static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg);
+static void send_local_description(struct client* const client);
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client);
 void data_channel_helper_create(struct data_channel_helper** const channel_helperp, struct client* const client, char* const label);
 static void data_channel_helper_destroy(void* arg);
@@ -65,7 +67,7 @@ wrtcr_rc initialise_client(){
   //create peer connection
   EORE(rawrtc_peer_connection_create(
                                     &client_info.connection, configuration,
-                                    negotiation_needed_handler, default_peer_connection_local_candidate_handler,
+                                    negotiation_needed_handler, local_candidate_handler,
                                     default_peer_connection_local_candidate_error_handler,
                                     default_signaling_state_change_handler, default_ice_transport_state_change_handler,
                                     default_ice_gatherer_state_change_handler, connection_state_change_handler,
@@ -168,6 +170,57 @@ void stop_on_return_handler(
         ZF_LOGI("Exiting\n");
         re_cancel();
     }
+}
+
+//handle local candidata (print, send last one to signaling server)
+static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg) {
+  struct client* const client = arg;
+
+  // Print local candidate
+  default_peer_connection_local_candidate_handler(candidate, url, arg);
+
+  // Print local description (if last candidate)
+  if (candidate) {
+    send_local_description(client);
+  }
+}
+
+//
+static void send_local_description(struct client* const client) {
+  struct rawrtc_peer_connection_description* description;
+  enum rawrtc_sdp_type type;
+  char* sdp;
+  cJSON* root;
+  char * output;
+  char * err_msg = "Could not create JSON for local description";
+
+  // Get description
+  EORE(rawrtc_peer_connection_get_local_description(&description, client->connection), "Could not get local description");
+
+  // Get SDP type & the SDP itself
+  EORE(rawrtc_peer_connection_description_get_sdp_type(&type, description), "Could not get sdp type");
+  EORE(rawrtc_peer_connection_description_get_sdp(&sdp, description), "Could not get SDP");
+
+  // Create json
+  root = cJSON_CreateObject();
+  EON(root, err_msg);
+  cJSON *temp = cJSON_CreateString(rawrtc_sdp_type_to_str(type));
+  EON(temp, err_msg);
+  cJSON_AddItemToObject(root, "type", temp);
+  temp = cJSON_CreateString(sdp);
+  EON(temp, err_msg);
+  cJSON_AddItemToObject(root, "sdp", temp);
+
+  // Print local description as JSON
+  output = cJSON_Print(root);
+  ZF_LOGD("Local Description:\n%s\n", output);
+  sigserv_send(output);
+
+  // Un-reference
+  cJSON_Delete(root);
+  free(output);
+  mem_deref(sdp);
+  mem_deref(description);
 }
 
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client) {
@@ -285,7 +338,7 @@ void data_channel_helper_create(struct data_channel_helper** const channel_helpe
 
   // Set fields
   channel->client = client;
-  EORE(rawrtc_strdup(&channel->label, label), "Coudl not copy label into new data channel helper");
+  EORE(rawrtc_strdup(&channel->label, label), "Could not copy label into new data channel helper");
 
   // Set pointer & done
   *channel_helperp = channel;
