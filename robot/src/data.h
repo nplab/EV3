@@ -3,6 +3,7 @@
 #include <rawrtc.h>
 #include <stdbool.h>
 #include <cJSON.h>
+#include "signaling.h"
 #include "default_handlers.h"
 #include "config.h"
 #include "utils.h"

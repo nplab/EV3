@@ -17,7 +17,7 @@ void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char cons
 void data_channel_helper_create(struct data_channel_helper** const channel_helperp, struct client* const client, char* const label);
 static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
-static void parse_remote_description(int flags, void* arg);
+static void get_remote_description();
 
 wrtcr_rc data_channel_setup(){
   unsigned int stun_urls_length;
@@ -52,6 +52,7 @@ wrtcr_rc data_channel_setup(){
   client_info.offering = true;
 
   initialise_client();
+  get_remote_description();
 
   return WRTCR_SUCCESS;
 }
@@ -59,6 +60,8 @@ wrtcr_rc data_channel_setup(){
 wrtcr_rc data_channel_shutdown(){
   client_stop();
   rawrtc_close();
+  tmr_debug();
+  mem_debug();
   return WRTCR_SUCCESS;
 }
 
@@ -383,69 +386,69 @@ bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_can
   return false;
 }
 
-static void parse_remote_description(int flags, void* arg) {
-/*     struct peer_connection_client* const client = arg; */
-/*     enum rawrtc_code error; */
-/*     bool do_exit = false; */
-/*     struct odict* dict = NULL; */
-/*     char* type_str; */
-/*     char* sdp; */
-/*     enum rawrtc_sdp_type type; */
-/*     struct rawrtc_peer_connection_description* remote_description = NULL; */
-/*     (void) flags; */
+static void get_remote_description() {
+    enum rawrtc_code error;
+    bool do_exit = false;
+    char *type_str = NULL;
+    char *sdp_str = NULL;
+    char *input = NULL;
+    cJSON* root = NULL;
+    enum rawrtc_sdp_type type;
+    struct rawrtc_peer_connection_description* remote_description = NULL;
 
-/*     // Get dict from JSON */
-/*     error = get_json_stdin(&dict); */
-/*     if (error) { */
-/*         do_exit = error == RAWRTC_CODE_NO_VALUE; */
-/*         goto out; */
-/*     } */
 
-/*     // Decode JSON */
-/*     error |= dict_get_entry(&type_str, dict, "type", ODICT_STRING, true); */
-/*     error |= dict_get_entry(&sdp, dict, "sdp", ODICT_STRING, true); */
-/*     if (error) { */
-/*         DEBUG_WARNING("Invalid remote description\n"); */
-/*         goto out; */
-/*     } */
+    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
+    root = cJSON_Parse(input);
+    // Get dict from JSON
+    if (!root) {
+      ZF_LOGE("Could not parse remote description JSON");
+      do_exit = true;
+      goto out;
+    }
 
-/*     // Convert to description */
-/*     error = rawrtc_str_to_sdp_type(&type, type_str); */
-/*     if (error) { */
-/*         DEBUG_WARNING("Invalid SDP type in remote description: '%s'\n", type_str); */
-/*         goto out; */
-/*     } */
-/*     error = rawrtc_peer_connection_description_create(&remote_description, type, sdp); */
-/*     if (error) { */
-/*         DEBUG_WARNING("Cannot parse remote description: %s\n", rawrtc_code_to_str(error)); */
-/*         goto out; */
-/*     } */
+    // Decode JSON
+    cJSON *temp = cJSON_GetObjectItem(root, "type");
+    if( cJSON_IsString(temp) && temp->valuestring != NULL){
+      ZF_LOGE("Invalid remote description\n");
+      goto out;
+    }
+    type_str = temp->valuestring;
 
-/*     // Set remote description */
-/*     DEBUG_INFO("Applying remote description\n"); */
-/*     EOE(rawrtc_peer_connection_set_remote_description(client->connection, remote_description)); */
+    temp = cJSON_GetObjectItem(root, "sdp");
+    if( cJSON_IsString(temp) && temp->valuestring != NULL){
+      ZF_LOGE("Invalid remote description\n");
+      goto out;
+    }
+    sdp_str = temp->valuestring;
 
-/*     // Answering: Create and set local description */
-/*     if (!client->offering) { */
-/*         struct rawrtc_peer_connection_description* local_description; */
-/*         EOE(rawrtc_peer_connection_create_answer(&local_description, client->connection)); */
-/*         EOE(rawrtc_peer_connection_set_local_description(client->connection, local_description)); */
-/*         mem_deref(local_description); */
-/*     } */
+    // Convert to description
+    error = rawrtc_str_to_sdp_type(&type, type_str);
+    if (error) {
+        ZF_LOGE("Invalid SDP type in remote description: '%s'\n", type_str);
+        goto out;
+    }
+    error = rawrtc_peer_connection_description_create(&remote_description, type, sdp_str);
+    if (error) {
+        ZF_LOGE("Cannot parse remote description: %s\n", rawrtc_code_to_str(error));
+        goto out;
+    }
 
-/* out: */
-/*     // Un-reference */
-/*     mem_deref(remote_description); */
-/*     mem_deref(dict); */
+    // Set remote description
+    ZF_LOGI("Applying remote description\n");
+    EORE(rawrtc_peer_connection_set_remote_description(client_info.connection, remote_description), "Could not apply remote description");
 
-/*     // Exit? */
-/*     if (do_exit) { */
-/*         DEBUG_NOTICE("Exiting\n"); */
+out:
+    // Un-reference
+    mem_deref(remote_description);
+    free(root);
 
-/*         // Stop client & bye */
-/*         client_stop(client); */
-/*         tmr_cancel(&timer); */
-/*         before_exit(); */
-/*         exit(0); */
-/*     } */
+    // Exit?
+    if (do_exit) {
+        ZF_LOGI("Exiting\n");
+
+        // Stop client_info & bye
+        /* tmr_cancel(&timer); */
+        data_channel_shutdown();
+        exit(0);
+    }
 }
