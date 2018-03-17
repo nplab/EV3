@@ -73,15 +73,28 @@ int sigserv_connect() {
 }
 
 int sigserv_send(char *msg) {
-  ssize_t sent_len = send(sigserv_sock_d, msg, strlen(msg) + 1, 0);
+  int rc = WRTCR_SUCCESS;
+  char *buf = NULL;
+  unsigned int buf_len;
+  uint32_t msg_len = strlen(msg);
+
+  //prepare send buffer
+  buf_len=msg_len*sizeof(char)+sizeof(uint32_t);
+  buf = (char *) malloc(buf_len);
+  memcpy(buf, &msg_len, sizeof(uint32_t));
+  memcpy(buf+sizeof(uint32_t), msg, msg_len*sizeof(char));
+
+  //send and handle result
+  ssize_t sent_len = send(sigserv_sock_d, buf, buf_len, 0);
   if (sent_len < 0) {
     handle_errno("Could not send message to signaling server", false);
-    return WRTCR_FAILURE;
-  } else if ((unsigned int)sent_len != strlen(msg) + 1) {
+    rc=WRTCR_FAILURE;
+  } else if ((unsigned int)sent_len != msg_len + sizeof(uint32_t)) {
     handle_errno("Could not send complete message to signaling server", false);
-    return WRTCR_FAILURE;
+    rc=WRTCR_FAILURE;
   }
-  return WRTCR_SUCCESS;
+  free(buf);
+  return rc;
 }
 
 int sigserv_receive(char **msg) {
