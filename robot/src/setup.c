@@ -36,6 +36,7 @@ int setup(int argc, char *argv[]){
   //start setup of components
   read_config(conf_file_name);
   sigserv_connect();
+  data_channel_setup();
 
   return WRTCR_SUCCESS;
 }
