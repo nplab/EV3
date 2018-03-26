@@ -49,3 +49,13 @@ wrtcr_rc check_collision() {
   ZF_LOGI("%d\n", val);
   return WRTCR_SUCCESS;
 }
+
+wrtcr_rc get_distance(){
+	float val;
+
+	if(set_sensor_mode(sn_sonar, "US-SI-CM") && !get_sensor_value0( sn_sonar, &val)){
+    handle_err("Could not get value from sonar sensor", false);
+  }
+  ZF_LOGI("%f\n", val);
+  return WRTCR_SUCCESS;
+}

@@ -40,7 +40,7 @@ int setup(int argc, char *argv[]){
   setup_robot();
 
   while(true){
-    check_collision();
+    get_distance();
   }
 
   return WRTCR_SUCCESS;

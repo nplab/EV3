@@ -9,3 +9,5 @@
 wrtcr_rc setup_robot();
 
 wrtcr_rc check_collision();
+
+wrtcr_rc get_distance();
