@@ -35,12 +35,9 @@ int setup(int argc, char *argv[]){
 
   //start setup of components
   read_config(conf_file_name);
-  /* sigserv_connect(); */
-  /* data_channel_setup(); */
+  sigserv_connect();
+  data_channel_setup();
   setup_robot();
-  float val;
-  while(true)
-  get_distance(&val);
 
   return WRTCR_SUCCESS;
 }
