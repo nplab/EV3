@@ -1,6 +1,6 @@
 #include "aktsens.h"
 
-#define SONAR_RIGHT_LIMIT 220
+#define SONAR_ROT_LIMIT 220
 #define SONAR_STEP_DEG 15
 #define SONAR_MOT_SPEED 100
 #define MOT_LEFT mots_drive[0]
@@ -17,7 +17,7 @@ static uint8_t sens_sonar;
 static uint8_t mot_sonar;
 static uint8_t mots_drive[3] = {0, 0, TACHO_DESC__LIMIT_};
 
-static const float sonar_deg_factor = 180.0/((float)SONAR_RIGHT_LIMIT*2.0);
+static const float sonar_deg_factor = 180.0/((float)SONAR_ROT_LIMIT*2.0);
 
 wrtcr_rc check_sensors();
 wrtcr_rc check_motors();
@@ -99,8 +99,9 @@ wrtcr_rc init_sonar(){
     POSGE(get_sensor_value( 0, sens_sonar_zero, &val),"Could not get value from sonar zero sensor", false);
   } while(val != 1);
   POSGE(set_tacho_command_inx(mot_sonar, TACHO_STOP), "Could not stop sonar motor", true);
-  //zero the motors position
-  POSGE(set_tacho_position(mot_sonar, -1*SONAR_RIGHT_LIMIT), "Could not set zero value for sonar motor", true);
+  sleep(1); //needs to be here, otherwise the set_position below is seen as a command to move for whatever reason
+  //set current motor position as left stop
+  POSGE(set_tacho_position(mot_sonar, -1*SONAR_ROT_LIMIT), "Could not set zero value for sonar motor", true);
   return WRTCR_SUCCESS;
 }
 
@@ -136,14 +137,12 @@ wrtcr_rc get_distance(float *val){
   POSGE(get_tacho_position(mot_sonar, &pos), "Could not get position value from sonar motor", true);
   if(left_limit == 1){ //if the sonar is at the left limit of its travel, set clockwise direction and zero position
     direction = 1;
-    set_tacho_position(mot_sonar, -1*SONAR_RIGHT_LIMIT);
-  } else if(pos >= SONAR_RIGHT_LIMIT){ //if the sonar is at the right limit of its travel, set counter-clockwise direction
+    set_tacho_position(mot_sonar, -1*SONAR_ROT_LIMIT);;
+  } else if(pos >= SONAR_ROT_LIMIT){ //if the sonar is at the right limit of its travel, set counter-clockwise direction
     direction = -1;
   }
 
 	POSGE(get_sensor_value0(sens_sonar, val), "Could not get value from sonar sensor", false);
-  ZF_LOGI("%f at %d°\n", *val, (int)(pos*sonar_deg_factor));
-  fflush(stdout);
   return WRTCR_SUCCESS;
 }
 

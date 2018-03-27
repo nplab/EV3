@@ -35,14 +35,9 @@ int setup(int argc, char *argv[]){
 
   //start setup of components
   read_config(conf_file_name);
-  /* sigserv_connect(); */
-  /* data_channel_setup(); */
+  sigserv_connect();
+  data_channel_setup();
   setup_robot();
-  int8_t speeds[] = {1, -1, 10, -10, 20, -20, 30, -30, 40, -40, 50, -50, 60, -60, 70, -70, 100, -100, 0, 0};
-  for(int i=0; i<10; i++){
-    drive(&(speeds[i*2]));
-    sleep(100);
-  }
 
   return WRTCR_SUCCESS;
 }
