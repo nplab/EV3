@@ -38,6 +38,9 @@ int setup(int argc, char *argv[]){
   /* sigserv_connect(); */
   /* data_channel_setup(); */
   setup_robot();
+  float val;
+  while(true)
+  get_distance(&val);
 
   return WRTCR_SUCCESS;
 }
