@@ -3,13 +3,14 @@
 #define SONAR_RIGHT_LIMIT 220
 #define SONAR_STEP_DEG 15
 #define SONAR_MOT_SPEED 100
+#define MOT_LEFT mots_drive[0]
+#define MOT_RIGHT mots_drive[1]
 
 static uint8_t sens_collision;
 static uint8_t sens_sonar_zero;
 static uint8_t sens_sonar;
 static uint8_t mot_sonar;
-static uint8_t mot_left;
-static uint8_t mot_right;
+static uint8_t mots_drive[2];
 
 static const float sonar_deg_factor = 180.0/((float)SONAR_RIGHT_LIMIT*2.0);
 
@@ -101,21 +102,21 @@ wrtcr_rc check_motors(){
     }
   }
 
-  if(!ev3_search_tacho_plugged_in(OUTPUT_C, 0, &mot_left, 0)){
+  if(!ev3_search_tacho_plugged_in(OUTPUT_C, 0, &MOT_LEFT, 0)){
     handle_err("Could not find motor on port C", false);
     rc = WRTCR_FAILURE;
   } else {
-    if( get_tacho_type_inx(mot_left) != LEGO_EV3_L_MOTOR){
+    if( get_tacho_type_inx(MOT_LEFT) != LEGO_EV3_L_MOTOR){
       handle_err("Motor attached to port C is not a large tacho motor", false);
       rc = WRTCR_FAILURE;
     }
   }
 
-  if(!ev3_search_tacho_plugged_in(OUTPUT_D, 0, &mot_right, 0)){
+  if(!ev3_search_tacho_plugged_in(OUTPUT_D, 0, &MOT_RIGHT, 0)){
     handle_err("Could not find motor on port C", false);
     rc = WRTCR_FAILURE;
   } else {
-    if( get_tacho_type_inx(mot_right) != LEGO_EV3_L_MOTOR){
+    if( get_tacho_type_inx(MOT_RIGHT) != LEGO_EV3_L_MOTOR){
       handle_err("Motor attached to port C is not a large tacho motor", false);
       rc = WRTCR_FAILURE;
     }
@@ -141,6 +142,10 @@ wrtcr_rc init_sonar(){
   set_tacho_command_inx(mot_sonar, TACHO_STOP);
   set_tacho_position(mot_sonar, -1*SONAR_RIGHT_LIMIT);
   return WRTCR_SUCCESS;
+}
+
+wrtcr_rc init_drive(){
+
 }
 
 wrtcr_rc check_collision() {
@@ -192,3 +197,8 @@ wrtcr_rc get_distance(float *val){
   fflush(stdout);
   return rc;
 }
+
+wrtcr_rc drive(){
+  
+}
+  
