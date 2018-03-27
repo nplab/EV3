@@ -6,6 +6,7 @@
 #include "utils.h"
 
 const char *no_item_msg = "Could not find %s value for config key %s!\n";
+const char *faulty_array_msg = "Array for config key %s did not contain only %s!\n";
 static cJSON *conf_root = NULL;
 
 int read_config(char *filename){
@@ -87,4 +88,28 @@ int conf_get_string(char *key, char **value){
     *value = item->valuestring;
     return WRTCR_SUCCESS;
   }
+}
+
+wrtcr_rc conf_get_string_array(char *key, char **array[], unsigned int *length){
+  cJSON *found_item = get_conf_item(key);
+  if( found_item == NULL || !cJSON_IsArray(found_item)){//if we didn't get anything or it's not an array return failure
+    fprintf(stderr, no_item_msg, "array", key);
+    return WRTCR_FAILURE;
+  }
+  else{//else write array and its length and return success
+    *length = cJSON_GetArraySize(found_item);
+    *array = (char**)malloc((*length)*sizeof(char*));
+    for(unsigned int i=0; i<*length; i++){ //Note: cJSON has a function that iterates over array efficiently, but these are short so it doesn't matter
+      cJSON *entry = cJSON_GetArrayItem(found_item, i);
+      if( !cJSON_IsString(entry)){ //check if all items are strings
+        fprintf(stderr, faulty_array_msg, key, "string");
+        return WRTCR_FAILURE;
+      }else{
+        (*array)[i] = (char*)malloc((strlen(entry->valuestring)+1)*sizeof(char));
+        strcpy((*array)[i], entry->valuestring);
+      }
+    }
+    return WRTCR_SUCCESS;
+  }
+
 }

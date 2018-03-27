@@ -1,12 +1,12 @@
 #include <getopt.h>
 
 #include "setup.h"
-#include "utils.h"
 
 int setup(int argc, char *argv[]){
   char *def_conf_file_name = "wrtcr_conf.json";
   char *conf_file_name = NULL;
 
+  ZF_LOGI("Starting setup procedure");
   //parse arguments
   opterr = 0;
   int c;
@@ -35,12 +35,18 @@ int setup(int argc, char *argv[]){
 
   //start setup of components
   read_config(conf_file_name);
-  sigserv_connect();
+  /* sigserv_connect(); */
+  /* data_channel_setup(); */
+  setup_robot();
+  float val;
+  while(true)
+  get_distance(&val);
 
   return WRTCR_SUCCESS;
 }
 
 int teardown(){
+  ZF_LOGI("Starting teardown procedure");
   sigserv_disconnect();
   delete_config();
 

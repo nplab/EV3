@@ -1,16 +1,4 @@
-#define _BSD_SOURCE
-#include <arpa/inet.h>
-#include <netinet/in.h>
-#include <stdbool.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <unistd.h>
-#include <netdb.h>
-
 #include "signaling.h"
-#include "utils.h"
-#include "config.h"
 
 //socket for connection to signaling server
 static int sigserv_sock_d;
@@ -29,7 +17,7 @@ struct hostent* get_hostinf(char *host_name_or_addr){
   return host;
 }
 
-int sigserv_connect() {
+wrtcr_rc sigserv_connect() {
   sigserv_sock_d = socket(AF_INET, SOCK_STREAM, 0); // open IPv4 TCP socket
   if (sigserv_sock_d < 0) {
     handle_errno("Could not create socket for connecting to signaling server",
@@ -72,8 +60,8 @@ int sigserv_connect() {
   return WRTCR_SUCCESS;
 }
 
-int sigserv_send(char *msg) {
-  int rc = WRTCR_SUCCESS;
+wrtcr_rc sigserv_send(char *msg) {
+  wrtcr_rc rc = WRTCR_SUCCESS;
   char *buf = NULL;
   unsigned int buf_len;
   uint32_t msg_len = strlen(msg);
@@ -97,7 +85,7 @@ int sigserv_send(char *msg) {
   return rc;
 }
 
-int sigserv_receive(char **msg) {
+wrtcr_rc sigserv_receive(char **msg) {
   uint8_t *recv_buf = NULL;
   uint32_t msg_len;
 
@@ -122,7 +110,7 @@ int sigserv_receive(char **msg) {
   return WRTCR_SUCCESS;
 }
 
-int sigserv_disconnect() {
+wrtcr_rc sigserv_disconnect() {
   if (close(sigserv_sock_d) < 0) {
     handle_errno("Could not close connection to signaling server", false);
   }
