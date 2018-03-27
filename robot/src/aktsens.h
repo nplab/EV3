@@ -12,3 +12,5 @@ wrtcr_rc setup_robot();
 wrtcr_rc check_collision();
 
 wrtcr_rc get_distance(float *val);
+
+wrtcr_rc drive();
