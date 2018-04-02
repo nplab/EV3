@@ -216,7 +216,7 @@ static void send_local_description(struct client* const client) {
 
   // Print local description as JSON
   output = cJSON_Print(root);
-  ZF_LOGD("Local Description:\n%s\n", output);
+  ZF_LOGD("Local Description:%s", output);
   sigserv_send(output);
 
   // Un-reference
@@ -398,15 +398,14 @@ static void get_remote_description() {
 
 
     EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
+    ZF_LOGI("%s", input);
     root = cJSON_Parse(input);
-    // Get dict from JSON
     if (!root) {
       ZF_LOGE("Could not parse remote description JSON");
       do_exit = true;
       goto out;
     }
 
-    // Decode JSON
     cJSON *temp = cJSON_GetObjectItem(root, "type");
     if( cJSON_IsString(temp) && temp->valuestring != NULL){
       ZF_LOGE("Invalid remote description\n");
@@ -440,7 +439,8 @@ static void get_remote_description() {
 out:
     // Un-reference
     mem_deref(remote_description);
-    free(root);
+    free(input);
+    cJSON_Delete(root);
 
     // Exit?
     if (do_exit) {
