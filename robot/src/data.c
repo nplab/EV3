@@ -54,6 +54,8 @@ wrtcr_rc data_channel_setup(){
   initialise_client();
   get_remote_description();
 
+  re_main(default_signal_handler);
+
   return WRTCR_SUCCESS;
 }
 
@@ -398,7 +400,6 @@ static void get_remote_description() {
 
 
     EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
-    ZF_LOGI("%s", input);
     root = cJSON_Parse(input);
     if (!root) {
       ZF_LOGE("Could not parse remote description JSON");
@@ -406,15 +407,16 @@ static void get_remote_description() {
       goto out;
     }
 
+
     cJSON *temp = cJSON_GetObjectItem(root, "type");
-    if( cJSON_IsString(temp) && temp->valuestring != NULL){
+    if( !cJSON_IsString(temp) && temp->valuestring == NULL){
       ZF_LOGE("Invalid remote description\n");
       goto out;
     }
     type_str = temp->valuestring;
 
     temp = cJSON_GetObjectItem(root, "sdp");
-    if( cJSON_IsString(temp) && temp->valuestring != NULL){
+    if( !cJSON_IsString(temp) && temp->valuestring == NULL){
       ZF_LOGE("Invalid remote description\n");
       goto out;
     }
@@ -440,7 +442,7 @@ out:
     // Un-reference
     mem_deref(remote_description);
     free(input);
-    cJSON_Delete(root);
+    //cJSON_Delete(root);
 
     // Exit?
     if (do_exit) {
