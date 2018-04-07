@@ -25,11 +25,24 @@ In order to set up ev3dev (the operating systems for the robot), execute the fol
 
 Also see section **Futher Setup** below.
 
-### Access
+## Access
 
 After you have completed the steps above you can log into ev3dev via ssh with the username `robot` and the password `maker`.
 
 You can also setup an NFS share by following [this guide](http://www.ev3dev.org/docs/tutorials/setting-up-an-nfs-file-share/).
+
+## Construction Notes
+
+The software expects the sensors and actors to be attached as follows:
+
+| sensor / actuator         | port |
+|---------------------------|------|
+| collision switch          |    1 |
+| zero switch for sonar     |    2 |
+| distance sensor for sonar |    3 |
+| motor for sonar           |    A |
+| left-hand drive motor     |    B |
+| right-hand drive motor    |    C |
 
 # Software
 
@@ -41,13 +54,8 @@ In order to build, please execute the following:
 ``` shell
     cd robot
     ../container/run_ev3wrtc.sh
-    mkdir -p build
-    cd build
-    cmake -DCMAKE_INSTALL_PREFIX=../bin ..
-    make install
 ```
-
-Feel free to replace the `-DCMAKE_INSTALL_PREFIX=<target_dir>` with whatever directory works for you.
+The resulting binary will be `robot/bin/wrtcrobot` and needs to be copied to the EV3 brick along with `wrtc_robot.conf`.
 
 ## Further Setup
 
@@ -59,22 +67,3 @@ The target system must have at least OpenSSL version 1.0.3. On *ev3dev*, this me
 
 Add `deb http://ftp.debian.org/debian jessie-backports main` to `/etc/apt/sources.list`. Then run `apt-get -t jessie-backports install openssl`.
 
-## Structure
-
-The software is structured into four main areas:
-
-### Signaling
-
-In order to set up a WebRTC connection, informatio about the end points must be exchanged via the signaling server.
-
-### WebRTC Datachannel
-
-For the actual real-time communication, a WebRTC data channel is established and used to send commands and sensor data back and forth.
-
-### Sensors
-
-The robots sensors are read, their data encoded and then send to the website.
-
-### Actors
-
-Data coming from the website is received, parsed and then applied to the motors.
