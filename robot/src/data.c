@@ -19,7 +19,7 @@ static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_description();
 
-wrtcr_rc data_channel_setup(){
+void* data_channel_setup(void* ignore){
   unsigned int stun_urls_length;
   char **stun_urls;
   unsigned int turn_urls_length;
@@ -79,7 +79,7 @@ wrtcr_rc initialise_client(){
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
   //create parameters for data channel
-  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "wrtc_robot");
+  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "cat-noises");
 
   EORE(rawrtc_data_channel_parameters_create(
                                            &dc_parameters, client_info.data_channel_negotiated->label,
@@ -399,6 +399,8 @@ static void get_remote_description() {
     struct rawrtc_peer_connection_description* remote_description = NULL;
 
 
+    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
+    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
     EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
     root = cJSON_Parse(input);
     if (!root) {

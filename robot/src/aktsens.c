@@ -24,7 +24,10 @@ wrtcr_rc check_motors();
 wrtcr_rc init_sonar();
 wrtcr_rc init_drive();
 
-wrtcr_rc setup_robot(){
+void* setup_robot(void *ignore){
+  if(ignore != NULL){
+    handle_err("Called setup robot with arguments", true);
+  }
   if( ev3_init() != 1){
     handle_err("Could not initialize robot library", true);
   }
@@ -34,7 +37,7 @@ wrtcr_rc setup_robot(){
   init_sonar();
   init_drive();
 
-  return WRTCR_SUCCESS;
+  return NULL;
 }
 
 wrtcr_rc check_sensors(){

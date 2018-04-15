@@ -7,7 +7,7 @@
 
 #include "utils.h"
 
-wrtcr_rc setup_robot();
+void* setup_robot(void *ignore);
 
 wrtcr_rc check_collision();
 
