@@ -74,18 +74,14 @@ wrtcr_rc check_motors(){
   }
 
   //check for correct motors
-  POSGE(ev3_search_tacho_plugged_in(OUTPUT_A, 0, &mot_sonar, 0), "Could not find motor on port B", true);
-  POSGE(get_tacho_type_inx(mot_sonar) == LEGO_EV3_M_MOTOR, "Motor attached to port B is not a medium tacho motor", true);
+  POSGE(ev3_search_tacho_plugged_in(OUTPUT_A, 0, &mot_sonar, 0), "Could not find motor on port A", true);
+  POSGE(get_tacho_type_inx(mot_sonar) == LEGO_EV3_M_MOTOR, "Motor attached to port A is not a medium tacho motor", true);
 
-  POSGE(ev3_search_tacho_plugged_in(OUTPUT_C, 0, &MOT_LEFT, 0), "Could not find motor on port C", true);
-  POSGE(get_tacho_type_inx(MOT_LEFT) == LEGO_EV3_L_MOTOR, "Motor attached to port C is not a large tacho motor", true);
+  POSGE(ev3_search_tacho_plugged_in(OUTPUT_B, 0, &MOT_LEFT, 0), "Could not find motor on port B", true);
+  POSGE(get_tacho_type_inx(MOT_LEFT) == LEGO_EV3_L_MOTOR, "Motor attached to port B is not a large tacho motor", true);
 
-  POSGE(ev3_search_tacho_plugged_in(OUTPUT_D, 0, &MOT_RIGHT, 0), "Could not find motor on port C", true);
+  POSGE(ev3_search_tacho_plugged_in(OUTPUT_C, 0, &MOT_RIGHT, 0), "Could not find motor on port C", true);
   POSGE(get_tacho_type_inx(MOT_RIGHT) == LEGO_EV3_L_MOTOR, "Motor attached to port C is not a large tacho motor", true);
-
-  int ms;
-  get_tacho_max_speed(MOT_LEFT, &ms);
-  ZF_LOGI("VMax = %d", ms);
 
   return WRTCR_SUCCESS;
 }
@@ -102,7 +98,7 @@ wrtcr_rc init_sonar(){
     POSGE(get_sensor_value( 0, sens_sonar_zero, &val),"Could not get value from sonar zero sensor", false);
   } while(val != 1);
   POSGE(set_tacho_command_inx(mot_sonar, TACHO_STOP), "Could not stop sonar motor", true);
-  sleep(1); //needs to be here, otherwise the set_position below is seen as a command to move for whatever reason
+  sleep(10); //needs to be here, otherwise the set_position below is seen as a command to move for whatever reason
   //set current motor position as left stop
   POSGE(set_tacho_position(mot_sonar, -1*SONAR_ROT_LIMIT), "Could not set zero value for sonar motor", true);
   return WRTCR_SUCCESS;
@@ -119,7 +115,6 @@ wrtcr_rc check_collision() {
 	if(!get_sensor_value( 0, sens_collision, &val)){
     handle_err("Could not get value from collision sensor", false);
   }
-  ZF_LOGI("%d\n", val);
   return WRTCR_SUCCESS;
 }
 
@@ -140,7 +135,7 @@ wrtcr_rc get_distance(float *val){
   POSGE(get_tacho_position(mot_sonar, &pos), "Could not get position value from sonar motor", true);
   if(left_limit == 1){ //if the sonar is at the left limit of its travel, set clockwise direction and zero position
     direction = 1;
-    set_tacho_position(mot_sonar, -1*SONAR_ROT_LIMIT);;
+    set_tacho_position(mot_sonar, -1*SONAR_ROT_LIMIT);
   } else if(pos >= SONAR_ROT_LIMIT){ //if the sonar is at the right limit of its travel, set counter-clockwise direction
     direction = -1;
   }
