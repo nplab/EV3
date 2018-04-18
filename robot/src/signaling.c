@@ -3,7 +3,7 @@
 //socket for connection to signaling server
 static int sigserv_sock_d;
 
-struct hostent* get_hostinf(char *host_name_or_addr){
+struct hostent* get_hostinf(const char *host_name_or_addr){
   struct in_addr ip4;
   struct in6_addr ip6;
   struct hostent *host = NULL;

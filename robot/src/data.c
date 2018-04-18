@@ -19,7 +19,7 @@ static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_description();
 
-wrtcr_rc data_channel_setup(){
+void* data_channel_setup(void* ignore){
   unsigned int stun_urls_length;
   char **stun_urls;
   unsigned int turn_urls_length;
@@ -54,6 +54,8 @@ wrtcr_rc data_channel_setup(){
   initialise_client();
   get_remote_description();
 
+  re_main(default_signal_handler);
+
   return WRTCR_SUCCESS;
 }
 
@@ -77,7 +79,7 @@ wrtcr_rc initialise_client(){
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
   //create parameters for data channel
-  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "wrtc_robot");
+  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "cat-noises");
 
   EORE(rawrtc_data_channel_parameters_create(
                                            &dc_parameters, client_info.data_channel_negotiated->label,
@@ -216,7 +218,7 @@ static void send_local_description(struct client* const client) {
 
   // Print local description as JSON
   output = cJSON_Print(root);
-  ZF_LOGD("Local Description:\n%s\n", output);
+  ZF_LOGD("Local Description:%s", output);
   sigserv_send(output);
 
   // Un-reference
@@ -398,24 +400,25 @@ static void get_remote_description() {
 
 
     EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
+    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
+    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
     root = cJSON_Parse(input);
-    // Get dict from JSON
     if (!root) {
       ZF_LOGE("Could not parse remote description JSON");
       do_exit = true;
       goto out;
     }
 
-    // Decode JSON
+
     cJSON *temp = cJSON_GetObjectItem(root, "type");
-    if( cJSON_IsString(temp) && temp->valuestring != NULL){
+    if( !cJSON_IsString(temp) && temp->valuestring == NULL){
       ZF_LOGE("Invalid remote description\n");
       goto out;
     }
     type_str = temp->valuestring;
 
     temp = cJSON_GetObjectItem(root, "sdp");
-    if( cJSON_IsString(temp) && temp->valuestring != NULL){
+    if( !cJSON_IsString(temp) && temp->valuestring == NULL){
       ZF_LOGE("Invalid remote description\n");
       goto out;
     }
@@ -440,7 +443,8 @@ static void get_remote_description() {
 out:
     // Un-reference
     mem_deref(remote_description);
-    free(root);
+    free(input);
+    //cJSON_Delete(root);
 
     // Exit?
     if (do_exit) {

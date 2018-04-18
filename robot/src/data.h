@@ -30,7 +30,7 @@ struct data_channel_helper {
 };
 
 //set up the data channel to the website
-wrtcr_rc data_channel_setup();
+void* data_channel_setup(void* ignore);
 
 //shut down data channel and clean up
 wrtcr_rc data_channel_shutdown();
