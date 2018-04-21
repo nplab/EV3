@@ -98,13 +98,17 @@ canvasSteuerung.addEventListener('mousemove', function(evt) {
 
 // Create Motor and Sensor Instanz
 
-var steuermotorLinks = new Motor('A', 'tacho-motor-l')
-var steuermotorRechts = new Motor('B', 'tacho-motor-l')
-var radarmotor = new Motor('C', 'tacho-motor-m')
+var motorSteuerLinks = new Motor('A', 'tacho-motor-l', 'run-forever')
+
+var motorSteuerRechts = new Motor('B', 'tacho-motor-l', 'run-forever')
+
+var radarmotor = new Motor('C', 'tacho-motor-m', 'run-forever')
 
 var sensorStoss = new Sensor('1', 'lego-ev3-touch')
 var sensorRadar = new Sensor('2', 'lego-ev3-us')
 var sensorStossNull = new Sensor('3', 'lego-ev3-touch')
+
+
 
 
 
