@@ -21,41 +21,32 @@
     margin-left: 10%;
 
 }
+.backgroundBox-header_text {
+    background-color: #9fa2a2;
+    padding-left: 3%;
+    margin-right: 35%;
+    margin-bottom: 2%;
+    margin-left: 10%;
+
+}
+
 .backgroundBox-left {
     background-color: #9fa2a2;
-    margin-left: 3.9%;
-    margin-right: 26%;
-    padding-top: 1.5%;
-    padding-bottom: 1.5%;
+    padding-left: 2%;
+    margin-right: -12%;
+    margin-top: 0%;
+    margin-left: 12%;
 }
 
-.backgroundBox-right {
-    background-color: #9fa2a2;
-    margin-left: -4%;
-    margin-right: 18%;
-    padding-top: 1.5%;
-    padding-bottom: 1.5%;
-}
 .backgroundBox {
     background-color: #9fa2a2;
-    margin-left: 6%;
-    margin-right: 8%;
+    margin-left: 4%;
+    margin-right: -11%;
     padding-top: 1.5%;
     padding-bottom: 1.5%;
-}
-
-.backgroundBox-text {
-    background-color: #9fa2a2;
-    margin-left: 6%;
-    margin-right: 8%;
-    padding-top: 1.5%;
-    padding-bottom: 1.5%;
-    padding-left: 2%;
-}
-
-.p-text {
-    font-size: inherit;
-    line-height: 180%;
+    padding-left: 4%;
+    padding-right: 4%;
+    font-size: 120%;
 }
 
 .captionbox{
@@ -69,6 +60,13 @@
     color: #ffb200;
 }
 
+.textsec {
+    margin-right: -115%;
+    margin-top: 0%;
+    background-color: #9fa2a2;
+    font-size: 120%;
+}
+
 .offset-section {
     padding-left: 12%;
 }
@@ -80,7 +78,8 @@
 }
 .offset-input {
     padding-top: 1.5%;
-    padding-right: 30%;
+    padding-right: 59%;
+    margin-right: -13%;
 }
 .offset-md6 {
     padding-left: 12%;
@@ -90,10 +89,7 @@
 
 
 
-.captionbox-right {
-    margin-left: -7%;
-    margin-right: 20%;
-}
+
 
 html {
     overflow-y: scroll;
@@ -101,7 +97,7 @@ html {
 
 body {
     background-color: #f3f3f4;
-    padding: 0 24px 48px;
+    padding: 0 10% 48px;
     font-family: 'Open Sans', sans-serif;
     font-size: 12px;
     color: #6f6f6f;
@@ -161,11 +157,23 @@ a:focus {
     background: inherit;
     height: 43px;
     margin: 0;
-    padding: 12px 18px;
+    padding-left: 39px;
+    padding-top: 61px;
+    padding-bottom: 12px;
     text-transform: uppercase;
     font-size: 2em;
     font-weight: 600;
     line-height: 43px;
+    color: #2d9abb;
+}
+
+.button-h1 {
+    display: inline-block;
+    background: inherit;
+    padding-top: 4%;
+    padding-left: 39px;
+    text-transform: uppercase;
+    font-size: 110%;
     color: #2d9abb;
 }
 
@@ -177,6 +185,8 @@ a:focus {
 #header-top {
     background-color: #414141;
     padding: 7px 24px;
+    margin-left: 10%;
+    margin-right: 10%;
 }
 .top-breadcrumb > li + li:before {
     font-size: 40px;
