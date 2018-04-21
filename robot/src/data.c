@@ -35,14 +35,19 @@ void* data_channel_setup(void* ignore){
   //set up configuration
   EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
 
-  EORE(rawrtc_peer_connection_configuration_add_ice_server(
+
+  if( *stun_urls != NULL){
+    EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                           configuration, stun_urls, stun_urls_length,
                                                           NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add STUN servers to RawRTC configuration");
+  }
 
-  EORE(rawrtc_peer_connection_configuration_add_ice_server(
+  if( *turn_urls != NULL){
+    EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                           configuration, turn_urls, turn_urls_length,
                                                           "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
                                                           RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD), "Could not add TURN servers to  RawRTC configuration");
+  }
 
   //set up client information
   client_info.name = "WebRTCRobot";
@@ -79,7 +84,7 @@ wrtcr_rc initialise_client(){
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
   //create parameters for data channel
-  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "cat-noises");
+  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "api");
 
   EORE(rawrtc_data_channel_parameters_create(
                                            &dc_parameters, client_info.data_channel_negotiated->label,
@@ -134,22 +139,22 @@ static void connection_state_change_handler(enum rawrtc_peer_connection_state co
     default_peer_connection_state_change_handler(state, arg);
 
     // Only create a new channel if none exist yet (in case we disconnect and then reconnect)
-    if (!client->data_channel && state == RAWRTC_PEER_CONNECTION_STATE_CONNECTED) {
-        struct rawrtc_data_channel_parameters* channel_parameters;
+    /* if (!client->data_channel && state == RAWRTC_PEER_CONNECTION_STATE_CONNECTED) { */
+    /*     struct rawrtc_data_channel_parameters* channel_parameters; */
 
-        // Create data channel helper for in-band negotiated data channel
-        data_channel_helper_create(
-                &client->data_channel, (struct client *) client, "wrtc_robot_2");
+    /*     // Create data channel helper for in-band negotiated data channel */
+    /*     data_channel_helper_create( */
+    /*             &client->data_channel, (struct client *) client, "wrtc_robot_2"); */
 
-        // Create data channel parameters
-        EORE(rawrtc_data_channel_parameters_create(&channel_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters");
+    /*     // Create data channel parameters */
+    /*     EORE(rawrtc_data_channel_parameters_create(&channel_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters"); */
 
-        // Create data channel
-        EORE(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, channel_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel), "Could not create data channel");
+    /*     // Create data channel */
+    /*     EORE(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, channel_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel), "Could not create data channel"); */
 
-        // Un-reference data channel parameters
-        mem_deref(channel_parameters);
-    }
+    /*     // Un-reference data channel parameters */
+    /*     mem_deref(channel_parameters); */
+    /* } */
 }
 
 
@@ -185,7 +190,7 @@ static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate*
   default_peer_connection_local_candidate_handler(candidate, url, arg);
 
   // Print local description (if last candidate)
-  if (candidate) {
+  if(!candidate) {
     send_local_description(client);
   }
 }
@@ -400,8 +405,6 @@ static void get_remote_description() {
 
 
     EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
-    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
-    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
     root = cJSON_Parse(input);
     if (!root) {
       ZF_LOGE("Could not parse remote description JSON");
@@ -444,7 +447,7 @@ out:
     // Un-reference
     mem_deref(remote_description);
     free(input);
-    //cJSON_Delete(root);
+    cJSON_Delete(root);
 
     // Exit?
     if (do_exit) {
