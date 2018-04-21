@@ -35,13 +35,18 @@ JSON-Array von Objekten, welche die Ports beschreiben.
 #### Beispiel Motor
 
 Metadaten:
-``` { 
+
+```
+{ 
   "port": "A", //Ausgabe des Address-Commands
   "type": "tacho-motor-l", //alternativ tacho-motor-m
-}```
+}
+```
 
 Livedaten-Befehl:
-```{
+
+```
+{
   "port": "A",
   "command": "run-forever",
   "value": 80 //-100 - +100
@@ -51,15 +56,19 @@ Livedaten-Befehl:
   "port": "A", 
   "command": "run-to-rel-position",
   "value": "180"
-}```
+}
+```
 
 #### Beispiel Ultraschallsensor
 
 Metadaten:
-```{
+
+```
+{
   "port": "1",
   "type": "lego-ev3-us" //driver name
-}```
+}
+```
 
 Livedaten Abfrage:
 
@@ -74,7 +83,10 @@ Livedaten Abfrage:
 ```
 
 Livedaten Antwort:
-```{
+
+```
+{
   "port": "1",
   "value": [1000] //alle values die von diesem Sensor in diesem Modus zur Verfügung gestellt werden
-}```
+}
+```
