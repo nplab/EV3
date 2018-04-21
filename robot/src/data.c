@@ -18,6 +18,7 @@ void data_channel_helper_create(struct data_channel_helper** const channel_helpe
 static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_description();
+void api_channel_open_handler(void* const arg);
 
 void* data_channel_setup(void* ignore){
   unsigned int stun_urls_length;
@@ -35,14 +36,19 @@ void* data_channel_setup(void* ignore){
   //set up configuration
   EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
 
-  EORE(rawrtc_peer_connection_configuration_add_ice_server(
+
+  if( *stun_urls != NULL){
+    EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                           configuration, stun_urls, stun_urls_length,
                                                           NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add STUN servers to RawRTC configuration");
+  }
 
-  EORE(rawrtc_peer_connection_configuration_add_ice_server(
+  if( *turn_urls != NULL){
+    EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                           configuration, turn_urls, turn_urls_length,
                                                           "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
                                                           RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD), "Could not add TURN servers to  RawRTC configuration");
+  }
 
   //set up client information
   client_info.name = "WebRTCRobot";
@@ -79,7 +85,7 @@ wrtcr_rc initialise_client(){
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
   //create parameters for data channel
-  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "cat-noises");
+  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "api");
 
   EORE(rawrtc_data_channel_parameters_create(
                                            &dc_parameters, client_info.data_channel_negotiated->label,
@@ -89,7 +95,7 @@ wrtcr_rc initialise_client(){
   EORE(rawrtc_peer_connection_create_data_channel(
                                                 &client_info.data_channel_negotiated->channel, client_info.connection,
                                                 dc_parameters, NULL,
-                                                default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
+                                                api_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
                                                 default_data_channel_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
 
@@ -116,7 +122,7 @@ static void negotiation_needed_handler(void* const arg) {
   struct client* const client = arg;
 
   // Print negotiation needed
-  default_negotiation_needed_handler(arg);
+  ZF_LOGI("(%s) Negotiation needed\n", client->name);
 
   // Offering: Create and set local description
   if (client->offering) {
@@ -130,26 +136,27 @@ static void negotiation_needed_handler(void* const arg) {
 static void connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg) {
     struct client* const client = arg;
 
-    // Print state
-    default_peer_connection_state_change_handler(state, arg);
+    //print the new state
+    char const * const state_name = rawrtc_peer_connection_state_to_name(state);
+    ZF_LOGD("(%s) Peer connection state change: %s\n", client->name, state_name);
 
     // Only create a new channel if none exist yet (in case we disconnect and then reconnect)
-    if (!client->data_channel && state == RAWRTC_PEER_CONNECTION_STATE_CONNECTED) {
-        struct rawrtc_data_channel_parameters* channel_parameters;
+    /* if (!client->data_channel && state == RAWRTC_PEER_CONNECTION_STATE_CONNECTED) { */
+    /*     struct rawrtc_data_channel_parameters* channel_parameters; */
 
-        // Create data channel helper for in-band negotiated data channel
-        data_channel_helper_create(
-                &client->data_channel, (struct client *) client, "wrtc_robot_2");
+    /*     // Create data channel helper for in-band negotiated data channel */
+    /*     data_channel_helper_create( */
+    /*             &client->data_channel, (struct client *) client, "wrtc_robot_2"); */
 
-        // Create data channel parameters
-        EORE(rawrtc_data_channel_parameters_create(&channel_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters");
+    /*     // Create data channel parameters */
+    /*     EORE(rawrtc_data_channel_parameters_create(&channel_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters"); */
 
-        // Create data channel
-        EORE(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, channel_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel), "Could not create data channel");
+    /*     // Create data channel */
+    /*     EORE(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, channel_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel), "Could not create data channel"); */
 
-        // Un-reference data channel parameters
-        mem_deref(channel_parameters);
-    }
+    /*     // Un-reference data channel parameters */
+    /*     mem_deref(channel_parameters); */
+    /* } */
 }
 
 
@@ -185,12 +192,11 @@ static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate*
   default_peer_connection_local_candidate_handler(candidate, url, arg);
 
   // Print local description (if last candidate)
-  if (candidate) {
+  if(!candidate) {
     send_local_description(client);
   }
 }
 
-//
 static void send_local_description(struct client* const client) {
   struct rawrtc_peer_connection_description* description;
   enum rawrtc_sdp_type type;
@@ -400,8 +406,6 @@ static void get_remote_description() {
 
 
     EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
-    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
-    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
     root = cJSON_Parse(input);
     if (!root) {
       ZF_LOGE("Could not parse remote description JSON");
@@ -444,7 +448,7 @@ out:
     // Un-reference
     mem_deref(remote_description);
     free(input);
-    //cJSON_Delete(root);
+    cJSON_Delete(root);
 
     // Exit?
     if (do_exit) {
@@ -455,4 +459,48 @@ out:
         data_channel_shutdown();
         exit(0);
     }
+}
+
+void api_channel_open_handler(void* const arg) {
+  struct data_channel_helper* const channel = arg;
+  char *test_desc = NULL;
+
+  cJSON *root = cJSON_CreateArray();
+  cJSON *tempObj = cJSON_CreateObject();
+  cJSON_AddStringToObject(tempObj, "port", "1");
+  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-m");
+  cJSON_AddItemToArray(root, tempObj);
+  tempObj = cJSON_CreateObject();
+  cJSON_AddStringToObject(tempObj, "port", "2");
+  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-l");
+  cJSON_AddItemToArray(root, tempObj);
+  tempObj = cJSON_CreateObject();
+  cJSON_AddStringToObject(tempObj, "port", "3");
+  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-l");
+  cJSON_AddItemToArray(root, tempObj);
+  tempObj = cJSON_CreateObject();
+  cJSON_AddStringToObject(tempObj, "port", "A");
+  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-touch");
+  cJSON_AddItemToArray(root, tempObj);
+  tempObj = cJSON_CreateObject();
+  cJSON_AddStringToObject(tempObj, "port", "B");
+  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-touch");
+  cJSON_AddItemToArray(root, tempObj);
+  tempObj = cJSON_CreateObject();
+  cJSON_AddStringToObject(tempObj, "port", "C");
+  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-us");
+  cJSON_AddItemToArray(root, tempObj);
+
+  test_desc = cJSON_Print(root);
+
+  ZF_LOGI("(%s) Data channel open: %s\n", channel->client->name, channel->label);
+
+  struct mbuf *port_desc = mbuf_alloc(strlen(test_desc)+1);
+  mbuf_printf(port_desc, "%s", test_desc);
+  mbuf_set_pos(port_desc, 0);
+
+  free(test_desc);
+  cJSON_Delete(root);
+
+  EORE(rawrtc_data_channel_send(channel->channel,  port_desc, false), "Could not send port description message");
 }
