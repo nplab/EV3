@@ -2,8 +2,8 @@ class Motor {
     constructor(port, type, mode = null) {
         this.port = port;
         this.type = type;
-        this.modes = mode;
-        this.selectedMode = null;
+        this.modes = null;
+        this.selectedMode = mode;
         this.value = null;
 
         // Set List of modes

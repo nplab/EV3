@@ -1,9 +1,9 @@
 class Sensor {
-    constructor(port, type) {
+    constructor(port, type, mode = null) {
         this.port = port;
         this.type = type;
         this.modes = null;
-        this.selectedMode = null;
+        this.selectedMode = mode;
         this.value = null;
 
         // Set List of modes
