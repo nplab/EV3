@@ -47,8 +47,8 @@ Robot demonstrator for WebRTC datachannels.
 | run-forever         | -100 – 100            | Drehe bis ein anderer Befehl gesendet wird. Wert ist Geschwindigkeit in Prozent. Positives Vorzeichen bedeutet eine Drehung im Uhrzeigersinn und umgekehrt. | %                                                        |
 | run-to-rel-position | INT32_MIN – INT32_MAX | Drehe die angegebene Anzahl an Schritten weiter. Positives Vorzeichen bedeutet eine Drehung im Uhrzeigersinn und umgekehrt.                                 | %                                                        |
 | set-position        | INT32_MIN – INT32_MAX | Setze den Wert für die aktuelle Position des Motors.                                                                                                        | %                                                        |
-| set-stop-action     | `hold OR coast`       | Lege fest was der Motor nach dem Stop-Kommando tut.                                                                                                         | %                                                        |
-| get-state           | %                     | Frage aktuellen Status des Motors ab.                                                                                                                       | `running OR ramping OR holding OR overloaded OR stalled`[^](`running` = Motor dreht; `ramping` = Motor beschleunigt oder bremst; `holding` = Motor versucht aktiv die Position zu halten; `olverloaded` = Motor kann trotz maximaler Leistung die eingestellete Geschwindigkeit nicht erreich; `stalled` = Motor steht, da das Drehmoment nicht ausreicht) |
+| set-stop-action     | `hold OR coast`[^1]      | Lege fest was der Motor nach dem Stop-Kommando tut.                                                                                                         | %                                                        |
+| get-state           | %                     | Frage aktuellen Status des Motors ab.                                                                                                                       | `running OR ramping OR holding OR overloaded OR stalled`[^2] |
 
 
 ### Metadatenformat
@@ -104,3 +104,6 @@ Livedaten Antwort:
   "value": [1000] //alle values die von diesem Sensor in diesem Modus zur Verfügung gestellt werden
 }
 ```
+
+[^1]: `hold` = Motor hält die letzte Position; `coast` = Motor dreht frei
+[^2]:`running` = Motor dreht; `ramping` = Motor beschleunigt oder bremst; `holding` = Motor versucht aktiv die Position zu halten; `olverloaded` = Motor kann trotz maximaler Leistung die eingestellete Geschwindigkeit nicht erreich; `stalled` = Motor steht, da das Drehmoment nicht ausreicht.
