@@ -1,104 +1,3 @@
-class Motor {
-    constructor(port, type) {
-        this.port = port;
-        this.type = type;
-        this.modes = this.getModes();
-        this.selectedMode = null;
-        this.value = null;
-    }
-    getModes() {
-        var mode1 = 'run-forever';
-        var mode2 = 'run-to-rel-position';
-
-        return [mode1, mode2]
-    }
-    setSelectedMode(mode) {
-        this.selectedMode = mode;
-    }
-    setValue(value) {
-        if (this.checkValue(value)) {
-            this.value = value
-            return true
-        }
-        return false
-    }
-    checkValue(value) {
-        if (this.selectedMode == "run-forever") {
-            if(value <= 100 && value >= 0) {
-                return true
-            }
-            alert("Der Wert muss eine Zahl zwischen 0 und 100 sein.")
-            return false
-        } else  if (this.selectedMode = 'run-to-rel-position'){
-            if(value <= 360 && value >= 0) {
-                return true
-            }
-            alert("Der Wert muss eine Zahl zwischen 0 und 360 sein.")
-            return false
-        }
-    }
-    drive(direction) {
-        sendingToRoboter(this.port, this.selectedMode, this.value * direction);
-    }
-    stop() {
-        sendingToRoboter(this.port)
-    }
-
-}
-
-class Sensor {
-    constructor(port, type) {
-        this.port = port;
-        this.type = type;
-        this.modes = this.getModes();
-        this.selectedMode = null;
-        this.value = null;
-    }
-    getModes() {
-        switch (this.type) {
-            case 'lego-ev3-us':
-                var mode1 = 'US-DIST-CM'
-                var mode2 = 'US-SI-CM'
-
-                this.modes = [mode1, mode2]
-                break;
-            case 'lego-ev3-gyro':
-                var mode1 = 'GYRO-ANG'
-                var mode2 = 'GYRO-RATE'
-                var mode3 = 'GYRO-G&A'
-
-                this.modes = [mode1, mode2, mode3]
-                break;
-            case 'lego-ev3-color':
-                var mode1 = 'COL-REFLECT'
-                var mode2 = 'COL-AMBIENT'
-                var mode3 = 'COL-COLOR'
-
-                this.modes = [mode1, mode2, mode3]
-                break;
-            case 'lego-ev3-touch':
-                var mode1 = 'TOUCH'
-
-                this.modes = [mode1]
-                break;
-
-            default:
-                console.error("Es wurde kein passender Typ definiert!");
-        }
-    }
-    setMode() {
-        sendingToRoboter(this.port, this.selectedMode);
-    }
-    getData() {
-        sendingToRoboter(this.port)
-    }
-    stop() {
-        sendingToRoboter(this.port, 'stop')
-    }
-}
-
-
-
 var buttonVW_PortA = document.getElementById("button_portA_vw")
 var buttonRW_PortA = document.getElementById("button_portA_rw")
 var buttonVW_PortB = document.getElementById("button_portB_vw")
@@ -189,6 +88,29 @@ mode_PortD.onchange = function() {
       value_PortA.value = ''
 }
 
+mode_Port1.onchange = function() {
+    sensor1.selectedMode = $("#modeport1 :selected").text();
+    buttonSM_Port1.disabled = 0
+    buttonGD_Port1.disabled = 1
+}
+mode_Port2.onchange = function() {
+    sensor2.selectedMode = $("#modeport2 :selected").text();
+    buttonSM_Port2.disabled = 0
+    buttonGD_Port2.disabled = 1
+}
+mode_Port3.onchange = function() {
+    sensor3.selectedMode = $("#modeport3 :selected").text();
+    buttonSM_Port3.disabled = 0
+    buttonGD_Port3.disabled = 1
+}
+mode_Port4.onchange = function() {
+    sensor4.selectedMode = $("#modeport4 :selected").text();
+    buttonSM_Port4.disabled = 0
+    buttonGD_Port4.disabled = 1
+}
+
+
+
 value_PortA.onchange = function () {
     if(motorA.setValue(parseInt(value_PortA.value))) {
         buttonVW_PortA.disabled = 0
@@ -226,6 +148,7 @@ value_PortD.onchange = function () {
     }
 }
 
+
 document.getElementById("onstart").onclick = start
 
 
@@ -247,20 +170,34 @@ function start() {
     {
         "port": "1", //Ausgabe des Address-Commands
         "type": "lego-ev3-us", //alternativ tacho-motor-m
+    },
+    {
+        "port": "2", //Ausgabe des Address-Commands
+        "type": "lego-ev3-gyro", //alternativ tacho-motor-m
+    },
+    {
+        "port": "3", //Ausgabe des Address-Commands
+        "type": "lego-ev3-color", //alternativ tacho-motor-m
+    },
+    {
+        "port": "4", //Ausgabe des Address-Commands
+        "type": "lego-ev3-touch", //alternativ tacho-motor-m
     }
     ]
 
 
-    // getDatafromRoboter(input);
+    getDatafromRoboter(input);
 
 
 
-    var motorBeispiel = new Motor("A", 'motor');
-    var sensorBeispiel = new Sensor("1", 'lego-ev3-us')
-
-    console.log(motorBeispiel);
-    console.log(sensorBeispiel);
+    // var motorBeispiel = new Motor("A", 'motor');
+    // var sensorBeispiel = new Sensor("1", 'lego-ev3-us')
+    //
+    // console.log(motorBeispiel);
+    // console.log(sensorBeispiel);
 }
+
+
 
 function getDatafromRoboter(input) {
     for (var i = 0; i < input.length; i++) {
@@ -296,18 +233,23 @@ function createInstanz(input) {
             break;
         case "1":
             sensor1 = new Sensor(input.port, input.type)
-            buttonSM_Port1.disabled = 0
             handleModes(sensor1, mode_Port1)
-            mode_Port1.disabled = 0
+            document.getElementById("Statusport1").firstChild.data = "Connected: " + input.type
             break;
         case "2":
             sensor2 = new Sensor(input.port, input.type)
+            handleModes(sensor2, mode_Port2)
+            document.getElementById("Statusport2").firstChild.data = "Connected: " + input.type
             break;
         case "3":
             sensor3 = new Sensor(input.port, input.type)
+            handleModes(sensor3, mode_Port3)
+            document.getElementById("Statusport3").firstChild.data = "Connected: " + input.type
             break;
         case "4":
             sensor4 = new Sensor(input.port, input.type)
+            handleModes(sensor4, mode_Port4)
+            document.getElementById("Statusport4").firstChild.data = "Connected: " + input.type
             break;
         default:
             console.log("Kein Port für Motor- oder Sensor gefunden.");
@@ -316,6 +258,53 @@ function createInstanz(input) {
 
 // ON Start
 disabledAllMotorButton(1)
+
+
+// Create peer connection instance
+const pc = new WebRTCPeerConnection();
+
+// Create Data Channel
+const dc = pc.createDataChannel('api', {
+    negotiated: true,
+    id: 0,
+})
+
+var INTITIALPAGE = 0
+
+dc.onmessage = (event) => {
+    console.log(event.data);
+
+    if (INTITIALPAGE == 0) {
+        getDatafromRoboter(JSON.parse(event.data));
+        INTITIALPAGE = 1
+    } else {
+        try {
+            handleMessages(JSON.parse(event.data))
+        } catch (e) {
+            console.error("Es wurde kein JSON Object geschickt!");
+        }
+    }
+};
+
+function handleMessages(message) {
+    switch (message.port) {
+        case '1':
+            value_Port1.value = message.value
+            break;
+        case '2':
+            value_Port2.value = message.value
+            break;
+        case '3':
+            value_Port3.value = message.value
+            break;
+        case '4':
+            value_Port4.value = message.value
+            break;
+
+        default:
+            console.error("Es wurde kein passender Port gefunden.");
+    }
+}
 
 // Forward
 buttonVW_PortA.onclick = function() {
@@ -347,37 +336,60 @@ buttonRW_PortD.onclick = function() {
 
 // Set Mode
 buttonSM_Port1.onclick = function() {
-    setMode("1");
+    sensor1.setMode();
+    buttonGD_Port1.disabled = 0
 }
 buttonSM_Port2.onclick = function() {
-    setMode("2");
+    sensor2.setMode();
+    buttonGD_Port2.disabled = 0
 }
 buttonSM_Port3.onclick = function() {
-    setMode("3");
+    sensor3.setMode();
+    buttonGD_Port3.disabled = 0
 }
 buttonSM_Port4.onclick = function() {
-    setMode("4");
+    sensor4.setMode();
+    buttonGD_Port4.disabled = 0
 }
 
 // Get Data
 buttonGD_Port1.onclick = function() {
-    getData("1");
+    sensor1.getData();
 }
 buttonGD_Port2.onclick = function() {
-    getData("2");
+    sensor2.getData();
 }
 buttonGD_Port3.onclick = function() {
-    getData("3");
+    sensor3.getData();
 }
 buttonGD_Port4.onclick = function() {
-    getData("4");
+    sensor4.getData();
 }
 
 
 
 // Sending data to roboter
 function sendingToRoboter(port, mode = null, direction = null) {
-    console.log(port, direction, mode);
+    var message = null;
+    if (direction != null) {
+        message = {
+            'port': port,
+            'type': mode,
+            'value': direction,
+
+        }
+    } else if (mode != null) {
+        message = {
+            'port': port,
+            'type': mode,
+        }
+    } else {
+        message = {
+            'port': port,
+        }
+    }
+
+    sendingData(message)
 }
 
 

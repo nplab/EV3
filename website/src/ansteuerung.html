@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <title>Startseite - Lego Minestrom Roboter mit WebRTC</title>
+
+    <meta charset="UTF-8">
+    <meta name="Startseite" content="Startseite der Webanwednung um einen Lego Minestorm Roboter über
+    ein Webinterface mit WebRTC zusteuern.">
+    <!--<Verweise auf CSS und javascript>-->
+    <link rel="stylesheet" type="text/css" href="../css/main/main1.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/main/materilize.css"/>
+    <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css"> <!--ICONS-->
+
+</head>
+
+
+<body>
+    <header>
+        <div class="navbar-fixed">
+            <nav class="background_navbar">
+                <div class="nav-wrapper container">
+                    <ul class="left hide-on-med-and-down">
+                        <li><a class="textcolor" href="index.html"><i class="fa fa-home" aria-hidden="true"></i> Home</a></li>
+                        <li><a class="textcolor" href="anleitung.html"><i class="fa fa-handshake-o" aria-hidden="true"></i> Anleitung</a></li>
+                        <li><a class="textcolor" href="ansteuerung.html"><i class="fa fa-rocket" aria-hidden="true"></i> Ansteuerung</a></li>
+                        <li><a class="textcolor" href="steuerung.html"><i class="fa fa-rocket" aria-hidden="true"></i> Steuerung</a></li>
+                        <li><a class="textcolor" href="entwicklung.html"><i class="fa fa-file-text-o" aria-hidden="true"></i> Entwicklung</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+
+
+    <div class="main" id="background">
+
+        <div class="row">
+            <div class="col s4">
+                <div class="title-h1">
+                    <p>
+                        <i class="fa fa-rocket" aria-hidden="true"></i>
+                        Ansteuerung
+                    </p>
+                </div>
+                <button class="btn waves-effect waves-light" type="submit" name="action" id="onstart">Start</button>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s4">
+                <div class="title-h2">
+                    <p>Motoren</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text_inhalt">
+            <div class="row">
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port A</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="StatusportA">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeportA" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueportA" type="text" placeholder="Value">
+                                <label>Value</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect waves-light" type="submit" name="action" id="button_portA_vw" disabled>forward</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portA_rw" disabled>backwards</button>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portA_stop" disabled>drive stop</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port B</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="StatusportB">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeportB" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueportB" type="text" placeholder="Value" disabled>
+                                <label>Value</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect waves-light" type="submit" name="action" id="button_portB_vw" disabled>forward</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portB_rw" disabled>backwards</button>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portB_stop" disabled>drive stop</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port C</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="StatusportC">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeportC" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueportC" type="text" placeholder="Value" disabled>
+                                <label>Value</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect waves-light" type="submit" name="action" id="button_portC_vw" disabled>forward</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portC_rw" disabled>backwards</button>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portC_stop" disabled>drive stop</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port D</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="StatusportD">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeportD" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueportD" type="text" placeholder="Value" disabled>
+                                <label>Value</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect waves-light" type="submit" name="action" id="button_portD_vw" disabled>forward</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portD_rw" disabled>backwards</button>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_portD_stop" disabled>drive stop</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s4">
+                <div class="title-h2">
+                    <p>Sensoren</p>
+                </div>
+            </div>
+        </div>
+        <div class="text_inhalt">
+            <div class="row">
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port 1</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="Statusport1">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeport1" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port1_sm" disabled>Set Mode</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port1_get" disabled>Get Data</button>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueport1" type="text" placeholder="Value" disabled>
+                                <label>Value</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port 2</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="Statusport2">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeport2" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port2_sm" disabled>Set Mode</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port2_gd" disabled>Get Data</button>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueport2" type="text" placeholder="Value" disabled>
+                                <label>Value</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port 3</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="Statusport3">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeport3" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port3_sm" disabled>Set Mode</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port3_gd" disabled>Get Data</button>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueport3" type="text" placeholder="Value" disabled>
+                                <label>Value</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row captionbox">
+                            <p>Port 4</p>
+                        </div>
+                        <div class="row">
+                            <textfield id="Statusport4">Disconnected</textfield>
+                        </div>
+                        <div class="row">
+                            <label>Mode</label>
+                            <select id="modeport4" class="browser-default selectfield">
+                                <option value="0" selected disabled>Select Mode</option>
+                            </select>
+                        </div>
+                        <div class="row">
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port4_sm" disabled>Set Mode</button>
+                            <button class="btn waves-effect" type="submit" name="action" id="button_port4_gd" disabled>Get Data</button>
+                        </div>
+                        <div class="row">
+                            <div class="center input-field textfield">
+                                <input id="valueport4" type="text" placeholder="Value" disabled>
+                                <label>Value</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+        </div>
+
+
+
+    <div class="footer">
+        <div class="cont-center">
+            <p class="text-center">&copy; Jesko Appenfeller & Frederik Broer & Labor für Netzwerkprogrammierung</p>
+        </div>
+    </div>
+</div>
+<script type="text/javascript" src="js/socket/socket.io.js"></script>
+<script type="text/javascript" src="js/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="js/materialize/materialize.js"></script>
+<script type="text/javascript" src="js/main/loadjson.js"></script>
+<script type="text/javascript" src="js/main/signaling.js"></script>
+<script type="text/javascript" src="js/main/webrtc.js"></script>
+<script type="text/javascript" src="js/main/motor.js"></script>
+<script type="text/javascript" src="js/main/sensor.js"></script>
+<script type="text/javascript" src="js/main/ansteuerung.js"></script>
+
+
+</body>
+
+</html>
+</DOCTYPE>
