@@ -75,17 +75,17 @@ Messages to sensors can either set the mode of a sensor by including the `mode` 
 }
  ```
  
- | type  | mode        | meaning                                   | values                            |
- |----------------|-------------|----------------------------------------------------|----------------------------------------|
- | lego-ev3-us    | US-DIST-CM  | continous distance measurement                     | 0.0 – 2550.0 (mm)                      |
- | lego-ev3-us    | US-SI-CM    | single distance measurement                        | 0.0 – 2550.0  (mm)                     |
- | lego-ev3-touch | %           | button pressed or released                         | 0 OR 1                                 |
- | lego-ev3-gyro  | GYRO-ANG    | angle the sensor has turned since initializasation | -32768 – 32767 (°)                     |
- | lego-ev3-gyro  | GYRO-RATE   | rate of turning                                    | -440 – 440 (°/s)                       |
- | lego-ev3-gyro  | GYRO-G&A    | angle and rate of turning                          | [-32768 – 32767 (°), -440 – 440 (°/s)] |
- | lego-ev3-color | COL-REFLECT | intensity of reflected light                       | 0-100 (%)                              |
- | lego-ev3-color | COL-AMBIENT | intensity of ambient light                         | 0-100 (%)                              |
- | lego-ev3-color | COL-COLOR   | detected color                                     | 0-7[^3]                                |
+ | type           | mode        | meaning                                            | values                                   |
+ |----------------|-------------|----------------------------------------------------|------------------------------------------|
+ | lego-ev3-us    | US-DIST-CM  | continous distance measurement                     | 0.0 – 2550.0 (mm)                        |
+ | lego-ev3-us    | US-SI-CM    | single distance measurement                        | 0.0 – 2550.0  (mm)                       |
+ | lego-ev3-touch | %           | button pressed or released                         | 0 OR 1                                   |
+ | lego-ev3-gyro  | GYRO-ANG    | angle the sensor has turned since initializasation | -32768 – 32767 (°)                       |
+ | lego-ev3-gyro  | GYRO-RATE   | rate of turning                                    | -440 – 440 (°/s)                         |
+ | lego-ev3-gyro  | GYRO-G&A    | angle and rate of turning                          | \[-32768 – 32767 (°), -440 – 440 (°/s)\] |
+ | lego-ev3-color | COL-REFLECT | intensity of reflected light                       | 0-100 (%)                                |
+ | lego-ev3-color | COL-AMBIENT | intensity of ambient light                         | 0-100 (%)                                |
+ | lego-ev3-color | COL-COLOR   | detected color                                     | 0-7[^3]                                  |
 
 
 [^1]: `hold` = motor attempts to hold position; `coast` = motor is free to be turned
