@@ -1,6 +1,11 @@
 /* Open Sans */
 @import url(https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,400,300,600,700);
 
+.backgroundCanvas {
+    background-color: #9fa2a2;
+}
+
+
 .text_inhalt {
     padding-left: 3%;
     padding-right: 3%;
