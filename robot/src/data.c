@@ -18,6 +18,7 @@ void data_channel_helper_create(struct data_channel_helper** const channel_helpe
 static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_description();
+void api_channel_open_handler(void* const arg);
 
 void* data_channel_setup(void* ignore){
   unsigned int stun_urls_length;
@@ -94,7 +95,7 @@ wrtcr_rc initialise_client(){
   EORE(rawrtc_peer_connection_create_data_channel(
                                                 &client_info.data_channel_negotiated->channel, client_info.connection,
                                                 dc_parameters, NULL,
-                                                default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
+                                                api_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
                                                 default_data_channel_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
 
@@ -121,7 +122,7 @@ static void negotiation_needed_handler(void* const arg) {
   struct client* const client = arg;
 
   // Print negotiation needed
-  default_negotiation_needed_handler(arg);
+  ZF_LOGI("(%s) Negotiation needed\n", client->name);
 
   // Offering: Create and set local description
   if (client->offering) {
@@ -135,8 +136,9 @@ static void negotiation_needed_handler(void* const arg) {
 static void connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg) {
     struct client* const client = arg;
 
-    // Print state
-    default_peer_connection_state_change_handler(state, arg);
+    //print the new state
+    char const * const state_name = rawrtc_peer_connection_state_to_name(state);
+    ZF_LOGD("(%s) Peer connection state change: %s\n", client->name, state_name);
 
     // Only create a new channel if none exist yet (in case we disconnect and then reconnect)
     /* if (!client->data_channel && state == RAWRTC_PEER_CONNECTION_STATE_CONNECTED) { */
@@ -195,7 +197,6 @@ static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate*
   }
 }
 
-//
 static void send_local_description(struct client* const client) {
   struct rawrtc_peer_connection_description* description;
   enum rawrtc_sdp_type type;
@@ -458,4 +459,16 @@ out:
         data_channel_shutdown();
         exit(0);
     }
+}
+
+void api_channel_open_handler(void* const arg) {
+  struct data_channel_helper* const channel = arg;
+
+  ZF_LOGI("(%s) Data channel open: %s\n", channel->client->name, channel->label);
+
+  struct mbuf *port_desc = mbuf_alloc(14);
+  mbuf_printf(port_desc, "Test an Fredo");
+  mbuf_set_pos(port_desc, 0);
+
+  EORE(rawrtc_data_channel_send(channel->channel,  port_desc, false), "Could not send port description message");
 }

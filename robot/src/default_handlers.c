@@ -111,19 +111,6 @@ void default_data_channel_message_handler(struct mbuf* const buffer, enum rawrtc
                  client->name, channel->label, mbuf_get_left(buffer));
 }
 
-// Print negotiation needed (duh!)
-void default_negotiation_needed_handler(void* const arg) {
-    struct client* const client = arg;
-    ZF_LOGD("(%s) Negotiation needed\n", client->name);
-}
-
-// Print the peer connection's state.
-void default_peer_connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg) {
-    struct client* const client = arg;
-    char const * const state_name = rawrtc_peer_connection_state_to_name(state);
-    ZF_LOGD("(%s) Peer connection state change: %s\n", client->name, state_name);
-}
-
 // Print the newly gathered local candidate (peer connection variant).
 void default_peer_connection_local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg) {
     struct client* const client = arg;
