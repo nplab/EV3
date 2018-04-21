@@ -1,7 +1,11 @@
 'use strict';
 
+/**
+ * A WebRTC peer connection helper. Tightly coupled with the signaling
+ * class.
+ */
 class WebRTCPeerConnection {
-    constructor(configuration = null) {
+    constructor(signaling, offering, configuration = null) {
         // Set default configuration (if none provided)
         if (configuration === null) {
             configuration = {
@@ -13,10 +17,18 @@ class WebRTCPeerConnection {
 
         // Create peer connection and bind events
         const pc = new RTCPeerConnection(configuration);
-
-
+        pc._offering = offering; // Meh!
+        signaling.pc = pc;
         pc.onnegotiationneeded = async () => {
             console.log('Negotiation needed');
+
+            // Create offer (if required)
+            if (offering) {
+                console.log('Creating offer');
+                const description = await pc.createOffer();
+                await pc.setLocalDescription(description);
+                signaling.handleLocalDescription(description);
+            }
         };
         pc.signalingstatechange = () => {
             console.log('Signaling state:', pc.signalingState);
@@ -31,8 +43,7 @@ class WebRTCPeerConnection {
             console.log('Connection state:', pc.connectionState);
         };
         pc.onicecandidate = (event) => {
-            console.log('Local ICE candidate:', event.candidate);
-            sendMessage(pc.localDescription);
+            signaling.handleLocalCandidate(event.candidate);
         };
         pc.onicecandidateerror = (event) => {
             console.error('ICE candidate error:', event);
@@ -79,51 +90,6 @@ class WebRTCPeerConnection {
         dc.onmessage = (event) => {
             const size = event.data.byteLength || event.data.size;
             console.log(dc._name, 'incoming message (' + size + ' bytes)');
-            console.log(event.data);
         };
     }
-
-    async handleDescription(description) {
-        // Set remote description
-        console.log('Setting remote description');
-        await this.pc.setRemoteDescription(description);
-        console.log('Remote description:', this.pc.remoteDescription);
-
-        console.log(name, 'Creating answer');
-        description = await this.pc.createAnswer();
-
-        // Apply local description
-        await this.pc.setLocalDescription(description);
-        console.log('Local description:', description);
-    }
-}
-
-
-
-
-// Functions
-
-/*
-handle a offer from signaling server
-*/
-function handleOffer(message) {
-    pc.handleDescription(message, true)
-    .catch((error) => console.error(error));
-}
-
-/*
-send data do other peer via dataChannel
-*/
-function sendingData(data) {
-    console.log(data);
-    try {
-        dc.send(data);
-    } catch (error) {
-        if (error.name === 'TypeError') {
-            console.error(dc._name, 'message too large to send');
-        } else {
-            console.error(dc._name, 'Unknown error:', error.name);
-        }
-    }
-
 }
