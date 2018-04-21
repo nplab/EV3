@@ -106,4 +106,4 @@ Livedaten Antwort:
 ```
 
 [^1]: `hold` = Motor hält die letzte Position; `coast` = Motor dreht frei
-[^2]:`running` = Motor dreht; `ramping` = Motor beschleunigt oder bremst; `holding` = Motor versucht aktiv die Position zu halten; `olverloaded` = Motor kann trotz maximaler Leistung die eingestellete Geschwindigkeit nicht erreich; `stalled` = Motor steht, da das Drehmoment nicht ausreicht.
+[^2]: `running` = Motor dreht; `ramping` = Motor beschleunigt oder bremst; `holding` = Motor versucht aktiv die Position zu halten; `olverloaded` = Motor kann trotz maximaler Leistung die eingestellete Geschwindigkeit nicht erreich; `stalled` = Motor steht, da das Drehmoment nicht ausreicht.
