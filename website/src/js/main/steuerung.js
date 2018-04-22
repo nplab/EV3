@@ -7,11 +7,11 @@ var centerY = 73;
 var distance = null;
 var angle = null;
 
-/**********
-Funktionen
- **********/
+// Start des Canvas Elements
 function startupCanvas() {
   var radius = 70;
+
+  // Canvas für die Steuerung
   canvasSteuerungContext.beginPath();
   canvasSteuerungContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
   canvasSteuerungContext.fillStyle = '#f3f3f4';
@@ -28,7 +28,7 @@ function startupCanvas() {
   canvasSteuerungContext.fillStyle = '#fbba00';
   canvasSteuerungContext.fillText("R", centerX-10, centerY+10);
 
-
+  // Canvas für die Darstellung der Hinternisse
   canvasAbstandContext.beginPath();
   canvasAbstandContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
   canvasAbstandContext.fillStyle = '#f3f3f4';
@@ -51,6 +51,7 @@ function runIntoWall() {
     oldhtml.style.background="#dedede";
   }, 1000);
 }
+
 
 function getDistanceAngle(mouseX, mouseY) {
   var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)

@@ -1,42 +1,47 @@
+// Lade Konfiguration
 config = getConfig();
 
-// Connect to Signaling Server
+// Verbindung zum Signaling Server
 var socket = io.connect('https://localhost:3001');
 
-// get and print info Message
+// erhalte und gebe die "info Message" aus
 socket.on('info', function (data) {
     console.info(data);
 
-    // Join room
+    // Betrete den Raum
     socket.emit('roomJoin', config.sig_serv.room);
 })
 
-// get all messages from room
+// Erhalte alle Nachrichten, die im Raum gesendet werden
 socket.on('signaling', function(data) {
     console.log('Client received message:', data);
     if (data === 'READY###') {
         return
     }
-
-    receiveMessages(JSON.parse(data))
+    try {
+        receiveMessages(JSON.parse(data))
+    } catch (e) {
+        console.error("Die Nachricht entspricht nicht dem JSON Format.", e);
+    }
 });
 
+// Erfolgreiche Verbindung zum Raum
+socket.emit('signaling', "Message to Server: Connection successfull");
+
+
+// Handle Nachrichten. Nur eine Offer-Nachricht wird weitergeleitet.
 function receiveMessages (message) {
 
     if (message.type === 'offer') {
         handleOffer(message)
-
     } else if (message === 'bye') {
-        // TODO: cleanup RTC connection?
+        // TODO, Falls eine Nachricht gesendet werden soll.
     }
 }
 
-
+// Senden einer Nachricht an den Siganling Server
 function sendMessage(message){
     console.log('Client sending message:');
     console.log(JSON.stringify(message));
     socket.emit('signaling', JSON.stringify(message));
 }
-
-// send message to room
-socket.emit('signaling', "Message to Server: Connection successfull");
