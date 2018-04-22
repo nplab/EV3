@@ -135,82 +135,81 @@ buttonGD_Port4.onclick = function() {
 // Onchange Events für die Mode Selections
 mode_PortA.onchange = function() {
       motorA.setSelectedMode($("#modeportA :selected").text()); // Setzen des Modus
-      handleMotorValuefield(value_PortA)
+      handleMotorMode(value_PortA)
 }
 mode_PortB.onchange = function() {
       motorB.setSelectedMode($("#modeportB :selected").text());
-      handleMotorValuefield(value_PortB)
+      handleMotorMode(value_PortB)
 }
 mode_PortC.onchange = function() {
       motorC.setSelectedMode($("#modeportC :selected").text());
-      handleMotorValuefield(value_PortC)
+      handleMotorMode(value_PortC)
 }
 mode_PortD.onchange = function() {
       motorD.setSelectedMode($("#modeportD :selected").text());
-      handleMotorValuefield(value_PortD)
+      handleMotorMode(value_PortD)
 }
 mode_Port1.onchange = function() {
     sensor1.setSelectedMode($("#modeport1 :selected").text());
-    buttonSM_Port1.disabled = 0
-    buttonGD_Port1.disabled = 1
+    handleSensorMode(buttonSM_Port1, buttonGD_Port1)
 }
 mode_Port2.onchange = function() {
     sensor2.setSelectedMode($("#modeport2 :selected").text());
-    buttonSM_Port2.disabled = 0
-    buttonGD_Port2.disabled = 1
+    handleSensorMode(buttonSM_Port2, buttonGD_Port2)
 }
 mode_Port3.onchange = function() {
     sensor3.setSelectedMode($("#modeport3 :selected").text());
-    buttonSM_Port3.disabled = 0
-    buttonGD_Port3.disabled = 1
+    handleSensorMode(buttonSM_Port3, buttonGD_Port3)
 }
 mode_Port4.onchange = function() {
     sensor4.setSelectedMode($("#modeport4 :selected").text());
-    buttonSM_Port4.disabled = 0
-    buttonGD_Port4.disabled = 1
+    handleSensorMode(buttonSM_Port4, buttonGD_Port4)
 }
 
 // Onchange für das Value Feld der Motoren
 value_PortA.onchange = function () {
     if(motorA.setValue(parseInt(value_PortA.value))) {
-        buttonVW_PortA.disabled = 0
-        buttonRW_PortA.disabled = 0
+        handleMotorValueField(buttonVW_PortA, buttonRW_PortA, 0)
     } else {
-        buttonVW_PortA.disabled = 1
-        buttonRW_PortA.disabled = 1
+        handleMotorValueField(buttonVW_PortA, buttonRW_PortA, 1)
     }
 }
 value_PortB.onchange = function () {
     if(motorB.setValue(parseInt(value_PortB.value))) {
-        buttonVW_PortB.disabled = 0
-        buttonRW_PortB.disabled = 0
+        handleMotorValueField(buttonVW_PortB, buttonRW_PortB, 0)
     } else {
-        buttonVW_PortB.disabled = 1
-        buttonRW_PortB.disabled = 1
+        handleMotorValueField(buttonVW_PortB, buttonRW_PortB, 1)
     }
 }
 value_PortC.onchange = function () {
     if(motorC.setValue(parseInt(value_PortC.value))) {
-        buttonVW_PortC.disabled = 0
-        buttonRW_PortC.disabled = 0
+        handleMotorValueField(buttonVW_PortC, buttonRW_PortC, 0)
     } else {
-        buttonVW_PortC.disabled = 1
-        buttonRW_PortC.disabled = 1
+        handleMotorValueField(buttonVW_PortC, buttonRW_PortC, 1)
     }
 }
 value_PortD.onchange = function () {
     if(motorD.setValue(parseInt(value_PortD.value))) {
-        buttonVW_PortD.disabled = 0
-        buttonRW_PortD.disabled = 0
+        handleMotorValueField(buttonVW_PortD, buttonRW_PortD, 0)
     } else {
-        buttonVW_PortD.disabled = 1
-        buttonRW_PortD.disabled = 1
+        handleMotorValueField(buttonVW_PortD, buttonRW_PortD, 0)
     }
 }
 
-function handleMotorValuefield(valuePort) {
+function handleSensorMode(buttonSM, buttonGD) {
+    buttonSM.disabled = 0
+    buttonGD.disabled = 1
+}
+
+
+function handleMotorMode(valuePort) {
     valuePort.disabled = 0  // Value-Feld einblenden
     valuePort.value = ''    // Value-Feld = ''
+}
+
+function handleMotorValueField(buttonRW, buttonVW, status) {
+    buttonVW.disabled = status
+    buttonRW.disabled = status
 }
 
 
@@ -229,7 +228,7 @@ function start() {
         "type": "tacho-motor-l", //alternativ tacho-motor-m
     },
     {
-        "port": "C", //Ausgabe des Address-Commands
+        "port": "D", //Ausgabe des Address-Commands
         "type": "tacho-motor-l", //alternativ tacho-motor-m
     },
     {
@@ -321,6 +320,7 @@ function createInstanz(input) {
     }
 }
 
+// Bei Nachrichteneingang wird die dem Port entsprechende Nachricht in einem Textfeld angegeben.
 function handleMessages(message) {
     switch (message.port) {
         case '1':
@@ -431,7 +431,6 @@ function disabledAllMotorButton(yesno) {
     buttonST_PortB.disabled = yesno
     buttonST_PortC.disabled = yesno
     buttonST_PortD.disabled = yesno
-
 }
 
 // ON Start
