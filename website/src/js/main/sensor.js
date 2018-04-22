@@ -48,6 +48,14 @@ class Sensor {
                 console.error("Es wurde kein passender Typ definiert!");
         }
     }
+    // Setzt den selectedMode, wenn der Modus in der Modusliste existiert.
+    setSelectedMode(mode) {
+        if (this.modes.indexOf(mode) != -1) {
+            this.selectedMode = mode;
+        } else {
+            console.error("Kein Passender Mode!");
+        }
+    }
 
     // Sendet den ausgewählten Modus
     setMode() {
