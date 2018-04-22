@@ -1,8 +1,10 @@
 'use strict';
-
+/*
+In dieser Klasse wid eine WebRTC Verbindung erzeugt. Sie kann mittls 'const pc = new WebRTCPeerConnection()' hergestellt werden. In dieser Klasse sind schon alle notwendigen Funktionen definiert, sodass nur die Funktion 'handleOffer' aufgerufen werden muss. Anschließend wird eine remoteDescription erzeugt und an den Signaling Server gesendet.
+*/
 class WebRTCPeerConnection {
     constructor(configuration = null) {
-        // Set default configuration (if none provided)
+        // Setzen einer default Konfiguration
         if (configuration === null) {
             configuration = {
                 iceServers: [{
@@ -11,10 +13,10 @@ class WebRTCPeerConnection {
             };
         }
 
-        // Create peer connection and bind events
+        // Erzeugen einer RTCPeerConnection
         const pc = new RTCPeerConnection(configuration);
 
-
+        // Initialisierung der verschiedenen "Change" Funktionen der RTC-Peers
         pc.onnegotiationneeded = async () => {
             console.log('Negotiation needed');
         };
@@ -50,6 +52,7 @@ class WebRTCPeerConnection {
         this.dcs = {};
     }
 
+    // Herstellen eines DataChannels
     createDataChannel(name, options = null) {
         const pc = this.pc;
 
@@ -62,6 +65,7 @@ class WebRTCPeerConnection {
         return dc;
     }
 
+    // handle der Events des DataChannels
     bindDataChannelEvents(dc) {
         dc._name = dc.label; // Meh!
         dc.onopen = () => {
@@ -83,6 +87,7 @@ class WebRTCPeerConnection {
         };
     }
 
+    // Handle description:
     async handleDescription(description) {
         // Set remote description
         console.log('Setting remote description');
@@ -98,22 +103,13 @@ class WebRTCPeerConnection {
     }
 }
 
-
-
-
-// Functions
-
-/*
-handle a offer from signaling server
-*/
+// Handle einer Offer-Nachricht
 function handleOffer(message) {
     pc.handleDescription(message, true)
     .catch((error) => console.error(error));
 }
 
-/*
-send data do other peer via dataChannel
-*/
+// Senden des Nachrichten in den DataChannel
 function sendingData(data) {
     console.log(data);
     try {
