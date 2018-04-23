@@ -2,11 +2,10 @@
 In dieser Klasse sind alle notwendigen Funktionen definiert, damit ein Lego Minestrom Motor gesteuert werden kann.
 
 Dafür ist es notwenig, dass sich die Weboberfläche mit dem Roboter verbindet (z.B. mittels webRTC). Außerdem muss anschließend die Funktion 'sendingToRoboter' definiert werden, sodass der Roboter die Nachrichten erhalten kann.
-
 */
 
 class Motor {
-    constructor(port, type, mode = null) {
+    constructor(port, type, mode = null, allModes = false) {
         this.port = port;               // Port des Motors
         this.type = type;               // Typ des Motors
         this.modes = null;              // Liste der wählbaren Modes
@@ -14,15 +13,22 @@ class Motor {
         this.value = null;
 
         // Set List of modes
-        this.getModes()
+        this.getModes(allModes)
     }
 
     // Je nach Typ des Sensors können unterschiedliche Modes genutzt werden. Zurzeit werden für beide Motoren die beiden gleichen Modi unterstützt.
-    getModes() {
+    getModes(allModes) {
         var mode1 = 'run-forever';
         var mode2 = 'run-to-rel-position';
 
-        this.modes = [mode1, mode2]
+        if (allModes) {
+            var mode3 = 'set-position';
+            var mode4 = 'set-stop-action';
+            var mode5 = 'get-state';
+            this.modes = [mode1, mode2, mode3, mode4, mode5]
+        } else {
+            this.modes = [mode1, mode2]
+        }
     }
 
     // Setzt den selectedMode, wenn der Modus in der Modusliste existiert.
