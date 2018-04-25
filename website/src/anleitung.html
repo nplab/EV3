@@ -50,6 +50,19 @@
         <div class="row">
             <div class="col s4">
                 <div class="title-h2">
+                    <p>Verbindungsaufbau</p>
+                </div>
+            </div>
+        </div>
+        <div class="text_inhalt">
+            <div class="row">
+                <p>So verbindet man den Roboter mit einem Signaling Server.</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s4">
+                <div class="title-h2">
                     <p>Ansteuerung</p>
                 </div>
             </div>
@@ -57,17 +70,29 @@
 
         <div class="text_inhalt">
             <div class="row">
-                <div class="col s6">
+                <div class="col s12">
                     <p>Auf dem Tab <a href="ansteuerung.html"> Ansteuerung</a> kann der Lego Minestorm Roboter mit Hilfe von verschiedenen Steuereinheuten gesteuert werden.</p>
                     <p>Die WebRTC Verbindung zum Roboter wird aufgebaut und der Roboter sendet eine Initialisierungsnachricht an die Website. In dieser Initialisierungsnachricht wird eine Zustandübersicht gesendet. In der sind beispielsweise alle angeschlossenen Motoren und die entsprechende Typen des Motors zusammengefasst. Beispielsweise steht in dieser Initialisierungsnachricht, dass an Port "A" ein Motor mit dem Typ "tacho-motor-l" angeschlossen ist. Das entspricht dem großen Motor. </p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s2">
+                </div>
+                <div class="col s4">
+                    <img class="img400" src="pic/sensor.png" alt="Bild der Sensorsteuerung">
+                    <p>Abbildung 1: Sensorsteuerung</p>
+                </div>
+                <div class="col s4">
+                    <img class="img400" src="pic/motor.png" alt="Bild der Motorsteuerung">
+                    <p>Abbildung 2: Motorsteuerung</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s12">
                     <p>Nachdem die Verdinung aufgebaut ist und die entsprechenden Steuereinheiten initialisiert wurden, kann mit dem Roboter kommuniziert werden. Dafür muss zunächst ein passender Modus gewählt werden. Im Fall des großen Motors ist es zum Beispiel "run-forever". Das bedeutet, dass der Motor solange läuft, bis er entweder ein "Stop" Kommando erhält, oder der Modus gewechselt wird. Zunätzlich zum Modus muss ein Wert angegeben werden, der für die Geschwindigkeit des Motors zuständig ist. In skizzierten Fall verwenden wir "100", damit der Motor mit voller Leistung fährt. </p>
                     <p>Anschließend kann der Motor mit den beiden Button "Forward" bzw. "Backward" Vorwärts bzw. Rückwärts gefahren werden. Der Button "Stop" sorgt dafür, dass der Motor aufhört zu laufen. </p>
                     <p>Die Steuerung der Sensoren läuft ein wenig anders. Nach der Initialisierungsnachricht können für jeden Sensor unterschiedliche Modi ausgesucht werden. Ein wichtiger und entscheidener Unterscheid ist, dass zuerst ein bestimmter Modus gesetzt werden muss, bevor Daten ausgelesen werden können. Allerdings sorgt die Oberfläche für diesen Schritt, weil sie den Button "Get Data" erst aktiviert, wenn ein Modus an den Roboter übermittelt wurde. </p>
                     <p>Auf dem Tab <a href="steuerung.html"> Steuerung</a> kann der Lego Minestorm Roboter mit Hilfe eines Kreises gesteuert werden.</p>
-                </div>
-                <div class="col s6">
-                    <img src="pic/motor.png" alt="Bild der Motorsteuerung">
-                    <img src="pic/sensor.png" alt="Bild der Sensorsteuerung">
                 </div>
             </div>
         </div>
