@@ -23,6 +23,12 @@
     border: 0px;
 }
 
+.imgbeispielbild {
+    width: inherit;
+    height: inherit;
+    border: 40px;
+}
+
 .port{
     border-style: solid;
     margin-left: 3%;
