@@ -187,14 +187,19 @@ void stop_on_return_handler(
 //handle local candidata (print, send last one to signaling server)
 static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg) {
   struct client* const client = arg;
+  struct rawrtc_ice_candidate* ortc_candidate = NULL;
+  enum rawrtc_ice_candidate_type cur_type, best_type;
 
-  // Print local candidate
-  default_peer_connection_local_candidate_handler(candidate, url, arg);
-
-  // Print local description (if last candidate)
-  if(!candidate) {
+  if (candidate) {
+    EORE(rawrtc_peer_connection_ice_candidate_get_ortc_candidate(&ortc_candidate, candidate), "Could not get ORTC ICE candidate");
+    EORE(rawrtc_ice_candidate_get_type(&type, ortc_candidate), "Could not get type of ice candidate");
+    // Print local candidate
+    print_ice_candidate(ortc_candidate, url, candidate, client);
+  } else {
+    
     send_local_description(client);
   }
+
 }
 
 static void send_local_description(struct client* const client) {
