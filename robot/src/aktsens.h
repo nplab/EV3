@@ -7,10 +7,4 @@
 
 #include "utils.h"
 
-void* setup_robot(void *ignore);
-
-wrtcr_rc check_collision();
-
-wrtcr_rc get_distance(float *val);
-
-wrtcr_rc drive();
+void* setup_robot();
