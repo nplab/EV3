@@ -29,8 +29,8 @@ void* setup_robot(){
   }
   for ( int i = 0; i < DESC_LIMIT; i++ ) {
       if ( ev3_tacho[ i ].type_inx != TACHO_TYPE__NONE_ ) {
-      printf( "  type = %s\n", ev3_tacho_type( ev3_tacho[ i ].type_inx ));
-      printf( "  port %d= %s\n", ev3_tacho[i].port, ev3_tacho_port_name( i, port ));
+      ev3_tacho_port_name( i, port );
+      EOE(add_port(port[3], ev3_tacho_type( ev3_tacho[ i ].type_inx ), ev3_search_port(i, EXT_PORT__NONE_)), "Could not add found sensor to port array");
     }
   }
   return NULL;
