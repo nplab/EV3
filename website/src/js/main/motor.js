@@ -55,13 +55,13 @@ class Motor {
             if(value <= 100 && value >= 0) {
                 return true
             }
-            alert("Der Wert muss eine Zahl zwischen 0 und 100 sein.")
+            // alert("Der Wert muss eine Zahl zwischen 0 und 100 sein.")
             return false
         } else  if (this.selectedMode = 'run-to-rel-position'){
             if(value <= 360 && value >= 0) {
                 return true
             }
-            alert("Der Wert muss eine Zahl zwischen 0 und 360 sein.")
+            // alert("Der Wert muss eine Zahl zwischen 0 und 360 sein.")
             return false
         }
     }
