@@ -168,32 +168,16 @@ mode_Port4.onchange = function() {
 
 // Onchange für das Value Feld der Motoren
 value_PortA.onchange = function () {
-    if(motorA.setValue(parseInt(value_PortA.value))) {
-        handleMotorValueField(buttonVW_PortA, buttonRW_PortA, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortA, buttonRW_PortA, 1)
-    }
+    handleMotorValueField(motorA, value_PortA, buttonRW_PortA, buttonVW_PortA)
 }
 value_PortB.onchange = function () {
-    if(motorB.setValue(parseInt(value_PortB.value))) {
-        handleMotorValueField(buttonVW_PortB, buttonRW_PortB, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortB, buttonRW_PortB, 1)
-    }
+    handleMotorValueField(motorB, value_PortB, buttonRW_PortB, buttonVW_PortB)
 }
 value_PortC.onchange = function () {
-    if(motorC.setValue(parseInt(value_PortC.value))) {
-        handleMotorValueField(buttonVW_PortC, buttonRW_PortC, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortC, buttonRW_PortC, 1)
-    }
+    handleMotorValueField(motorC, value_PortC, buttonRW_PortC, buttonVW_PortC)
 }
 value_PortD.onchange = function () {
-    if(motorD.setValue(parseInt(value_PortD.value))) {
-        handleMotorValueField(buttonVW_PortD, buttonRW_PortD, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortD, buttonRW_PortD, 0)
-    }
+    handleMotorValueField(motorD, value_PortD, buttonRW_PortD, buttonVW_PortD)
 }
 
 function handleSensorMode(buttonSM, buttonGD) {
@@ -207,9 +191,16 @@ function handleMotorMode(valuePort) {
     valuePort.value = ''    // Value-Feld = ''
 }
 
-function handleMotorValueField(buttonRW, buttonVW, status) {
-    buttonVW.disabled = status
-    buttonRW.disabled = status
+function handleMotorValueField(motor, valuePort, buttonRW, buttonVW) {
+    if(motor.setValue(parseInt(valuePort.value))) {
+        buttonVW.disabled = 0
+        buttonRW.disabled = 0
+    } else {
+        buttonVW.disabled = 1
+        buttonRW.disabled = 1
+        valuePort.value = ''
+        alert("Es wurde ein falscher Wert eingetragen. 'run-for-ever': 0-100; 'run-to-rel-position': 0-360")
+    }
 }
 
 
