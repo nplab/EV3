@@ -42,10 +42,9 @@ int main(int argc, char *argv[]) {
 
   //start setup of components
   read_config(conf_file_name);
-  sigserv_connect();
-
-  /* data_channel_setup(NULL); */
   setup_robot();
+  sigserv_connect();
+  data_channel_setup();
 
   ZF_LOGI("Starting teardown procedure");
   sigserv_disconnect();

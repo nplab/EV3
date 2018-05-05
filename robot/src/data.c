@@ -20,7 +20,7 @@ bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_can
 static void get_remote_description();
 void api_channel_open_handler(void* const arg);
 
-void* data_channel_setup(void* ignore){
+wrtcr_rc data_channel_setup(){
   unsigned int stun_urls_length;
   char **stun_urls;
   unsigned int turn_urls_length;
@@ -463,44 +463,16 @@ out:
 
 void api_channel_open_handler(void* const arg) {
   struct data_channel_helper* const channel = arg;
-  char *test_desc = NULL;
-
-  cJSON *root = cJSON_CreateArray();
-  cJSON *tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "A");
-  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-m");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "B");
-  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-l");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "C");
-  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-l");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "1");
-  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-touch");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "2");
-  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-touch");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "3");
-  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-us");
-  cJSON_AddItemToArray(root, tempObj);
-
-  test_desc = cJSON_Print(root);
-
+  char *description = NULL;
   ZF_LOGI("(%s) Data channel open: %s\n", channel->client->name, channel->label);
 
-  struct mbuf *port_desc = mbuf_alloc(strlen(test_desc)+1);
-  mbuf_printf(port_desc, "%s", test_desc);
-  mbuf_set_pos(port_desc, 0);
+  EOE(get_port_description(&description), "Could not get port description");
 
-  free(test_desc);
-  cJSON_Delete(root);
+  struct mbuf *desc_mbuf = mbuf_alloc(strlen(description)+1);
+  mbuf_printf(desc_mbuf, "%s", description);
+  mbuf_set_pos(desc_mbuf, 0);
 
-  EORE(rawrtc_data_channel_send(channel->channel,  port_desc, false), "Could not send port description message");
+  free(description);
+
+  EORE(rawrtc_data_channel_send(channel->channel,  desc_mbuf, false), "Could not send port description message");
 }

@@ -2,11 +2,11 @@
 
 #include <rawrtc.h>
 #include <stdbool.h>
-#include <cJSON.h>
 #include "signaling.h"
 #include "default_handlers.h"
 #include "config.h"
 #include "utils.h"
+#include "aktsens.h"
 
 //client side meta info
 struct client {
@@ -30,7 +30,7 @@ struct data_channel_helper {
 };
 
 //set up the data channel to the website
-void* data_channel_setup(void* ignore);
+wrtcr_rc data_channel_setup();
 
 //shut down data channel and clean up
 wrtcr_rc data_channel_shutdown();
