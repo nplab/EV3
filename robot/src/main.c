@@ -12,7 +12,6 @@
 int main(int argc, char *argv[]) {
   char *def_conf_file_name = "wrtcr_conf.json";
   char *conf_file_name = NULL;
-  pthread_t drive, sensors;
 
   ZF_LOGI("Starting setup procedure");
   //parse arguments
@@ -43,14 +42,9 @@ int main(int argc, char *argv[]) {
 
   //start setup of components
   read_config(conf_file_name);
+  setup_robot();
   sigserv_connect();
-
-  data_channel_setup(NULL);
-  /* pthread_create(&drive, NULL, data_channel_setup, NULL); */
-  /* pthread_create(&sensors, NULL, setup_robot, NULL); */
-
-  /* pthread_join(drive, NULL); */
-  /* pthread_join(sensors, NULL); */
+  data_channel_setup();
 
   ZF_LOGI("Starting teardown procedure");
   sigserv_disconnect();
