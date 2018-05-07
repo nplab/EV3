@@ -16,3 +16,9 @@ typedef struct port_serial_number {
 wrtcr_rc setup_robot();
 
 wrtcr_rc get_port_description(char **out_string);
+
+unsigned int get_port_index(char port);
+
+wrtc_rc handle_tacho_message(int port_number, cJSON *message);
+
+wrtc_rc handle_sensor_message(int port_number, cJSON *message);

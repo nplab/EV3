@@ -19,6 +19,7 @@ static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_description();
 void api_channel_open_handler(void* const arg);
+void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
 
 wrtcr_rc data_channel_setup(){
   unsigned int stun_urls_length;
@@ -31,7 +32,9 @@ wrtcr_rc data_channel_setup(){
   conf_get_string_array("turn_urls", &turn_urls, &turn_urls_length);
 
   //initialize RawRTC
-  EORE(rawrtc_init(),"RawRTC Initialisaton failed");
+  EORE(rawrtc_i.
+2. gutscheine für zeit (hundebetreuung, hilfe bei größeren projekten usw) nehmen wir auch wieder gern entgegen ♥
+nit(),"RawRTC Initialisaton failed");
 
   //set up configuration
   EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
@@ -97,7 +100,7 @@ wrtcr_rc initialise_client(){
                                                 dc_parameters, NULL,
                                                 api_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
-                                                default_data_channel_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
+                                                robot_api_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
 
   //clean up
   mem_deref(dc_parameters);
@@ -475,4 +478,34 @@ void api_channel_open_handler(void* const arg) {
   free(description);
 
   EORE(rawrtc_data_channel_send(channel->channel,  desc_mbuf, false), "Could not send port description message");
+}
+
+void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg) {
+  struct data_channel_helper* const channel = arg;
+  struct client* const client = channel->client;
+  (void) flags;
+
+  ZF_LOGD("(%s) Incoming message for data channel %s: %zu bytes\n",
+          client->name, channel->label, mbuf_get_left(buffer));
+
+  //parse JSON and check it
+  cJSON *root = cJSON_Parse((const char*)buffer->buf);
+  PON(root, "Could not parse JSON on channel %s", channel->label);
+  cJSON *port_item = cJSON_GetObjectItem(root, "port");
+  char *port = cJSON_GetStringValue(port_item);
+  if(port == NULL || strlen(port) != 1){
+    handle_err("Message malformed, no port", false);
+  }
+
+  //call handler functions based on port
+  int port_number = get_port_index(*port);
+  if( port_number < 0){
+    handle_err("Message contained invalid port designator", false);
+  }
+  if( port_number <= 3 ){
+    handle_tacho_message(port_number, root);
+  } else if(port_number <= 7){
+    handle_sensor_message(port_number, root);
+  } 
+  cJSON_delete(root);
 }
