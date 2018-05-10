@@ -43,9 +43,6 @@ int main(int argc, char *argv[]) {
   //start setup of components
   read_config(conf_file_name);
   setup_robot();
-  char *temp;
-  get_port_description(&temp);
-  ZF_LOGI("%s", temp);
   sigserv_connect();
   data_channel_setup();
 
