@@ -100,11 +100,18 @@ wrtcr_rc handle_sensor_message(char port, cJSON *message){
 }
 
 wrtcr_rc tacho_stop_handler(uint8_t sn, cJSON *value){
-
+  (void) value;
+  set_tacho_command_inx(sn, TACHO_STOP);
   return WRTCR_SUCCESS;
 }
 wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
-  
+  int speed;
+  if(!cJSON_IsNumber(value)){
+    speed = value->valueint;
+    return WRTCR_FAILURE;
+  }
+  set_tacho_speed_sp(sn, speed);
+  set_tacho_command(sn, TACHO_RUN_FOREVER);
   return WRTCR_SUCCESS;
 }
 wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
