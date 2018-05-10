@@ -32,9 +32,7 @@ wrtcr_rc data_channel_setup(){
   conf_get_string_array("turn_urls", &turn_urls, &turn_urls_length);
 
   //initialize RawRTC
-  EORE(rawrtc_i.
-2. gutscheine für zeit (hundebetreuung, hilfe bei größeren projekten usw) nehmen wir auch wieder gern entgegen ♥
-nit(),"RawRTC Initialisaton failed");
+  EORE(rawrtc_init(),"RawRTC Initialisaton failed");
 
   //set up configuration
   EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
@@ -490,7 +488,9 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
 
   //parse JSON and check it
   cJSON *root = cJSON_Parse((const char*)buffer->buf);
-  PON(root, "Could not parse JSON on channel %s", channel->label);
+  if(!root){
+    ZF_LOGI("Could not parse JSON on channel %s", channel->label);
+  }
   cJSON *port_item = cJSON_GetObjectItem(root, "port");
   char *port = cJSON_GetStringValue(port_item);
   if(port == NULL || strlen(port) != 1){
@@ -498,14 +498,10 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
   }
 
   //call handler functions based on port
-  int port_number = get_port_index(*port);
-  if( port_number < 0){
-    handle_err("Message contained invalid port designator", false);
+  if( *port < 'A'){
+    handle_sensor_message(port, root);
+  } else {
+    handle_tacho_message(port, root);
   }
-  if( port_number <= 3 ){
-    handle_tacho_message(port_number, root);
-  } else if(port_number <= 7){
-    handle_sensor_message(port_number, root);
-  } 
-  cJSON_delete(root);
+  cJSON_Delete(root);
 }
