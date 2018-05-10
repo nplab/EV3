@@ -84,7 +84,7 @@ wrtcr_rc handle_tacho_message(char port, cJSON *message){
   uint8_t sn = *map_get(&port_map, &port);
   cJSON *command_item = cJSON_GetObjectItem(message, "command");
   char *command = cJSON_GetStringValue(command_item);
-  if(command == NULL || strlen(command) != 1){
+  if(command == NULL){
     handle_err("Message malformed, no command", false);
     return WRTCR_FAILURE;
   }
@@ -111,22 +111,39 @@ wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
     return WRTCR_FAILURE;
   }
   set_tacho_speed_sp(sn, speed);
-  set_tacho_command(sn, TACHO_RUN_FOREVER);
+  set_tacho_command_inx(sn, TACHO_RUN_FOREVER);
   return WRTCR_SUCCESS;
 }
 wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
-  
+  int pos;
+  if(!cJSON_IsNumber(value)){
+    pos = value->valueint;
+    return WRTCR_FAILURE;
+  }
+  set_tacho_position_sp(sn, pos);
+  set_tacho_command_inx(sn, TACHO_RUN_TO_REL_POS);
   return WRTCR_SUCCESS;
 }
 wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value){
-  
+  int pos;
+  if(!cJSON_IsNumber(value)){
+    pos = value->valueint;
+    return WRTCR_FAILURE;
+  }
+  set_tacho_position(sn, pos);
   return WRTCR_SUCCESS;
 }
 wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
-  
+  char *stop_action = cJSON_GetStringValue(value);
+  if(stop_action == NULL){
+    return WRTCR_FAILURE;
+  }
+  set_tacho_stop_action(sn, stop_action);
   return WRTCR_SUCCESS;
 }
 wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
-  
+  (void*) value;
+  char state[10];
+  get_tacho_state(sn, &state, sizeof(state));
   return WRTCR_SUCCESS;
 }
