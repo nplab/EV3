@@ -21,6 +21,7 @@ static void get_remote_description();
 void api_channel_open_handler(void* const arg);
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
 
+
 wrtcr_rc data_channel_setup(){
   unsigned int stun_urls_length;
   char **stun_urls;
@@ -499,9 +500,21 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
 
   //call handler functions based on port
   if( *port < 'A'){
-    handle_sensor_message(port, root);
+    handle_sensor_message(*port, root);
   } else {
-    handle_tacho_message(port, root);
+    handle_tacho_message(*port, root);
   }
   cJSON_Delete(root);
+}
+
+wrtcr_rc send_message_on_api_channel(char *msg){
+  struct mbuf *buf = mbuf_alloc(strlen(msg)+1);
+  mbuf_printf(buf, "%s", msg);
+  mbuf_set_pos(buf, 0);
+
+  if(rawrtc_data_channel_send(&client_info.data_channel_negotiated->channel,  buf, false) == RAWRTC_CODE_SUCCESS){
+    return WRTCR_SUCCESS;
+  } else {
+    return WRTCR_FAILURE;
+  }
 }

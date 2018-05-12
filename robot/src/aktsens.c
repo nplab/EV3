@@ -104,6 +104,7 @@ wrtcr_rc tacho_stop_handler(uint8_t sn, cJSON *value){
   set_tacho_command_inx(sn, TACHO_STOP);
   return WRTCR_SUCCESS;
 }
+
 wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
   int speed;
   if(!cJSON_IsNumber(value)){
@@ -114,6 +115,7 @@ wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
   set_tacho_command_inx(sn, TACHO_RUN_FOREVER);
   return WRTCR_SUCCESS;
 }
+
 wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
   int pos;
   if(!cJSON_IsNumber(value)){
@@ -124,6 +126,7 @@ wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
   set_tacho_command_inx(sn, TACHO_RUN_TO_REL_POS);
   return WRTCR_SUCCESS;
 }
+
 wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value){
   int pos;
   if(!cJSON_IsNumber(value)){
@@ -133,6 +136,7 @@ wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value){
   set_tacho_position(sn, pos);
   return WRTCR_SUCCESS;
 }
+
 wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
   char *stop_action = cJSON_GetStringValue(value);
   if(stop_action == NULL){
@@ -141,9 +145,19 @@ wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
   set_tacho_stop_action(sn, stop_action);
   return WRTCR_SUCCESS;
 }
+
 wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
   (void*) value;
   char state[10];
-  get_tacho_state(sn, &state, sizeof(state));
+  char port[5];
+  char msg[40];
+  get_tacho_state(sn, state, sizeof(state));
+
+  snprintf(msg, sizeof(msg),
+           "{\"port\": \"%s\", \"state\": \"%s\"}", 
+           &(ev3_tacho_port_name(sn, port)[3]), state);
+
+  EOE(send_message_on_api_channel(msg), "Could not send tacho motor state message");
+
   return WRTCR_SUCCESS;
 }
