@@ -194,7 +194,7 @@ static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate*
   default_peer_connection_local_candidate_handler(candidate, url, arg);
 
   // Print local description (if last candidate)
-  if(!candidate) {
+  if(candidate) {
     send_local_description(client);
   }
 }
