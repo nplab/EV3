@@ -491,11 +491,13 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
   cJSON *root = cJSON_Parse((const char*)buffer->buf);
   if(!root){
     ZF_LOGI("Could not parse JSON on channel %s", channel->label);
+    return;
   }
   cJSON *port_item = cJSON_GetObjectItem(root, "port");
   char *port = cJSON_GetStringValue(port_item);
   if(port == NULL || strlen(port) != 1){
     handle_err("Message malformed, no port", false);
+    return;
   }
 
   //call handler functions based on port
@@ -505,6 +507,7 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
     handle_tacho_message(*port, root);
   }
   cJSON_Delete(root);
+  return;
 }
 
 wrtcr_rc send_message_on_api_channel(char *msg){
