@@ -502,9 +502,9 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
 
   //call handler functions based on port
   if( *port < 'A'){
-    handle_sensor_message(*port, root);
+    handle_sensor_message(port, root);
   } else {
-    handle_tacho_message(*port, root);
+    handle_tacho_message(port, root);
   }
   cJSON_Delete(root);
   return;

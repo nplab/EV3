@@ -41,6 +41,9 @@ wrtcr_rc setup_robot(){
       map_set(&port_map, &(port[3]), i);
     }
   }
+
+  set_up_function_maps();
+
   return WRTCR_SUCCESS;
 }
 
@@ -77,11 +80,12 @@ wrtcr_rc set_up_function_maps(){
   map_set(&tf_map, "set-position", tacho_set_position_handler);
   map_set(&tf_map, "set-stop_action", tacho_set_stop_action_handler);
   map_set(&tf_map, "get-state", tacho_get_state_handler);
+
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc handle_tacho_message(char port, cJSON *message){
-  uint8_t sn = *map_get(&port_map, &port);
+wrtcr_rc handle_tacho_message(char *port, cJSON *message){
+  uint8_t sn = *map_get(&port_map, port);
   cJSON *command_item = cJSON_GetObjectItem(message, "command");
   char *command = cJSON_GetStringValue(command_item);
   if(command == NULL){
@@ -95,7 +99,7 @@ wrtcr_rc handle_tacho_message(char port, cJSON *message){
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc handle_sensor_message(char port, cJSON *message){
+wrtcr_rc handle_sensor_message(char *port, cJSON *message){
   return WRTCR_SUCCESS;
 }
 
@@ -108,9 +112,9 @@ wrtcr_rc tacho_stop_handler(uint8_t sn, cJSON *value){
 wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
   int speed;
   if(!cJSON_IsNumber(value)){
-    speed = value->valueint;
     return WRTCR_FAILURE;
   }
+  speed = value->valueint;
   set_tacho_speed_sp(sn, speed);
   set_tacho_command_inx(sn, TACHO_RUN_FOREVER);
   return WRTCR_SUCCESS;
@@ -119,9 +123,9 @@ wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
 wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
   int pos;
   if(!cJSON_IsNumber(value)){
-    pos = value->valueint;
     return WRTCR_FAILURE;
   }
+  pos = value->valueint;
   set_tacho_position_sp(sn, pos);
   set_tacho_command_inx(sn, TACHO_RUN_TO_REL_POS);
   return WRTCR_SUCCESS;
@@ -130,9 +134,9 @@ wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
 wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value){
   int pos;
   if(!cJSON_IsNumber(value)){
-    pos = value->valueint;
     return WRTCR_FAILURE;
   }
+  pos = value->valueint;
   set_tacho_position(sn, pos);
   return WRTCR_SUCCESS;
 }
