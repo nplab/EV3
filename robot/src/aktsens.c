@@ -110,11 +110,12 @@ wrtcr_rc tacho_stop_handler(uint8_t sn, cJSON *value){
 }
 
 wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
-  int speed;
+  int speed, max_speed;
+  get_tacho_max_speed(sn, &max_speed);
   if(!cJSON_IsNumber(value)){
     return WRTCR_FAILURE;
   }
-  speed = value->valueint;
+  speed = value->valueint*max_speed/100; //convert speed percentage to motor value
   set_tacho_speed_sp(sn, speed);
   set_tacho_command_inx(sn, TACHO_RUN_FOREVER);
   return WRTCR_SUCCESS;
