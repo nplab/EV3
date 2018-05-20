@@ -35,7 +35,7 @@ Robot demonstrator for WebRTC datachannels.
 ```
 {
   "port": "A", 
-  "command": "run-to-rel-position",
+  "mode": "run-to-rel-position",
   "value": "180"
 }
 ```
