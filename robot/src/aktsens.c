@@ -16,6 +16,8 @@ wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value);
+wrtcr_rc handle_sensor_value_request(uint8_t sn);
+wrtcr_rc handle_sensor_set_mode(uint8_t sn, cJSON *mode_item);
 
 wrtcr_rc setup_robot(){
   if( ev3_init() != 1){
@@ -86,20 +88,27 @@ wrtcr_rc set_up_function_maps(){
 
 wrtcr_rc handle_tacho_message(char *port, cJSON *message){
   uint8_t sn = *map_get(&port_map, port);
-  cJSON *command_item = cJSON_GetObjectItem(message, "command");
-  char *command = cJSON_GetStringValue(command_item);
-  if(command == NULL){
-    handle_err("Message malformed, no command", false);
+  cJSON *mode_item = cJSON_GetObjectItem(message, "mode");
+  char *mode = cJSON_GetStringValue(mode_item);
+  if(mode == NULL){
+    handle_err("Message malformed, no mode", false);
     return WRTCR_FAILURE;
   }
   cJSON *value_item = cJSON_GetObjectItem(message, "value");
-  tacho_api_function func = *map_get(&tf_map, command);
+  tacho_api_function func = *map_get(&tf_map, mode);
 
   func(sn, value_item);
   return WRTCR_SUCCESS;
 }
 
 wrtcr_rc handle_sensor_message(char *port, cJSON *message){
+  uint8_t sn = *map_get(&port_map, port);
+  cJSON *mode_item = cJSON_GetObjectItem(message, "mode");
+  if( !mode_item ){
+    return handle_sensor_value_request(sn);
+  } else {
+    return handle_sensor_set_mode(sn, mode_item);
+  }
   return WRTCR_SUCCESS;
 }
 
@@ -165,4 +174,18 @@ wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
   EOE(send_message_on_api_channel(msg), "Could not send tacho motor state message");
 
   return WRTCR_SUCCESS;
+}
+
+wrtcr_rc handle_sensor_value_request(uint8_t sn){
+  
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc handle_sensor_set_mode(uint8_t sn, cJSON *mode_item){
+  char *mode = cJSON_GetStringValue(mode_item);
+  if( strlen(mode) != set_sensor_mode(sn, mode)){ //set mode and check that it worked
+    return WRTCR_FAILURE;
+  } else {
+    return WRTCR_SUCCESS;
+  }
 }
