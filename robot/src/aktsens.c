@@ -16,7 +16,7 @@ wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value);
-wrtcr_rc handle_sensor_value_request(uint8_t sn);
+wrtcr_rc handle_sensor_value_request(char *port, uint8_t sn);
 wrtcr_rc handle_sensor_set_mode(uint8_t sn, cJSON *mode_item);
 
 wrtcr_rc setup_robot(){
@@ -105,7 +105,7 @@ wrtcr_rc handle_sensor_message(char *port, cJSON *message){
   uint8_t sn = *map_get(&port_map, port);
   cJSON *mode_item = cJSON_GetObjectItem(message, "mode");
   if( !mode_item ){
-    return handle_sensor_value_request(sn);
+    return handle_sensor_value_request(port, sn);
   } else {
     return handle_sensor_set_mode(sn, mode_item);
   }
@@ -176,8 +176,26 @@ wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc handle_sensor_value_request(uint8_t sn){
-  
+wrtcr_rc handle_sensor_value_request(char *port, uint8_t sn){
+  int i, buf[8];
+  char *msg;
+  for(int i=0; i<8; i++){
+    if(get_sensor_value(i, sn, &buf[i]) < 1){ //if we can get the value, set index back to last good value and leave loop
+      i--;
+      break;
+    }
+  }
+  //create JSON 
+  cJSON *root = cJSON_CreateObject();
+  cJSON_AddStringToObject(root, "port", port);
+  cJSON *values = cJSON_CreateIntArray(buf, i);
+  cJSON_AddItemToObject(root, "values", values);
+
+  msg = cJSON_Print(root);
+  EOE(send_message_on_api_channel(msg), "Could not send sensor value message");
+
+  cJSON_Delete(root);
+  free(msg);
   return WRTCR_SUCCESS;
 }
 
