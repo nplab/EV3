@@ -40,14 +40,14 @@ Robot demonstrator for WebRTC datachannels.
 }
 ```
 
-| command             | value                 | meaning                                                                                                             | answer                                                 |
-|---------------------|-----------------------|------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
-| stop                | %                     | Stops the motor.                                                                                                             | %                                                            |
-| run-forever         | -100 – 100            | Run until a different command is sent. Value is the speed in percent. Positive values turn clockwise and vice versa.         | %                                                            |
-| run-to-rel-position | INT32_MIN – INT32_MAX | Run specified number of steps. Steps per degree/rotation depend on the motor. Positive values turn clockwise and vice versa. | %                                                            |
-| set-position        | INT32_MIN – INT32_MAX | Define the current position as <value> number of steps.                                                                      | %                                                            |
-| set-stop-action     | `hold OR coast`[^1]   | Define what the motor does after receivin a stop command.                                                                    | %                                                            |
-| get-state           | %                     | Get current state of the motor.                                                                                              | `running OR ramping OR holding OR overloaded OR stalled`[^2] |
+| command             | value                 | meaning                                                                                                                                                | answer                                                       |
+|---------------------|-----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| stop                | %                     | Stops the motor.                                                                                                                                       | %                                                            |
+| run-forever         | INT32_MIN – INT32_MAX | Run until a different command is sent. Value is rotation per minute in degrees. The maximum obtainable speed depends on the motor and battery voltage. | %                                                            |
+| run-to-rel-position | INT32_MIN – INT32_MAX | Run specified number of steps. Steps per degree/rotation depend on the motor. Positive values turn clockwise and vice versa.                           | %                                                            |
+| set-position        | INT32_MIN – INT32_MAX | Define the current position as <value> number of steps.                                                                                                | %                                                            |
+| set-stop-action     | `hold OR coast`[^1]   | Define what the motor does after receivin a stop command.                                                                                              | %                                                            |
+| get-state           | %                     | Get current state of the motor.                                                                                                                        | `running OR ramping OR holding OR overloaded OR stalled`[^2] |
 
 #### Sensors
 

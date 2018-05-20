@@ -347,14 +347,14 @@ function sendingToRoboter(port, mode = null, direction = null) {
     if (direction != null) {
         message = {
             'port': port,
-            'type': mode,
+            'command': mode,
             'value': direction,
 
         }
     } else if (mode != null) {
         message = {
             'port': port,
-            'type': mode,
+            'command': mode,
         }
     } else {
         message = {
