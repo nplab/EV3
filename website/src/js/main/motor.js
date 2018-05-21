@@ -65,24 +65,22 @@ class Motor {
 
     // Der Wert muss überprüft werden, weil der Roboter in den verschiedenen Modie nur unterschiedliche Werte erlauben. Zurzeit werden nur zwei Modie unterstützt.
     checkValue(value) {
-        if (this.selectedMode == "run-forever") {
-            if(value <= 100 && value >= 0) {
-                return true
-            }
-            // alert("Der Wert muss eine Zahl zwischen 0 und 100 sein.")
-            return false
-        } else  if (this.selectedMode = 'run-to-rel-position'){
-            if(value <= 360 && value >= 0) {
-                return true
-            }
-            // alert("Der Wert muss eine Zahl zwischen 0 und 360 sein.")
-            return false
+        if(value <= 100 && value >= 0) {
+            return true
         }
+        alert("Der Wert muss eine Zahl zwischen 0 und 100 sein.")
+        return false
     }
 
     // Fahren des Roboters. Es wird eine Richtung ('direction') definiert. "+" -> Vorwärts; "-" -> Rückwärts
     drive(direction) {
-        sendingToRoboter(this.port, this.selectedMode, this.value * direction);
+        if(this.selectedMode == 'run-to-rel-position') {
+            sendingToRoboter(this.port, this.selectedMode, [this.value * direction, 100]);
+        } else {
+            sendingToRoboter(this.port, this.selectedMode, this.value * direction);
+        }
+
+
     }
 
     // Stoppen des Motors

@@ -65,4 +65,8 @@ class Sensor {
     getData() {
         sendingToRoboter(this.port)
     }
+
+    // Speichern des Wertes, Werte
+
+    // Funktion für neue Werte
 }

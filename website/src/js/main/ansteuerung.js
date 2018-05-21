@@ -102,6 +102,11 @@ var value_PortB = document.getElementById("valueportB")
 var value_PortC = document.getElementById("valueportC")
 var value_PortD = document.getElementById("valueportD")
 
+var degree_PortA = document.getElementById("degreeportA")
+var degree_PortB = document.getElementById("degreeportB")
+var degree_PortC = document.getElementById("degreeportC")
+var degree_PortD = document.getElementById("degreeportD")
+
 var value_Port1 = document.getElementById("valueport1")
 var value_Port2 = document.getElementById("valueport2")
 var value_Port3 = document.getElementById("valueport3")
