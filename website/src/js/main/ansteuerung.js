@@ -1,3 +1,55 @@
+// Testcase
+
+// Test Anwednung - Erste Nachricht
+document.getElementById("onstart").onclick = start
+
+
+function start() {
+    var input = [{
+        "port": "A", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
+        "port": "B", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
+        "port": "D", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
+        "port": "1", //Ausgabe des Address-Commands
+        "type": "lego-ev3-us", //alternativ tacho-motor-m
+    },
+    {
+        "port": "2", //Ausgabe des Address-Commands
+        "type": "lego-ev3-gyro", //alternativ tacho-motor-m
+    },
+    {
+        "port": "3", //Ausgabe des Address-Commands
+        "type": "lego-ev3-color", //alternativ tacho-motor-m
+    },
+    {
+        "port": "4", //Ausgabe des Address-Commands
+        "type": "lego-ev3-touch", //alternativ tacho-motor-m
+    }
+    ]
+    getDatafromRoboter(input);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Variablen für die Oberflächenaktionen
 var buttonVW_PortA = document.getElementById("button_portA_vw")
 var buttonRW_PortA = document.getElementById("button_portA_rw")
@@ -202,55 +254,6 @@ function handleMotorValueField(motor, valuePort, buttonRW, buttonVW) {
         alert("Es wurde ein falscher Wert eingetragen. 'run-for-ever': 0-100; 'run-to-rel-position': 0-360")
     }
 }
-
-
-document.getElementById("onstart").onclick = start
-
-
-function start() {
-
-
-    var input = [{
-        "port": "A", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "B", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "D", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "1", //Ausgabe des Address-Commands
-        "type": "lego-ev3-us", //alternativ tacho-motor-m
-    },
-    {
-        "port": "2", //Ausgabe des Address-Commands
-        "type": "lego-ev3-gyro", //alternativ tacho-motor-m
-    },
-    {
-        "port": "3", //Ausgabe des Address-Commands
-        "type": "lego-ev3-color", //alternativ tacho-motor-m
-    },
-    {
-        "port": "4", //Ausgabe des Address-Commands
-        "type": "lego-ev3-touch", //alternativ tacho-motor-m
-    }
-    ]
-
-    getDatafromRoboter(input);
-
-
-
-    // var motorBeispiel = new Motor("A", 'motor');
-    // var sensorBeispiel = new Sensor("1", 'lego-ev3-us')
-    //
-    // console.log(motorBeispiel);
-    // console.log(sensorBeispiel);
-}
-
 
 // Leitet die Port und Typ Bezeichungen der angelegten Sensoren und Motoren weiter
 function getDatafromRoboter(input) {
