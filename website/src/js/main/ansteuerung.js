@@ -362,22 +362,14 @@ function sendingToRoboter(port, mode = null, direction = null) {
     if (direction != null) {
         message = {
             'port': port,
-<<<<<<< HEAD
             'mode': mode,
-=======
-            'command': mode,
->>>>>>> f4d0076ed500d4769489af5e4c06007e71c2f196
             'value': direction,
 
         }
     } else if (mode != null) {
         message = {
             'port': port,
-<<<<<<< HEAD
             'mode': mode,
-=======
-            'command': mode,
->>>>>>> f4d0076ed500d4769489af5e4c06007e71c2f196
         }
     } else {
         message = {
