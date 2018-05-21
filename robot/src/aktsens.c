@@ -131,11 +131,22 @@ wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
 }
 
 wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
-  int pos;
-  if(!cJSON_IsNumber(value)){
+  int pos, speed, max_speed;
+  cJSON *pos_item, *speed_item;
+  if(!cJSON_IsArray(value) || cJSON_GetArraySize(value) != 2){
+    ZF_LOGE("Message with relative position mode did not contain two values.");
     return WRTCR_FAILURE;
   }
-  pos = value->valueint;
+  speed_item = cJSON_GetArrayItem(value, 0);
+  pos_item = cJSON_GetArrayItem(value, 1);
+  if(!cJSON_IsNumber(pos_item) || !cJSON_IsNumber(speed_item)){
+    ZF_LOGE("Message with relative position mode did not contain two integers.");
+    return WRTCR_FAILURE;
+  }
+  get_tacho_max_speed(sn, &max_speed);
+  pos = pos_item->valueint;
+  speed = speed_item->valueint*max_speed/100; //convert speed percentage to motor value
+  set_tacho_speed_sp(sn, speed);
   set_tacho_position_sp(sn, pos);
   set_tacho_command_inx(sn, TACHO_RUN_TO_REL_POS);
   return WRTCR_SUCCESS;
@@ -168,8 +179,8 @@ wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
 
 wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
   (void*) value;
-  char state[10];
-  char msg[40];
+  char state[20];
+  char msg[50];
   char port[5];
   if(get_tacho_state(sn, state, sizeof(state)) < 1){
     ZF_LOGE("Could not get state of tacho motor");
