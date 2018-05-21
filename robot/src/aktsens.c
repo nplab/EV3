@@ -80,7 +80,7 @@ wrtcr_rc set_up_function_maps(){
   map_set(&tf_map, "run-forever", tacho_run_forever_handler);
   map_set(&tf_map, "run-to-rel-position", tacho_run_to_rel_pos_handler);
   map_set(&tf_map, "set-position", tacho_set_position_handler);
-  map_set(&tf_map, "set-stop_action", tacho_set_stop_action_handler);
+  map_set(&tf_map, "set-stop-action", tacho_set_stop_action_handler);
   map_set(&tf_map, "get-state", tacho_get_state_handler);
 
   return WRTCR_SUCCESS;
@@ -147,7 +147,10 @@ wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value){
     return WRTCR_FAILURE;
   }
   pos = value->valueint;
-  set_tacho_position(sn, pos);
+  if(set_tacho_position(sn, pos) < 1){
+    ZF_LOGE("Could not set position of tacho motor");
+    return WRTCR_FAILURE;
+  }
   return WRTCR_SUCCESS;
 }
 
@@ -156,16 +159,22 @@ wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
   if(stop_action == NULL){
     return WRTCR_FAILURE;
   }
-  set_tacho_stop_action(sn, stop_action);
+  if(set_tacho_stop_action(sn, stop_action) < 1){
+    ZF_LOGE("Could not set stop action of tacho motor");
+    return WRTCR_FAILURE;
+  }
   return WRTCR_SUCCESS;
 }
 
 wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
   (void*) value;
   char state[10];
-  char port[5];
   char msg[40];
-  get_tacho_state(sn, state, sizeof(state));
+  char port[5];
+  if(get_tacho_state(sn, state, sizeof(state)) < 1){
+    ZF_LOGE("Could not get state of tacho motor");
+    return WRTCR_FAILURE;
+  }
 
   snprintf(msg, sizeof(msg),
            "{\"port\": \"%s\", \"state\": \"%s\"}", 
