@@ -18,13 +18,13 @@ class Motor {
 
     // Je nach Typ des Sensors können unterschiedliche Modes genutzt werden. Zurzeit werden für beide Motoren die beiden gleichen Modi unterstützt.
     getModes(allModes) {
-        var mode1 = 'run-forever';
-        var mode2 = 'run-to-rel-position';
+        var mode1 = 'run-forever';          //
+        var mode2 = 'run-to-rel-position';  //
 
         if (allModes) {
-            var mode3 = 'set-position';
-            var mode4 = 'set-stop-action';
-            var mode5 = 'get-state';
+            var mode3 = 'set-position';     //
+            var mode4 = 'set-stop-action';  //
+            var mode5 = 'get-state';   set-stop-action     //
             this.modes = [mode1, mode2, mode3, mode4, mode5]
         } else {
             this.modes = [mode1, mode2]

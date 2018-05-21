@@ -38,6 +38,27 @@ function start() {
 }
 
 
+// Test DataChannel
+
+document.getElementById("SetModeTest").onclick = SetModeTest
+document.getElementById("StartTest").onclick = StartTest
+document.getElementById("StopTest").onclick = StopTest
+
+var TestPort = new Motor('A', 'tacho-motor-l', null, true)
+
+function SetModeTest() {
+    sendingToRoboter('A', 'run-forever', 80)
+}
+
+function StartTest() {
+    sendingToRoboter('A', 'get-state')
+}
+
+function StopTest() {
+    sendingToRoboter('A', 'set-position', 10)
+}
+
+
 
 
 
@@ -341,14 +362,14 @@ function sendingToRoboter(port, mode = null, direction = null) {
     if (direction != null) {
         message = {
             'port': port,
-            'type': mode,
+            'mode': mode,
             'value': direction,
 
         }
     } else if (mode != null) {
         message = {
             'port': port,
-            'type': mode,
+            'mode': mode,
         }
     } else {
         message = {
