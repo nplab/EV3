@@ -47,27 +47,86 @@
             </div>
         </div>
 
-        <div class="text_inhalt">
-            <div class="row">
-                <p>
-                    Bei dem Masterprojekt an der Fachhochschule Münster sollen die Studierenden über eine Zeitspanne von 2 Semestern in einer Projektgruppen an einem bestimmten Projekt arbeiten. Dazu stellen die Professoren des Fachbereichs ihre Kompetenzen zur Verfügung und betreuen verschiedenste Projekte in ihrem Themengebiet. Dabei sollen neben den fachlichen Kompetenzen auch mMethodische Kompetenzen, wie beispielsweise das selbstständige Arbeiten, die Kommunikation im Team oder die Projektplanung erlernt und angewendet werden.
-                </p>
-                <p>
-                    Wir (Jesko Appelfeller und Frederik Broer) haben uns für ein Thema von Prof. Dr. Michael Tüxen entschieden. Dieser hat an der Fachhochschule Münster die Verantworung über das Labor für Netzwerkprogrammierung. Die vom Ihm gestellt Aufgabe wird im folgenden beschrieben und erläutert:
-                </p>
-                <p>
-                    Die Aufgaben bestand darin einen &copy; Lego Minestorm Roboter [Bild 1: Logo Minestorm Roboter] über WebRTC zu steuern. Dafür stellte Prof. Tüxen den {Name des Roberters} zur Verfügung. Das gesamtpaket des Roboters besteht nicht nur aus Bauteilen zum Aufbauen und bewegen, wie die beiden leistungsstraken Motoren {XXX Leistung der Motoren}, sondern auch aus einigen Sensoren. Deswegen bestand die Möglichkeit die verschiedenen Sensoren auszulesen. Die von den Sensoren gelieferten Daten können zum einen dargestellt werden und zum anderen können anhand der Daten verschiedene Kennzahlen wie beispielsweise die Geschwindigkeit werden.
-                </p>
+        <div class="row">
+            <div class="col s4">
+                <div class="title-h2">
+                    <p>Aufgabenbeschreibung</p>
+                </div>
             </div>
         </div>
 
+        <div class="text_inhalt">
+            <div class="row">
+                <div class="col s12">
+                    <p>Bei dem Masterprojekt an der Fachhochschule Münster sollen die Studierenden über eine Zeitspanne von 2 Semestern in einer Projektgruppen an einem bestimmten Projekt arbeiten. Dazu stellen die Professoren des Fachbereichs ihre Kompetenzen zur Verfügung und betreuen verschiedenste Projekte in ihrem Themengebiet. Dabei sollen neben den fachlichen Kompetenzen auch mMethodische Kompetenzen, wie beispielsweise das selbstständige Arbeiten, die Kommunikation im Team oder die Projektplanung erlernt und angewendet werden.</p>
+                    <p>Wir, Jesko Appelfeller und Frederik Broer, haben uns für ein Thema von Prof. Dr. Michael Tüxen entschieden. Dieser hat an der Fachhochschule Münster die Verantworung über das Labor für Netzwerkprogrammierung. Die vom ihm gestellt Aufgabe wird im folgenden beschrieben und erläutert:</p>
+                    <p>Die erste Aufgabe bestand darin, auf dem Lego Minestorm Roboter <a href="https://webrtc.org/">"webRTC"</a> zum Laufen zu bringen und sich mit einer Beispielwebsite zu verbinden. Dazu haben wir <a href="https://github.com/rawrtc/rawrtc"> "rawrtc"</a> verwendet, das ebenfalls von einem Studierenden der Fachhochschule Münster geschrieben wurde. Mit dieser Bibliothek lässt sich ein webRTC Peer auf dem Minicomputer des Lego Minestrom Roboters konfigurieren.</p>
+                    <p>Außerdem muss ein Javascript Framework implementiert werden. Dabei lag die Aufgabe darin alle Funktionalitäten des Roboters über das Javascript Framework darstellen zu können. Beispielsweise sollen die verschiedenen Modi der Sensoren ausgelesen und dargestellt werden, oder die Motoren vorwärts bzw. rückwärts gesteuert angesteuert werden.</p>
+                    <p>Die dritte und letzte Aufgabe war nun, einen Beispielroboter aufzubauen und die Steuerung für diesen Roboter zu implementieren.</p>
+                    <p>Die Aufgabe besteht darin ein Webclient zu implementieren, mit dessen Hilfe ein Lego Minestrom Roboter über WebRTC gesteuert werden kann.</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s9 offset-s2">
+                    <img class="imgbeispielbild" src="pic/beispielbild.png" alt="Bild der Sensorsteuerung">
+                    <p>Abbildung 1: WebRTC und Lego Minestorm</p>
+                </div>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col s4">
+                <div class="title-h2">
+                    <p>Softwareentwurf Roboter</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text_inhalt">
+            <div class="row">
+                <div class="col s12">
+                    <p>Die Roboterentwicklung bassiert, wie auf der Abbildung 1 dargestellt, auf der Programmiersprache "C". Dabei wurde die Implementierung des Roboters in folgende Schritte geteilt.</p>
+                    <ol>
+                        <li>1. Schritt</li>
+                        <li>2. Schritt</li>
+                        <li>.</li>
+                        <li>.</li>
+                        <li>.</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s4">
+                <div class="title-h2">
+                    <p>Softwareentwurf Webseite</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="text_inhalt">
+            <div class="row">
+                <div class="col s12">
+                    <p>Die Webentwicklung bassiert, wie auf der Abbildung 1 dargestellt, auf den Programmiersprachen "CSS", "Javascript" und "HTML". Dabei wurde die Implementierung der Website in folgende Schritte eingeteilt.</p>
+                    <ol>
+                        <li>Aussuchen eines geeigneten 'front-end frameworks'.</li>
+                        <li>Aufteilung in die verschiedenen Seiten.</li>
+                        <li>WebRTC Verbindung zu einem anderen Browser aufbauen</li>
+                        <li>WebRTC Verbindung zum Roboter herstellen</li>
+                        <li>API für die Robotersteuerung Implementieren</li>
+                        <li>Eigne Steuerung implementieren</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
 
     <div class="footer">
         <div class="cont-center">
             <p class="text-center">&copy; Jesko Appenfeller & Frederik Broer & Labor für Netzwerkprogrammierung</p>
         </div>
     </div>
+
 </div>
 
 

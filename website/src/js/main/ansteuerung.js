@@ -1,3 +1,76 @@
+// Testcase
+
+// Test Anwednung - Erste Nachricht
+document.getElementById("onstart").onclick = start
+
+
+function start() {
+    var input = [{
+        "port": "A", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
+        "port": "B", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
+        "port": "D", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
+        "port": "1", //Ausgabe des Address-Commands
+        "type": "lego-ev3-us", //alternativ tacho-motor-m
+    },
+    {
+        "port": "2", //Ausgabe des Address-Commands
+        "type": "lego-ev3-gyro", //alternativ tacho-motor-m
+    },
+    {
+        "port": "3", //Ausgabe des Address-Commands
+        "type": "lego-ev3-color", //alternativ tacho-motor-m
+    },
+    {
+        "port": "4", //Ausgabe des Address-Commands
+        "type": "lego-ev3-touch", //alternativ tacho-motor-m
+    }
+    ]
+    getDatafromRoboter(input);
+}
+
+
+// Test DataChannel
+
+document.getElementById("SetModeTest").onclick = SetModeTest
+document.getElementById("StartTest").onclick = StartTest
+document.getElementById("StopTest").onclick = StopTest
+
+var TestPort = new Motor('A', 'tacho-motor-l', null, true)
+
+function SetModeTest() {
+    sendingToRoboter('A', 'run-forever', 80)
+}
+
+function StartTest() {
+    sendingToRoboter('A', 'get-state')
+}
+
+function StopTest() {
+    sendingToRoboter('A', 'set-position', 10)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Variablen für die Oberflächenaktionen
 var buttonVW_PortA = document.getElementById("button_portA_vw")
 var buttonRW_PortA = document.getElementById("button_portA_rw")
@@ -168,32 +241,16 @@ mode_Port4.onchange = function() {
 
 // Onchange für das Value Feld der Motoren
 value_PortA.onchange = function () {
-    if(motorA.setValue(parseInt(value_PortA.value))) {
-        handleMotorValueField(buttonVW_PortA, buttonRW_PortA, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortA, buttonRW_PortA, 1)
-    }
+    handleMotorValueField(motorA, value_PortA, buttonRW_PortA, buttonVW_PortA)
 }
 value_PortB.onchange = function () {
-    if(motorB.setValue(parseInt(value_PortB.value))) {
-        handleMotorValueField(buttonVW_PortB, buttonRW_PortB, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortB, buttonRW_PortB, 1)
-    }
+    handleMotorValueField(motorB, value_PortB, buttonRW_PortB, buttonVW_PortB)
 }
 value_PortC.onchange = function () {
-    if(motorC.setValue(parseInt(value_PortC.value))) {
-        handleMotorValueField(buttonVW_PortC, buttonRW_PortC, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortC, buttonRW_PortC, 1)
-    }
+    handleMotorValueField(motorC, value_PortC, buttonRW_PortC, buttonVW_PortC)
 }
 value_PortD.onchange = function () {
-    if(motorD.setValue(parseInt(value_PortD.value))) {
-        handleMotorValueField(buttonVW_PortD, buttonRW_PortD, 0)
-    } else {
-        handleMotorValueField(buttonVW_PortD, buttonRW_PortD, 0)
-    }
+    handleMotorValueField(motorD, value_PortD, buttonRW_PortD, buttonVW_PortD)
 }
 
 function handleSensorMode(buttonSM, buttonGD) {
@@ -207,59 +264,17 @@ function handleMotorMode(valuePort) {
     valuePort.value = ''    // Value-Feld = ''
 }
 
-function handleMotorValueField(buttonRW, buttonVW, status) {
-    buttonVW.disabled = status
-    buttonRW.disabled = status
-}
-
-
-document.getElementById("onstart").onclick = start
-
-
-function start() {
-
-
-    var input = [{
-        "port": "A", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "B", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "D", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "1", //Ausgabe des Address-Commands
-        "type": "lego-ev3-us", //alternativ tacho-motor-m
-    },
-    {
-        "port": "2", //Ausgabe des Address-Commands
-        "type": "lego-ev3-gyro", //alternativ tacho-motor-m
-    },
-    {
-        "port": "3", //Ausgabe des Address-Commands
-        "type": "lego-ev3-color", //alternativ tacho-motor-m
-    },
-    {
-        "port": "4", //Ausgabe des Address-Commands
-        "type": "lego-ev3-touch", //alternativ tacho-motor-m
+function handleMotorValueField(motor, valuePort, buttonRW, buttonVW) {
+    if(motor.setValue(parseInt(valuePort.value))) {
+        buttonVW.disabled = 0
+        buttonRW.disabled = 0
+    } else {
+        buttonVW.disabled = 1
+        buttonRW.disabled = 1
+        valuePort.value = ''
+        alert("Es wurde ein falscher Wert eingetragen. 'run-for-ever': 0-100; 'run-to-rel-position': 0-360")
     }
-    ]
-
-    getDatafromRoboter(input);
-
-
-
-    // var motorBeispiel = new Motor("A", 'motor');
-    // var sensorBeispiel = new Sensor("1", 'lego-ev3-us')
-    //
-    // console.log(motorBeispiel);
-    // console.log(sensorBeispiel);
 }
-
 
 // Leitet die Port und Typ Bezeichungen der angelegten Sensoren und Motoren weiter
 function getDatafromRoboter(input) {
@@ -347,14 +362,14 @@ function sendingToRoboter(port, mode = null, direction = null) {
     if (direction != null) {
         message = {
             'port': port,
-            'command': mode,
+            'mode': mode,
             'value': direction,
 
         }
     } else if (mode != null) {
         message = {
             'port': port,
-            'command': mode,
+            'mode': mode,
         }
     } else {
         message = {
