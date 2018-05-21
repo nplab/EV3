@@ -55,8 +55,8 @@ function StartTest() {
 }
 
 function StopTest() {
-    sendingToRoboter('A', 'stop-action', 'hold')
-    sendingToRoboter('B', 'stop-action', 'coast')
+    sendingToRoboter('A', 'set-stop-action', 'hold')
+    sendingToRoboter('B', 'set-stop-action', 'coast')
 }
 
 // Variablen für die Oberflächenaktionen
