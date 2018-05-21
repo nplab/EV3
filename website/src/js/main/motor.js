@@ -18,14 +18,15 @@ class Motor {
 
     // Je nach Typ des Sensors können unterschiedliche Modes genutzt werden. Zurzeit werden für beide Motoren die beiden gleichen Modi unterstützt.
     getModes(allModes) {
-        var mode1 = 'run-forever';          //
-        var mode2 = 'run-to-rel-position';  //
+        var mode1 = 'run-forever';          // läuft für immer
+        var mode2 = 'run-to-rel-position';  // drehen bis zu einer bestimmten Position
 
         if (allModes) {
-            var mode3 = 'set-position';     //
-            var mode4 = 'set-stop-action';  //
-            var mode5 = 'get-state';        //
-            this.modes = [mode1, mode2, mode3, mode4, mode5]
+            var mode3 = 'set-position';     // definierte Position, Beispielsweise 0 Grad
+            var mode4 = 'set-stop-action';  // sich drehen oder nicht
+            var mode5 = 'get-state';        // Welcher Status, Läuft, usw...
+            var mode6 = 'stop'              // Stop
+            this.modes = [mode1, mode2, mode3, mode4, mode5, mode6]
         } else {
             this.modes = [mode1, mode2]
         }
@@ -38,6 +39,19 @@ class Motor {
         } else {
             console.error("Kein Passender Mode!");
         }
+    }
+
+    //
+    getState() {
+        sendingToRoboter(this.port, 'get-state')
+    }
+
+    setStopAction(action) {
+        sendingToRoboter(this.port, 'set-stop-action', action)
+    }
+
+    setPosition(degree) {
+        sendingToRoboter(this.port, 'set-position', degree)
     }
 
     // Setter value
