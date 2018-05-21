@@ -55,21 +55,9 @@ function StartTest() {
 }
 
 function StopTest() {
-    sendingToRoboter('A', 'set-position', 10)
+    sendingToRoboter('A', 'stop-action', 'hold')
+    sendingToRoboter('B', 'stop-action', 'coast')
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Variablen für die Oberflächenaktionen
 var buttonVW_PortA = document.getElementById("button_portA_vw")

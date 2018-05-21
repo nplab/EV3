@@ -25,7 +25,8 @@ class Motor {
             var mode3 = 'set-position';     //
             var mode4 = 'set-stop-action';  //
             var mode5 = 'get-state';        //
-            this.modes = [mode1, mode2, mode3, mode4, mode5]
+            var mode6 = 'stop-action'       //
+            this.modes = [mode1, mode2, mode3, mode4, mode5, mode6]
         } else {
             this.modes = [mode1, mode2]
         }
