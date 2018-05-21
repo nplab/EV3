@@ -238,7 +238,7 @@ static void send_local_description(struct client* const client) {
 }
 
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client) {
-    if (candidate) {
+    if(candidate) {
         const char *err_msg = "Could not print ice candidate!";
         enum rawrtc_code error;
         char* foundation;
