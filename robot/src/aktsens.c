@@ -1,154 +1,168 @@
 #include "aktsens.h"
 
-#define SONAR_ROT_LIMIT 220
-#define SONAR_STEP_DEG 15
-#define SONAR_MOT_SPEED 100
-#define MOT_LEFT mots_drive[0]
-#define MOT_RIGHT mots_drive[1]
-#define MOT_VMAX_DEG 1050
-#define MOT_VMIN_DEG 10
+//define tacho function map
+typedef wrtcr_rc (*tacho_api_function)(uint8_t sn, cJSON *value);
+typedef map_t(tacho_api_function) tacho_function_map_t;
 
 //print on error of the robot set or get functions which return the number of bytes written or read
 #define POSGE(rc, msg, fail) if(!(rc)){handle_err(msg, false); if(fail) return WRTCR_FAILURE;}
+map_int_t port_map;
+tacho_function_map_t tf_map;
 
-static uint8_t sens_collision;
-static uint8_t sens_sonar_zero;
-static uint8_t sens_sonar;
-static uint8_t mot_sonar;
-static uint8_t mots_drive[3] = {0, 0, TACHO_DESC__LIMIT_};
+wrtcr_rc set_up_function_maps();
+wrtcr_rc tacho_stop_handler(uint8_t sn, cJSON *value);
+wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value);
+wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value);
+wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value);
+wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value);
+wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value);
 
-static const float sonar_deg_factor = 180.0/((float)SONAR_ROT_LIMIT*2.0);
-
-wrtcr_rc check_sensors();
-wrtcr_rc check_motors();
-wrtcr_rc init_sonar();
-wrtcr_rc init_drive();
-
-void* setup_robot(void *ignore){
-  if(ignore != NULL){
-    handle_err("Called setup robot with arguments", true);
-  }
+wrtcr_rc setup_robot(){
   if( ev3_init() != 1){
     handle_err("Could not initialize robot library", true);
   }
+  if( ev3_sensor_init() < 1){
+    handle_err("Could not initialize sensors", true);
+  }
+  map_init(&port_map);
+  char port[8];
+  for ( int i = 0; i < DESC_LIMIT; i++ ) {
+    if ( ev3_sensor[ i ].type_inx != SENSOR_TYPE__NONE_ ) {
+      ev3_sensor_port_name( i, port );
+      map_set(&port_map, &(port[2]), i);
+    }
+  }
+  if( ev3_tacho_init() < 1){
+    handle_err("Could not initialize motors", true);
+  }
+  for ( int i = 0; i < DESC_LIMIT; i++ ) {
+    if ( ev3_tacho[ i ].type_inx != TACHO_TYPE__NONE_ ) {
+      ev3_tacho_port_name( i, port );
+      map_set(&port_map, &(port[3]), i);
+    }
+  }
 
-  check_sensors();
-  check_motors();
-  init_sonar();
-  init_drive();
+  set_up_function_maps();
 
-  return NULL;
+  return WRTCR_SUCCESS;
 }
 
-wrtcr_rc check_sensors(){
-  //intialize sensors
-  int result = ev3_sensor_init();
-  if( result < 0 ){
-    handle_err("Could not find any sensors", false);
+wrtcr_rc get_port_description(char **out_string){
+  char port[8];
+  cJSON *root = cJSON_CreateArray();
+  cJSON *tempObj;
+  map_iter_t iterator = map_iter(&port_map);
+  const char *key;
+  uint8_t sn;
+  while( (key = map_next(&port_map, &iterator))){
+    sn = *map_get(&port_map, key);
+    tempObj = cJSON_CreateObject();
+    if( *key<'A' ){
+      ev3_sensor_port_name(sn, port);
+      cJSON_AddStringToObject(tempObj, "type", ev3_sensor_type( ev3_sensor[sn].type_inx ));
+    } else {
+      ev3_tacho_port_name(sn, port);
+      cJSON_AddStringToObject(tempObj, "type", ev3_tacho_type( ev3_tacho[sn].type_inx ));
+    }
+    cJSON_AddStringToObject(tempObj, "port", port + strlen(port) -1);
+    cJSON_AddItemToArray(root, tempObj);
+  }
+  *out_string = cJSON_Print(root);
+  cJSON_Delete(root);
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc set_up_function_maps(){
+  map_init(&tf_map);
+  map_set(&tf_map, "stop", tacho_stop_handler);
+  map_set(&tf_map, "run-forever", tacho_run_forever_handler);
+  map_set(&tf_map, "run-to-rel-position", tacho_run_to_rel_pos_handler);
+  map_set(&tf_map, "set-position", tacho_set_position_handler);
+  map_set(&tf_map, "set-stop_action", tacho_set_stop_action_handler);
+  map_set(&tf_map, "get-state", tacho_get_state_handler);
+
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc handle_tacho_message(char *port, cJSON *message){
+  uint8_t sn = *map_get(&port_map, port);
+  cJSON *command_item = cJSON_GetObjectItem(message, "command");
+  char *command = cJSON_GetStringValue(command_item);
+  if(command == NULL){
+    handle_err("Message malformed, no command", false);
     return WRTCR_FAILURE;
-  } else {
-    ZF_LOGI("Found %d sensors", result);
   }
-  //check for correct sensors
-  POSGE(ev3_search_sensor_plugged_in(INPUT_1, 0, &sens_collision, 0), "Could not find sensor on port 1", true);
-  POSGE(ev3_sensor_desc_type_inx(sens_collision) == LEGO_EV3_TOUCH, "Sensor attached to port 1 is not a touch sensor", true);
+  cJSON *value_item = cJSON_GetObjectItem(message, "value");
+  tacho_api_function func = *map_get(&tf_map, command);
 
-  POSGE(ev3_search_sensor_plugged_in(INPUT_2, 0, &sens_sonar_zero, 0), "Could not find sensor on port 2", true);
-  POSGE(ev3_sensor_desc_type_inx(sens_sonar_zero) == LEGO_EV3_TOUCH, "Sensor attached to port 2 is not a touch sensor", true);
-
-  POSGE(ev3_search_sensor_plugged_in(INPUT_3, 0, &sens_sonar, 0), "Could not find sensor on port 3", true);
-  POSGE(ev3_sensor_desc_type_inx(sens_sonar) == LEGO_EV3_US, "Sensor attached to port 3 is not an ultrasound sensor", true);
-  POSGE(set_sensor_mode(sens_sonar, "US-DIST-CM"), "Could not initialize sonar sensor", true);
-
+  func(sn, value_item);
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc check_motors(){
-  //intialize motors
-  int result = ev3_tacho_init();
-  if( result == -1 ){
-    handle_err("Could not find any motors", false);
+wrtcr_rc handle_sensor_message(char *port, cJSON *message){
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc tacho_stop_handler(uint8_t sn, cJSON *value){
+  (void) value;
+  set_tacho_command_inx(sn, TACHO_STOP);
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value){
+  int speed, max_speed;
+  get_tacho_max_speed(sn, &max_speed);
+  if(!cJSON_IsNumber(value)){
     return WRTCR_FAILURE;
-  } else {
-    ZF_LOGI("Found %d motors", result);
   }
-
-  //check for correct motors
-  POSGE(ev3_search_tacho_plugged_in(OUTPUT_A, 0, &mot_sonar, 0), "Could not find motor on port A", true);
-  POSGE(get_tacho_type_inx(mot_sonar) == LEGO_EV3_M_MOTOR, "Motor attached to port A is not a medium tacho motor", true);
-
-  POSGE(ev3_search_tacho_plugged_in(OUTPUT_B, 0, &MOT_LEFT, 0), "Could not find motor on port B", true);
-  POSGE(get_tacho_type_inx(MOT_LEFT) == LEGO_EV3_L_MOTOR, "Motor attached to port B is not a large tacho motor", true);
-
-  POSGE(ev3_search_tacho_plugged_in(OUTPUT_C, 0, &MOT_RIGHT, 0), "Could not find motor on port C", true);
-  POSGE(get_tacho_type_inx(MOT_RIGHT) == LEGO_EV3_L_MOTOR, "Motor attached to port C is not a large tacho motor", true);
-
+  speed = value->valueint*max_speed/100; //convert speed percentage to motor value
+  set_tacho_speed_sp(sn, speed);
+  set_tacho_command_inx(sn, TACHO_RUN_FOREVER);
   return WRTCR_SUCCESS;
 }
 
-//move sonar to zero position and zero variables
-wrtcr_rc init_sonar(){
-  int val;
-
-  //reset motor, set speed for moving to zero and make it attempt to hold its position on stop
-  POSGE(set_tacho_command_inx(mot_sonar, TACHO_RESET) && set_tacho_speed_sp(mot_sonar, -SONAR_MOT_SPEED) && set_tacho_stop_action_inx(mot_sonar, TACHO_HOLD), "Could not configure sonar motor", true);
-  //run to zero position
-  POSGE(set_tacho_command_inx(mot_sonar, TACHO_RUN_FOREVER), "Could not start moving towards zero on sonar motor", true);
-  do{
-    POSGE(get_sensor_value( 0, sens_sonar_zero, &val),"Could not get value from sonar zero sensor", false);
-  } while(val != 1);
-  POSGE(set_tacho_command_inx(mot_sonar, TACHO_STOP), "Could not stop sonar motor", true);
-  sleep(10); //needs to be here, otherwise the set_position below is seen as a command to move for whatever reason
-  //set current motor position as left stop
-  POSGE(set_tacho_position(mot_sonar, -1*SONAR_ROT_LIMIT), "Could not set zero value for sonar motor", true);
-  return WRTCR_SUCCESS;
-}
-
-wrtcr_rc init_drive(){
-  //reset motors and let them rotate freely after a stop
-  POSGE(multi_set_tacho_command_inx(mots_drive, TACHO_RESET) &&multi_set_tacho_stop_action_inx(mots_drive, TACHO_COAST), "Could not intialize drive motors", true);
-  return WRTCR_SUCCESS;
-}
-
-wrtcr_rc check_collision() {
-	int val;
-	if(!get_sensor_value( 0, sens_collision, &val)){
-    handle_err("Could not get value from collision sensor", false);
+wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value){
+  int pos;
+  if(!cJSON_IsNumber(value)){
+    return WRTCR_FAILURE;
   }
+  pos = value->valueint;
+  set_tacho_position_sp(sn, pos);
+  set_tacho_command_inx(sn, TACHO_RUN_TO_REL_POS);
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc get_distance(float *val){
-  static int8_t direction = 1;
-  uint8_t state;
-	int left_limit, pos;
-
-
-  //move and get value
-  POSGE(set_tacho_position_sp( mot_sonar, direction*SONAR_STEP_DEG) && set_tacho_command_inx(mot_sonar, TACHO_RUN_TO_REL_POS), "Could not make sonar motor move", true);
-  do{
-    POSGE(get_tacho_state_flags(mot_sonar, &state), "Could not get state of sonar motor", false);
-  }while( state == TACHO_RUNNING);
-
-  //check limits
-  POSGE(get_sensor_value( 0, sens_sonar_zero, &left_limit), "Could not get value from sonar zero sensor", true);
-  POSGE(get_tacho_position(mot_sonar, &pos), "Could not get position value from sonar motor", true);
-  if(left_limit == 1){ //if the sonar is at the left limit of its travel, set clockwise direction and zero position
-    direction = 1;
-    set_tacho_position(mot_sonar, -1*SONAR_ROT_LIMIT);
-  } else if(pos >= SONAR_ROT_LIMIT){ //if the sonar is at the right limit of its travel, set counter-clockwise direction
-    direction = -1;
+wrtcr_rc tacho_set_position_handler(uint8_t sn, cJSON *value){
+  int pos;
+  if(!cJSON_IsNumber(value)){
+    return WRTCR_FAILURE;
   }
-
-	POSGE(get_sensor_value0(sens_sonar, val), "Could not get value from sonar sensor", false);
+  pos = value->valueint;
+  set_tacho_position(sn, pos);
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc drive(int8_t *speeds){
-  int speeds_normalized[2];
-  speeds_normalized[0] = MOT_VMAX_DEG*speeds[0]/100;
-  speeds_normalized[1] = MOT_VMAX_DEG*speeds[1]/100;
-  POSGE(set_tacho_speed_sp(MOT_LEFT, speeds_normalized[0]) && set_tacho_speed_sp(MOT_RIGHT, speeds_normalized[1]), "Could not set speeds on drive motors", false);
-  POSGE(multi_set_tacho_command_inx(mots_drive, TACHO_RUN_FOREVER), "Could not send run command to drive motors", false);
+wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
+  char *stop_action = cJSON_GetStringValue(value);
+  if(stop_action == NULL){
+    return WRTCR_FAILURE;
+  }
+  set_tacho_stop_action(sn, stop_action);
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
+  (void*) value;
+  char state[10];
+  char port[5];
+  char msg[40];
+  get_tacho_state(sn, state, sizeof(state));
+
+  snprintf(msg, sizeof(msg),
+           "{\"port\": \"%s\", \"state\": \"%s\"}", 
+           &(ev3_tacho_port_name(sn, port)[3]), state);
+
+  EOE(send_message_on_api_channel(msg), "Could not send tacho motor state message");
+
   return WRTCR_SUCCESS;
 }

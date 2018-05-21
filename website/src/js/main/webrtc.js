@@ -113,7 +113,7 @@ function handleOffer(message) {
 function sendingData(data) {
     console.log(data);
     try {
-        dc.send(data);
+        dc.send(JSON.stringify(data));
     } catch (error) {
         if (error.name === 'TypeError') {
             console.error(dc._name, 'message too large to send');

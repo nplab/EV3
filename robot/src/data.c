@@ -19,8 +19,10 @@ static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_description();
 void api_channel_open_handler(void* const arg);
+void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
 
-void* data_channel_setup(void* ignore){
+
+wrtcr_rc data_channel_setup(){
   unsigned int stun_urls_length;
   char **stun_urls;
   unsigned int turn_urls_length;
@@ -97,7 +99,7 @@ wrtcr_rc initialise_client(){
                                                 dc_parameters, NULL,
                                                 api_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
-                                                default_data_channel_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
+                                                robot_api_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
 
   //clean up
   mem_deref(dc_parameters);
@@ -192,7 +194,7 @@ static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate*
   default_peer_connection_local_candidate_handler(candidate, url, arg);
 
   // Print local description (if last candidate)
-  if(!candidate) {
+  if(candidate) {
     send_local_description(client);
   }
 }
@@ -463,44 +465,59 @@ out:
 
 void api_channel_open_handler(void* const arg) {
   struct data_channel_helper* const channel = arg;
-  char *test_desc = NULL;
-
-  cJSON *root = cJSON_CreateArray();
-  cJSON *tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "A");
-  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-m");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "B");
-  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-l");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "C");
-  cJSON_AddStringToObject(tempObj, "type", "tacho-motor-l");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "1");
-  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-touch");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "2");
-  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-touch");
-  cJSON_AddItemToArray(root, tempObj);
-  tempObj = cJSON_CreateObject();
-  cJSON_AddStringToObject(tempObj, "port", "3");
-  cJSON_AddStringToObject(tempObj, "type", "lego-ev3-us");
-  cJSON_AddItemToArray(root, tempObj);
-
-  test_desc = cJSON_Print(root);
-
+  char *description = NULL;
   ZF_LOGI("(%s) Data channel open: %s\n", channel->client->name, channel->label);
 
-  struct mbuf *port_desc = mbuf_alloc(strlen(test_desc)+1);
-  mbuf_printf(port_desc, "%s", test_desc);
-  mbuf_set_pos(port_desc, 0);
+  EOE(get_port_description(&description), "Could not get port description");
 
-  free(test_desc);
+  struct mbuf *desc_mbuf = mbuf_alloc(strlen(description)+1);
+  mbuf_printf(desc_mbuf, "%s", description);
+  mbuf_set_pos(desc_mbuf, 0);
+
+  free(description);
+
+  EORE(rawrtc_data_channel_send(channel->channel,  desc_mbuf, false), "Could not send port description message");
+}
+
+void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg) {
+  struct data_channel_helper* const channel = arg;
+  struct client* const client = channel->client;
+  (void) flags;
+
+  ZF_LOGD("(%s) Incoming message for data channel %s: %zu bytes\n",
+          client->name, channel->label, mbuf_get_left(buffer));
+
+  //parse JSON and check it
+  cJSON *root = cJSON_Parse((const char*)buffer->buf);
+  if(!root){
+    ZF_LOGI("Could not parse JSON on channel %s", channel->label);
+    return;
+  }
+  cJSON *port_item = cJSON_GetObjectItem(root, "port");
+  char *port = cJSON_GetStringValue(port_item);
+  if(port == NULL || strlen(port) != 1){
+    handle_err("Message malformed, no port", false);
+    return;
+  }
+
+  //call handler functions based on port
+  if( *port < 'A'){
+    handle_sensor_message(port, root);
+  } else {
+    handle_tacho_message(port, root);
+  }
   cJSON_Delete(root);
+  return;
+}
 
-  EORE(rawrtc_data_channel_send(channel->channel,  port_desc, false), "Could not send port description message");
+wrtcr_rc send_message_on_api_channel(char *msg){
+  struct mbuf *buf = mbuf_alloc(strlen(msg)+1);
+  mbuf_printf(buf, "%s", msg);
+  mbuf_set_pos(buf, 0);
+
+  if(rawrtc_data_channel_send(&client_info.data_channel_negotiated->channel,  buf, false) == RAWRTC_CODE_SUCCESS){
+    return WRTCR_SUCCESS;
+  } else {
+    return WRTCR_FAILURE;
+  }
 }
