@@ -44,19 +44,22 @@ document.getElementById("SetModeTest").onclick = SetModeTest
 document.getElementById("StartTest").onclick = StartTest
 document.getElementById("StopTest").onclick = StopTest
 
-var TestPort = new Motor('A', 'tacho-motor-l', null, true)
+var TestPortA = new Motor('A', 'tacho-motor-l', null, true)
+var TestPortB = new Motor('B', 'tacho-motor-l', null, true)
 
 function SetModeTest() {
+    TestPortB.setPosition(10)
     sendingToRoboter('A', 'run-forever', 80)
 }
 
 function StartTest() {
-    sendingToRoboter('A', 'get-state')
+    TestPortA.getState()
+    TestPortB.getState()
 }
 
 function StopTest() {
-    sendingToRoboter('A', 'set-stop-action', 'hold')
-    sendingToRoboter('B', 'set-stop-action', 'coast')
+    TestPortA.setStopAction('hold')
+    TestPortB.setStopAction('coast')
 }
 
 // Variablen für die Oberflächenaktionen
