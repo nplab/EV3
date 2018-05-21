@@ -337,22 +337,24 @@ function createInstanz(input) {
 
 // Bei Nachrichteneingang wird die dem Port entsprechende Nachricht in einem Textfeld angegeben.
 function handleMessages(message) {
-    switch (message.port) {
-        case '1':
-            value_Port1.value = message.value
-            break;
-        case '2':
-            value_Port2.value = message.value
-            break;
-        case '3':
-            value_Port3.value = message.value
-            break;
-        case '4':
-            value_Port4.value = message.value
-            break;
+    var data = eval(message);
+    console.log(data);
+    switch (data.port) {
+    case '1':
+        value_Port1.value = data.values;
+        break;
+    case '2':
+        value_Port2.value = data.values;
+        break;
+    case '3':
+        value_Port3.value = data.values;
+        break;
+    case '4':
+        value_Port4.value = data.values;
+        break;
 
-        default:
-            console.error("Es wurde kein passender Port gefunden.");
+    default:
+        console.error("Es wurde kein passender Port gefunden.");
     }
 }
 
