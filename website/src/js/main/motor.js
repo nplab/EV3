@@ -18,6 +18,7 @@ class Motor {
 
         // Set List of modes
         this.getModes(allModes)
+        this.getStopModes()
     }
 
     // Je nach Typ des Sensors können unterschiedliche Modes genutzt werden. Zurzeit werden für beide Motoren die beiden gleichen Modi unterstützt.
@@ -34,6 +35,13 @@ class Motor {
         } else {
             this.modes = [mode1, mode2]
         }
+    }
+
+    //
+    getStopModes() {
+        var mode1 = 'hold'
+        var mode2 = 'coast'
+        this.stopAction = [mode1, mode2]
     }
 
     // Setzt den selectedMode, wenn der Modus in der Modusliste existiert.
