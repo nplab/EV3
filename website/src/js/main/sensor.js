@@ -10,7 +10,7 @@ class Sensor {
         this.type = type;           // Typ des Sensors
         this.modes = null;          // Liste der wählbaren Modes
         this.selectedMode = mode;   // Ausgewählter Modus
-        this.value = null;          //
+        this.value = null;          // Value Wert
 
         // Set List of modes
         this.getModes()
@@ -67,6 +67,8 @@ class Sensor {
     }
 
     // Speichern des Wertes, Werte
-
+    setValue(value) {
+        this.value = value
+    }
     // Funktion für neue Werte
 }
