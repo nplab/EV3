@@ -77,6 +77,16 @@ var buttonST_PortB = document.getElementById("button_portB_stop")
 var buttonST_PortC = document.getElementById("button_portC_stop")
 var buttonST_PortD = document.getElementById("button_portD_stop")
 
+var buttonGS_PortA = document.getElementById("button_portA_getstate")
+var buttonGS_PortB = document.getElementById("button_portB_getstate")
+var buttonGS_PortC = document.getElementById("button_portC_getstate")
+var buttonGS_PortD = document.getElementById("button_portD_getstate")
+
+var buttonSSM_PortA = document.getElementById("button_portA_stopmode")
+var buttonSSM_PortB = document.getElementById("button_portB_stopmode")
+var buttonSSM_PortC = document.getElementById("button_portC_stopmode")
+var buttonSSM_PortD = document.getElementById("button_portD_stopmode")
+
 var buttonSM_Port1 = document.getElementById("button_port1_sm")
 var buttonSM_Port2 = document.getElementById("button_port2_sm")
 var buttonSM_Port3 = document.getElementById("button_port3_sm")
@@ -92,6 +102,11 @@ var mode_PortB = document.getElementById("modeportB")
 var mode_PortC = document.getElementById("modeportC")
 var mode_PortD = document.getElementById("modeportD")
 
+var stopmode_PortA = document.getElementById("stopmodeportA")
+var stopmode_PortB = document.getElementById("stopmodeportB")
+var stopmode_PortC = document.getElementById("stopmodeportC")
+var stopmode_PortD = document.getElementById("stopmodeportD")
+
 var mode_Port1 = document.getElementById("modeport1")
 var mode_Port2 = document.getElementById("modeport2")
 var mode_Port3 = document.getElementById("modeport3")
@@ -106,6 +121,11 @@ var degree_PortA = document.getElementById("degreeportA")
 var degree_PortB = document.getElementById("degreeportB")
 var degree_PortC = document.getElementById("degreeportC")
 var degree_PortD = document.getElementById("degreeportD")
+
+var state_PortA = document.getElementById("stateportA")
+var state_PortB = document.getElementById("stateportB")
+var state_PortC = document.getElementById("stateportC")
+var state_PortD = document.getElementById("stateportD")
 
 var value_Port1 = document.getElementById("valueport1")
 var value_Port2 = document.getElementById("valueport2")
@@ -440,6 +460,31 @@ function disabledAllMotorButton(yesno) {
     mode_PortC.value = 0
     mode_PortD.value = 0
 
+    buttonGS_PortA.disabled = yesno
+    buttonGS_PortB.disabled = yesno
+    buttonGS_PortC.disabled = yesno
+    buttonGS_PortD.disabled = yesno
+
+    buttonSSM_PortA.disabled = yesno
+    buttonSSM_PortB.disabled = yesno
+    buttonSSM_PortC.disabled = yesno
+    buttonSSM_PortD.disabled = yesno
+
+    stopmode_PortA.value = 0
+    stopmode_PortB.value = 0
+    stopmode_PortC.value = 0
+    stopmode_PortD.value = 0
+
+    state_PortA.value = ""
+    state_PortB.value = ""
+    state_PortC.value = ""
+    state_PortD.value = ""
+
+    state_PortA.disabled = yesno
+    state_PortB.disabled = yesno
+    state_PortC.disabled = yesno
+    state_PortD.disabled = yesno
+
     value_PortA.disabled = yesno
     value_PortB.disabled = yesno
     value_PortC.disabled = yesno
@@ -451,14 +496,14 @@ function disabledAllMotorButton(yesno) {
     value_PortD.value = ""
 
     degree_PortA.disabled = yesno
-    // degree_PortB.disabled = yesno
-    // degree_PortC.disabled = yesno
-    // degree_PortD.disabled = yesno
+    degree_PortB.disabled = yesno
+    degree_PortC.disabled = yesno
+    degree_PortD.disabled = yesno
 
     degree_PortA.value = ""
-    // degree_PortB.value = ""
-    // degree_PortC.value = ""
-    // degree_PortD.value = ""
+    degree_PortB.value = ""
+    degree_PortC.value = ""
+    degree_PortD.value = ""
 
     buttonSM_Port1.disabled = yesno
     buttonSM_Port2.disabled = yesno
