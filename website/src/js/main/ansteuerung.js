@@ -14,6 +14,10 @@ function start() {
         "type": "tacho-motor-l", //alternativ tacho-motor-m
     },
     {
+        "port": "C", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
         "port": "D", //Ausgabe des Address-Commands
         "type": "tacho-motor-l", //alternativ tacho-motor-m
     },
@@ -221,6 +225,20 @@ buttonGD_Port4.onclick = function() {
     sensor4.getData();
 }
 
+// get State
+buttonGS_PortA.onclick = function() {
+    motorA.getState();
+}
+buttonGS_PortB.onclick = function() {
+    motorB.getState();
+}
+buttonGS_PortC.onclick = function() {
+    motorC.getState();
+}
+buttonGS_PortD.onclick = function() {
+    motorD.getState();
+}
+
 // Onchange Events für die Mode Selections
 mode_PortA.onchange = function() {
       motorA.setSelectedMode($("#modeportA :selected").text()); // Setzen des Modus
@@ -337,25 +355,25 @@ function createInstanz(input) {
             motorA = new Motor(input.port, input.type)
             handleModes(motorA, mode_PortA);
             document.getElementById("StatusportA").firstChild.data = "Connected: " + input.type
-            buttonST_PortA.disabled = 0
+            handleMotorModes(motorA, buttonST_PortA, buttonGS_PortA, stopmode_PortA)
             break;
         case "B":
             motorB = new Motor(input.port, input.type)
             handleModes(motorB, mode_PortB);
             document.getElementById("StatusportB").firstChild.data = "Connected: " + input.type
-            buttonST_PortB.disabled = 0
+            handleMotorModes(motorB, buttonST_PortB, buttonGS_PortB, stopmode_PortB)
             break;
         case "C":
             motorC = new Motor(input.port, input.type)
             handleModes(motorC, mode_PortC);
             document.getElementById("StatusportC").firstChild.data = "Connected: " + input.type
-            buttonST_PortC.disabled = 0
+            handleMotorModes(motorC, buttonST_PortC, buttonGS_PortC, stopmode_PortC)
             break;
         case "D":
             motorD = new Motor(input.port, input.type)
             handleModes(motorD, mode_PortD);
             document.getElementById("StatusportD").firstChild.data = "Connected: " + input.type
-            buttonST_PortD.disabled = 0
+            handleMotorModes(motorD, buttonST_PortD, buttonGS_PortD, stopmode_PortD)
             break;
         case "1":
             sensor1 = new Sensor(input.port, input.type)
@@ -379,6 +397,18 @@ function createInstanz(input) {
             break;
         default:
             console.log("Kein Port für Motor- oder Sensor gefunden.");
+    }
+}
+
+function handleMotorModes(motor, buttonST, buttonGS, stopmode) {
+    buttonST.disabled = 0
+    buttonGS.disabled = 0
+    stopmode.disabled = 0
+    for( var i = 0; i < motor.stopAction.length; i++) {
+        var option = document.createElement('option');
+        option.text = motor.stopAction[i]
+        option.value = i;
+        stopmode.options[i+1] = option
     }
 }
 
@@ -474,6 +504,11 @@ function disabledAllMotorButton(yesno) {
     stopmode_PortB.value = 0
     stopmode_PortC.value = 0
     stopmode_PortD.value = 0
+
+    stopmode_PortA.disabled = yesno
+    stopmode_PortB.disabled = yesno
+    stopmode_PortC.disabled = yesno
+    stopmode_PortD.disabled = yesno
 
     state_PortA.value = ""
     state_PortB.value = ""
