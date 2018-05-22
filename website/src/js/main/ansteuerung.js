@@ -204,19 +204,19 @@ buttonGD_Port4.onclick = function() {
 // Onchange Events für die Mode Selections
 mode_PortA.onchange = function() {
       motorA.setSelectedMode($("#modeportA :selected").text()); // Setzen des Modus
-      handleMotorMode(value_PortA)
+      handleMotorMode(motorA, value_PortA, degree_PortA, buttonVW_PortA, buttonRW_PortA)
 }
 mode_PortB.onchange = function() {
       motorB.setSelectedMode($("#modeportB :selected").text());
-      handleMotorMode(value_PortB)
+      handleMotorMode(motorB, value_PortB, degree_PortB, buttonVW_PortB, buttonRW_PortB)
 }
 mode_PortC.onchange = function() {
       motorC.setSelectedMode($("#modeportC :selected").text());
-      handleMotorMode(value_PortC)
+      handleMotorMode(motorC, value_PortC, degree_PortC, buttonVW_PortC, buttonRW_PortC)
 }
 mode_PortD.onchange = function() {
       motorD.setSelectedMode($("#modeportD :selected").text());
-      handleMotorMode(value_PortD)
+      handleMotorMode(motorD, value_PortD, degree_PortA, buttonVW_PortD, buttonRW_PortD)
 }
 mode_Port1.onchange = function() {
     sensor1.setSelectedMode($("#modeport1 :selected").text());
@@ -249,15 +249,46 @@ value_PortD.onchange = function () {
     handleMotorValueField(motorD, value_PortD, buttonRW_PortD, buttonVW_PortD)
 }
 
+// Onchange für das Defree Feld der Motoren
+degree_PortA.onchange = function() {
+    handleMotorDegree(motorA, degree_PortA)
+}
+// Onchange für das Defree Feld der Motoren
+degree_PortB.onchange = function() {
+    handleMotorDegree(motorB, degree_PortB)
+}
+// Onchange für das Defree Feld der Motoren
+degree_PortC.onchange = function() {
+    handleMotorDegree(motorC, degree_PortC)
+}
+// Onchange für das Defree Feld der Motoren
+degree_PortD.onchange = function() {
+    handleMotorDegree(motorD, degree_PortD)
+}
+
+function handleMotorDegree(motor, degreeField) {
+    motor.setDegree(degreeField.value)
+    console.log(degreeField.value);
+}
+
+
 function handleSensorMode(buttonSM, buttonGD) {
     buttonSM.disabled = 0
     buttonGD.disabled = 1
 }
 
-
-function handleMotorMode(valuePort) {
+function handleMotorMode(motor, valuePort, degreePort, buttonVW, buttonRW) {
     valuePort.disabled = 0  // Value-Feld einblenden
     valuePort.value = ''    // Value-Feld = ''
+    degreePort.value = ''
+    buttonVW.disabled = 1
+    buttonRW.disabled = 1
+    if(motor.selectedMode == 'run-to-rel-position') {
+        degreePort.disabled = 0;
+    } else {
+        degreePort.disabled = 1;
+    }
+
 }
 
 function handleMotorValueField(motor, valuePort, buttonRW, buttonVW) {
@@ -268,7 +299,7 @@ function handleMotorValueField(motor, valuePort, buttonRW, buttonVW) {
         buttonVW.disabled = 1
         buttonRW.disabled = 1
         valuePort.value = ''
-        alert("Es wurde ein falscher Wert eingetragen. 'run-for-ever': 0-100; 'run-to-rel-position': 0-360")
+        alert("Es muss ein Wert zwischen 0 und 100 eingetragen werden!")
     }
 }
 
@@ -399,7 +430,6 @@ function disabledAllMotorButton(yesno) {
     buttonVW_PortD.disabled = yesno
     buttonRW_PortD.disabled = yesno
 
-
     mode_PortA.disabled = yesno
     mode_PortB.disabled = yesno
     mode_PortC.disabled = yesno
@@ -419,6 +449,16 @@ function disabledAllMotorButton(yesno) {
     value_PortB.value = ""
     value_PortC.value = ""
     value_PortD.value = ""
+
+    degree_PortA.disabled = yesno
+    // degree_PortB.disabled = yesno
+    // degree_PortC.disabled = yesno
+    // degree_PortD.disabled = yesno
+
+    degree_PortA.value = ""
+    // degree_PortB.value = ""
+    // degree_PortC.value = ""
+    // degree_PortD.value = ""
 
     buttonSM_Port1.disabled = yesno
     buttonSM_Port2.disabled = yesno
