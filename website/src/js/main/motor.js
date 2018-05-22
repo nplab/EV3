@@ -10,7 +10,11 @@ class Motor {
         this.type = type;               // Typ des Motors
         this.modes = null;              // Liste der wählbaren Modes
         this.selectedMode = mode;       // Ausgewählter Modus [Wird nicht überprüft]
-        this.value = null;
+        this.value = null;              // Geschwindigkeit
+        this.degree = 100;             // Grad bei 'run-to-rel-position'
+        this.state = null;              // State des Motors
+        this.stopAction = null;         // Stop Action
+        this.selectedStopAction = null; // Ausgewählte StopAction
 
         // Set List of modes
         this.getModes(allModes)
@@ -46,12 +50,23 @@ class Motor {
         sendingToRoboter(this.port, 'get-state')
     }
 
-    setStopAction(action) {
-        sendingToRoboter(this.port, 'set-stop-action', action)
+    //
+    setState(state) {
+        this.state = state;
     }
 
-    setPosition(degree) {
-        sendingToRoboter(this.port, 'set-position', degree)
+    setStopAction(action) {
+        sendingToRoboter(this.port, 'set-stop-action', action)
+        this.selectedStopAction = action
+    }
+
+    setPosition(position) {
+        sendingToRoboter(this.port, 'set-position', position)
+    }
+
+    setDegree(degree) {
+        // TODO Check Integer
+        this.degree = degree
     }
 
     // Setter value
@@ -75,7 +90,7 @@ class Motor {
     // Fahren des Roboters. Es wird eine Richtung ('direction') definiert. "+" -> Vorwärts; "-" -> Rückwärts
     drive(direction) {
         if(this.selectedMode == 'run-to-rel-position') {
-            sendingToRoboter(this.port, this.selectedMode, [this.value * direction, 100]);
+            sendingToRoboter(this.port, this.selectedMode, [this.value, this.degree * direction]);
         } else {
             sendingToRoboter(this.port, this.selectedMode, this.value * direction);
         }
