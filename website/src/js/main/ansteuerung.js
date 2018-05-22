@@ -427,17 +427,23 @@ function handleMessages(message) {
     switch (data.port) {
     case '1':
         value_Port1.value = data.values;
+        sensor1.setValue(data.values)
         break;
     case '2':
         value_Port2.value = data.values;
+        sensor2.value = data.values;
+        sensor2.setValue(data.values)
         break;
     case '3':
         value_Port3.value = data.values;
+        sensor3.value = data.values;
+        sensor3.setValue(data.values)
         break;
     case '4':
         value_Port4.value = data.values;
+        sensor4.value = data.values;
+        sensor4.setValue(data.values)
         break;
-
     default:
         console.error("Es wurde kein passender Port gefunden.");
     }
