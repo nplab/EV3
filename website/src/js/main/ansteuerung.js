@@ -52,8 +52,13 @@ var TestPortA = new Motor('A', 'tacho-motor-l', null, true)
 var TestPortB = new Motor('B', 'tacho-motor-l', null, true)
 
 function SetModeTest() {
-    TestPortB.setPosition(10)
-    sendingToRoboter('A', 'run-forever', 80)
+    // TestPortB.setPosition(10)
+    // sendingToRoboter('A', 'run-forever', 80)
+
+    handleMessages({port: "A", values: 'dasdasd'})
+    handleMessages({port: "B", values: 'dasdasd43214'})
+    handleMessages({port: "D", values: 'da31232sdasd'})
+    handleMessages({port: "C", values: '123dasdasd'})
 }
 
 function StartTest() {
@@ -425,6 +430,22 @@ function handleMessages(message) {
     var data = eval(message);
     console.log(data);
     switch (data.port) {
+    case "A":
+        state_PortA.value = data.values;
+        motorA.setState(data.values);
+        break;
+    case "B":
+        state_PortB.value = data.values;
+        motorB.setState(data.values);
+        break;
+    case "C":
+        state_PortC.value = data.values;
+        motorC.setState(data.values);
+        break;
+    case "D":
+        state_PortD.value = data.values;
+        motorD.setState(data.values);
+        break;
     case '1':
         value_Port1.value = data.values;
         sensor1.setValue(data.values)
