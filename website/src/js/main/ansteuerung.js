@@ -86,11 +86,6 @@ var buttonGS_PortB = document.getElementById("button_portB_getstate")
 var buttonGS_PortC = document.getElementById("button_portC_getstate")
 var buttonGS_PortD = document.getElementById("button_portD_getstate")
 
-var buttonSSM_PortA = document.getElementById("button_portA_stopmode")
-var buttonSSM_PortB = document.getElementById("button_portB_stopmode")
-var buttonSSM_PortC = document.getElementById("button_portC_stopmode")
-var buttonSSM_PortD = document.getElementById("button_portD_stopmode")
-
 var buttonSM_Port1 = document.getElementById("button_port1_sm")
 var buttonSM_Port2 = document.getElementById("button_port2_sm")
 var buttonSM_Port3 = document.getElementById("button_port3_sm")
@@ -271,6 +266,12 @@ mode_Port3.onchange = function() {
 mode_Port4.onchange = function() {
     sensor4.setSelectedMode($("#modeport4 :selected").text());
     handleSensorMode(buttonSM_Port4, buttonGD_Port4)
+}
+
+stopmode_PortA.onchange = function() {
+    motorA.setStopAction($("#stopmodeportA :selected").text()); // Setzen des Modus
+
+    console.log(motorA.selectedStopAction);
 }
 
 // Onchange für das Value Feld der Motoren
@@ -494,11 +495,6 @@ function disabledAllMotorButton(yesno) {
     buttonGS_PortB.disabled = yesno
     buttonGS_PortC.disabled = yesno
     buttonGS_PortD.disabled = yesno
-
-    buttonSSM_PortA.disabled = yesno
-    buttonSSM_PortB.disabled = yesno
-    buttonSSM_PortC.disabled = yesno
-    buttonSSM_PortD.disabled = yesno
 
     stopmode_PortA.value = 0
     stopmode_PortB.value = 0
