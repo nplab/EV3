@@ -270,8 +270,15 @@ mode_Port4.onchange = function() {
 
 stopmode_PortA.onchange = function() {
     motorA.setStopAction($("#stopmodeportA :selected").text()); // Setzen des Modus
-
-    console.log(motorA.selectedStopAction);
+}
+stopmode_PortB.onchange = function() {
+    motorB.setStopAction($("#stopmodeportB :selected").text()); // Setzen des Modus
+}
+stopmode_PortC.onchange = function() {
+    motorC.setStopAction($("#stopmodeportC :selected").text()); // Setzen des Modus
+}
+stopmode_PortD.onchange = function() {
+    motorD.setStopAction($("#stopmodeportD :selected").text()); // Setzen des Modus
 }
 
 // Onchange für das Value Feld der Motoren
