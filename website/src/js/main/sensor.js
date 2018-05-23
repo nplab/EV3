@@ -70,5 +70,4 @@ class Sensor {
     setValue(value) {
         this.value = value
     }
-    // Funktion für neue Werte
 }
