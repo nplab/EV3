@@ -431,20 +431,20 @@ function handleMessages(message) {
     console.log(data);
     switch (data.port) {
     case "A":
-        state_PortA.value = data.values;
-        motorA.setState(data.values);
+        state_PortA.value = data.state;
+        motorA.setState(data.state);
         break;
     case "B":
-        state_PortB.value = data.values;
-        motorB.setState(data.values);
+        state_PortB.value = data.state;
+        motorB.setState(data.state);
         break;
     case "C":
-        state_PortC.value = data.values;
-        motorC.setState(data.values);
+        state_PortC.value = data.state;
+        motorC.setState(data.state);
         break;
     case "D":
-        state_PortD.value = data.values;
-        motorD.setState(data.values);
+        state_PortD.value = data.state;
+        motorD.setState(data.state);
         break;
     case '1':
         value_Port1.value = data.values;
