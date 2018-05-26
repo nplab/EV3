@@ -33,8 +33,8 @@ socket.emit('signaling', "Message to Server: Connection successfull");
 function receiveMessages (message) {
     if (message.type === 'offer') {
         handleOffer(message);
-    } else if( message.type == 'candidate'){
-        pc.handleRemoteICECandidate(message.sdp);
+    } else if( message.candidate){
+        handleICECandidate(message);
     }
     else if (message === 'bye') {
         // TODO, Falls eine Nachricht gesendet werden soll.

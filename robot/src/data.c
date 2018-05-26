@@ -190,18 +190,34 @@ void stop_on_return_handler(
 //handle local candidata (print, send last one to signaling server)
 static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg) {
   struct client* const client = arg;
-  char *candidate_sdp;
+  cJSON *root;
 
   if (candidate) {
+    char *candidate_sdp = NULL, *mid = NULL, *mli=NULL, *msg=NULL;
+    root = cJSON_CreateObject();
+
     EORE(rawrtc_peer_connection_ice_candidate_get_sdp(&candidate_sdp, candidate), "Could not get sdp string for local ICE candidate");
+    cJSON_AddStringToObject(root, "candidate", candidate_sdp);
+    mem_deref(candidate_sdp);
+
+    if(rawrtc_peer_connection_ice_candidate_get_sdp_mid(&mid, candidate) != RAWRTC_CODE_NO_VALUE){
+      cJSON_AddStringToObject(root, "sdpMid", mid);
+      mem_deref(mid);
+    }
+    if(rawrtc_peer_connection_ice_candidate_get_sdp_media_line_index(&mli, candidate) != RAWRTC_CODE_NO_VALUE){
+      cJSON_AddStringToObject(root, "sdpMLineIndex", mli);
+      mem_deref(mli);
+    }
+
+    msg = cJSON_Print(root);
+    sigserv_send(msg);
+
+    free(msg);
+    cJSON_Delete(root);
   }
   // Print local candidate
   default_peer_connection_local_candidate_handler(candidate, url, arg);
 
-  // Print local description (if last candidate)
-  /* if(candidate) { */
-  /*   send_local_description(client); */
-  /* } */
 }
 
 static void send_local_description(struct client* const client) {

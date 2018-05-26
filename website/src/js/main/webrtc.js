@@ -103,8 +103,9 @@ class WebRTCPeerConnection {
         console.log('Local description:', description);
     }
 
-    async handleRemoteICECandidate(sdp_string){
-        await this.pc.addIceCandidate(new RTCIceCandidate(sdp_string));
+    async handleRemoteICECandidate(candidate){
+        console.log("Add remote ICE candidate");
+        await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
 }
 
@@ -112,6 +113,12 @@ class WebRTCPeerConnection {
 function handleOffer(message) {
     pc.handleDescription(message, true)
     .catch((error) => console.error(error));
+}
+
+// Handle einer Offer-Nachricht
+function handleICECandidate(message) {
+    pc.handleRemoteICECandidate(message, true)
+        .catch((error) => console.error(error));
 }
 
 
