@@ -34,7 +34,7 @@ class WebRTCPeerConnection {
         };
         pc.onicecandidate = function(event) {
             if(event.candidate === null){
-                sendMessage({"stop": true});
+                sendMessage({"candidate": ""});
             }
             sendMessage(event.candidate);
             console.log('Local ICE candidate:', event.candidate);

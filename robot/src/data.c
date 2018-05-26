@@ -20,7 +20,7 @@ static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_info();
 static void handle_remote_description(cJSON *desc_json);
-static void handle_remote_ICE_candidate(cJSON *candidate_json);
+int handle_remote_ICE_candidate(cJSON *candidate_json);
 void api_channel_open_handler(void* const arg);
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
 
@@ -404,15 +404,12 @@ static void get_remote_info(){
   EOE(sigserv_receive(&input), "Could not get remote information from signaling server");
   while((root = cJSON_Parse(input))){
     if(cJSON_GetObjectItem(root, "candidate") != NULL){
-      handle_remote_ICE_candidate(root);
+      if( handle_remote_ICE_candidate(root) ){
+        break;
+      }
     } else if(cJSON_GetObjectItem(root, "type") != NULL){
       handle_remote_description(root);
-    } else if(cJSON_GetObjectItem(root, "stop") != NULL){
-      free(input);
-      cJSON_Delete(root);
-      break;
-    }
-    else{
+    } else{
       ZF_LOGE("Unknown type of remote information received.");
     }
     free(input);
@@ -421,8 +418,26 @@ static void get_remote_info(){
   }
 }
 
-static void handle_remote_ICE_candidate(cJSON *candidate_json){
-  
+int handle_remote_ICE_candidate(cJSON *candidate_json){
+  struct rawrtc_peer_connection_ice_candidate* candidate;
+  cJSON *sdp_item, *mid_item, *mli_item;
+  if(!cJSON_GetObjectItem(candidate_json, "candidate", sdp_item)){
+    ZF_LOGE("Could not get sdp string from remote ICE candidate JSON");
+  }
+  if(strlen(sdp_item->valuestring) == 0){ //last (empty) candidate
+    return 1;
+  }
+  if(!cJSON_GetObjectItem(candidate_json, "sdpMid", mid_item)){
+    ZF_LOGE("Cnuld not get sdpMid string from remote ICE candidate JSON");
+  }
+  if(!cJSON_GetObjectItem(candidate_json, "sdpMLineIndex", mli_item)){
+    ZF_LOGE("Could not get sdpMLineIndex integer from remote ICE candidate JSON");
+  }
+
+  EORE(rawrtc_peer_connection_ice_candidate_create(&candidate, sdp_item->valuestring, mid_item->valuestring, &(mli_item->valueint), null), "Could not create remote ICE candidate");
+
+  EORE(rawrtc_peer_connection_add_ice_candidate(client_info.connection, candidate), "Could not set remote ICE candidate");
+  return 0;
 }
 
 static void handle_remote_description(cJSON *desc_json) {
