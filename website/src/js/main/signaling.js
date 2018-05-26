@@ -43,7 +43,7 @@ function receiveMessages (message) {
 
 // Senden einer Nachricht an den Siganling Server
 function sendMessage(message){
-    console.log('Client sending message:');
+    console.log('Website sending message:');
     console.log(JSON.stringify(message));
     socket.emit('signaling', JSON.stringify(message));
 }
