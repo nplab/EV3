@@ -60,7 +60,7 @@ wrtcr_rc sigserv_connect() {
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc sigserv_send(const char *msg) {
+wrtcr_rc sigserv_send(char *msg) {
   wrtcr_rc rc = WRTCR_SUCCESS;
   char *buf = NULL;
   unsigned int buf_len;
@@ -80,13 +80,12 @@ wrtcr_rc sigserv_send(const char *msg) {
   } else if ((unsigned int)sent_len != msg_len + sizeof(uint32_t)) {
     handle_errno("Could not send complete message to signaling server", false);
     rc=WRTCR_FAILURE;
-  } else {
-    ZF_LOGD("Sent message to signaling server: %s", msg);
   }
   free(buf);
   return rc;
 }
 
+<<<<<<< HEAD
 wrtcr_rc sigserv_send_sdp_json(const char *type, const char *sdp_string){
   wrtcr_rc ret;
 
@@ -102,6 +101,8 @@ wrtcr_rc sigserv_send_sdp_json(const char *type, const char *sdp_string){
   return ret;
 }
 
+=======
+>>>>>>> parent of d6014c9... add sending of ICE candidate plus sigserv helper function
 wrtcr_rc sigserv_receive(char **msg) {
   uint8_t *recv_buf = NULL;
   uint32_t msg_len;

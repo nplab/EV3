@@ -194,16 +194,14 @@ static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate*
 
   if (candidate) {
     EORE(rawrtc_peer_connection_ice_candidate_get_sdp(&candidate_sdp, candidate), "Could not get sdp string for local ICE candidate");
-    EOE(sigserv_send_json("candidate", candidate_sdp), "Could not send ICE candidate");
   }
   // Print local candidate
   default_peer_connection_local_candidate_handler(candidate, url, arg);
 
-  // Send local description if there are no more candidates to come
-  /* if(!candidate) { */
+  // Print local description (if last candidate)
+  /* if(candidate) { */
   /*   send_local_description(client); */
   /* } */
-  mem_deref(candidate_sdp);
 }
 
 static void send_local_description(struct client* const client) {
@@ -212,6 +210,7 @@ static void send_local_description(struct client* const client) {
   char* sdp;
   cJSON* root;
   char * output;
+  char * err_msg = "Could not create JSON for local description";
 
   // Get description
   EORE(rawrtc_peer_connection_get_local_description(&description, client->connection), "Could not get local description");
@@ -221,9 +220,23 @@ static void send_local_description(struct client* const client) {
   EORE(rawrtc_peer_connection_description_get_sdp(&sdp, description), "Could not get SDP");
 
   // Create json
-  EOE(sigserv_send_sdp_json(rawrtc_sdp_type_to_str(type), sdp), "Could send local description");
+  root = cJSON_CreateObject();
+  EON(root, err_msg);
+  cJSON *temp = cJSON_CreateString(rawrtc_sdp_type_to_str(type));
+  EON(temp, err_msg);
+  cJSON_AddItemToObject(root, "type", temp);
+  temp = cJSON_CreateString(sdp);
+  EON(temp, err_msg);
+  cJSON_AddItemToObject(root, "sdp", temp);
+
+  // Print local description as JSON
+  output = cJSON_Print(root);
+  ZF_LOGD("Local Description:%s", output);
+  sigserv_send(output);
 
   // Un-reference
+  cJSON_Delete(root);
+  free(output);
   mem_deref(sdp);
   mem_deref(description);
 }

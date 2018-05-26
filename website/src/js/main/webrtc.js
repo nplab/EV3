@@ -32,9 +32,10 @@ class WebRTCPeerConnection {
         pc.onconnectionstatechange = () => {
             console.log('Connection state:', pc.connectionState);
         };
-        pc.onicecandidate = (event) => {
+        pc.onicecandidate = function(event) {
+            sendMessage({ "type": "candidate", "sdp": event.candidate});
             console.log('Local ICE candidate:', event.candidate);
-            sendMessage(pc.localDescription);
+            // sendMessage(pc.localDescription);
         };
         pc.onicecandidateerror = (event) => {
             console.error('ICE candidate error:', event);
@@ -101,6 +102,10 @@ class WebRTCPeerConnection {
         await this.pc.setLocalDescription(description);
         console.log('Local description:', description);
     }
+
+    async handleRemoteICECandidate(sdp_string){
+        await this.pc.addIceCandidate(new RTCIceCandidate(sdp_string));
+    }
 }
 
 // Handle einer Offer-Nachricht
@@ -108,6 +113,7 @@ function handleOffer(message) {
     pc.handleDescription(message, true)
     .catch((error) => console.error(error));
 }
+
 
 // Senden des Nachrichten in den DataChannel
 function sendingData(data) {
