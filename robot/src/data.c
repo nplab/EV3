@@ -193,9 +193,8 @@ static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate*
   char *candidate_sdp;
 
   if (candidate) {
-    EORE(rawrtc_peer_connection_add_ice_candidate(client->connection , candidate), "Could not add local ICE candidate");
     EORE(rawrtc_peer_connection_ice_candidate_get_sdp(&candidate_sdp, candidate), "Could not get sdp string for local ICE candidate");
-    EOE(sigserv_send_sdp_json("candidate", candidate_sdp), "Could not send ICE candidate");
+    EOE(sigserv_send_json("candidate", candidate_sdp), "Could not send ICE candidate");
   }
   // Print local candidate
   default_peer_connection_local_candidate_handler(candidate, url, arg);

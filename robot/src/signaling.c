@@ -90,7 +90,7 @@ wrtcr_rc sigserv_send(const char *msg) {
 wrtcr_rc sigserv_send_sdp_json(const char *type, const char *sdp_string){
   wrtcr_rc ret;
 
-  cJSON *root = cJSON_createObject();
+  cJSON *root = cJSON_CreateObject();
   cJSON_AddStringToObject(root, "type", type);
   cJSON_AddStringToObject(root, "sdp", sdp_string);
   char *msg = cJSON_Print(root);
