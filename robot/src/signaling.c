@@ -60,7 +60,7 @@ wrtcr_rc sigserv_connect() {
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc sigserv_send(char *msg) {
+wrtcr_rc sigserv_send(const char *msg) {
   wrtcr_rc rc = WRTCR_SUCCESS;
   char *buf = NULL;
   unsigned int buf_len;
@@ -80,9 +80,26 @@ wrtcr_rc sigserv_send(char *msg) {
   } else if ((unsigned int)sent_len != msg_len + sizeof(uint32_t)) {
     handle_errno("Could not send complete message to signaling server", false);
     rc=WRTCR_FAILURE;
+  } else {
+    ZF_LOGD("Sent message to signaling server: %s", msg);
   }
   free(buf);
   return rc;
+}
+
+wrtcr_rc sigserv_send_sdp_json(const char *type, const char *sdp_string){
+  wrtcr_rc ret;
+
+  cJSON *root = cJSON_createObject();
+  cJSON_AddStringToObject(root, "type", type);
+  cJSON_AddStringToObject(root, "sdp", sdp_string);
+  char *msg = cJSON_Print(root);
+
+  ret = sigserv_send(msg);
+
+  free(msg);
+  cJSON_Delete(root);
+  return ret;
 }
 
 wrtcr_rc sigserv_receive(char **msg) {
