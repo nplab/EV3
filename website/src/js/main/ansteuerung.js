@@ -14,6 +14,10 @@ function start() {
         "type": "tacho-motor-l", //alternativ tacho-motor-m
     },
     {
+        "port": "C", //Ausgabe des Address-Commands
+        "type": "tacho-motor-l", //alternativ tacho-motor-m
+    },
+    {
         "port": "D", //Ausgabe des Address-Commands
         "type": "tacho-motor-l", //alternativ tacho-motor-m
     },
@@ -48,8 +52,13 @@ var TestPortA = new Motor('A', 'tacho-motor-l', null, true)
 var TestPortB = new Motor('B', 'tacho-motor-l', null, true)
 
 function SetModeTest() {
-    TestPortB.setPosition(10)
-    sendingToRoboter('A', 'run-forever', 80)
+    // TestPortB.setPosition(10)
+    // sendingToRoboter('A', 'run-forever', 80)
+
+    handleMessages({port: "A", values: 'dasdasd'})
+    handleMessages({port: "B", values: 'dasdasd43214'})
+    handleMessages({port: "D", values: 'da31232sdasd'})
+    handleMessages({port: "C", values: '123dasdasd'})
 }
 
 function StartTest() {
@@ -77,6 +86,11 @@ var buttonST_PortB = document.getElementById("button_portB_stop")
 var buttonST_PortC = document.getElementById("button_portC_stop")
 var buttonST_PortD = document.getElementById("button_portD_stop")
 
+var buttonGS_PortA = document.getElementById("button_portA_getstate")
+var buttonGS_PortB = document.getElementById("button_portB_getstate")
+var buttonGS_PortC = document.getElementById("button_portC_getstate")
+var buttonGS_PortD = document.getElementById("button_portD_getstate")
+
 var buttonSM_Port1 = document.getElementById("button_port1_sm")
 var buttonSM_Port2 = document.getElementById("button_port2_sm")
 var buttonSM_Port3 = document.getElementById("button_port3_sm")
@@ -92,6 +106,11 @@ var mode_PortB = document.getElementById("modeportB")
 var mode_PortC = document.getElementById("modeportC")
 var mode_PortD = document.getElementById("modeportD")
 
+var stopmode_PortA = document.getElementById("stopmodeportA")
+var stopmode_PortB = document.getElementById("stopmodeportB")
+var stopmode_PortC = document.getElementById("stopmodeportC")
+var stopmode_PortD = document.getElementById("stopmodeportD")
+
 var mode_Port1 = document.getElementById("modeport1")
 var mode_Port2 = document.getElementById("modeport2")
 var mode_Port3 = document.getElementById("modeport3")
@@ -101,6 +120,16 @@ var value_PortA = document.getElementById("valueportA")
 var value_PortB = document.getElementById("valueportB")
 var value_PortC = document.getElementById("valueportC")
 var value_PortD = document.getElementById("valueportD")
+
+var degree_PortA = document.getElementById("degreeportA")
+var degree_PortB = document.getElementById("degreeportB")
+var degree_PortC = document.getElementById("degreeportC")
+var degree_PortD = document.getElementById("degreeportD")
+
+var state_PortA = document.getElementById("stateportA")
+var state_PortB = document.getElementById("stateportB")
+var state_PortC = document.getElementById("stateportC")
+var state_PortD = document.getElementById("stateportD")
 
 var value_Port1 = document.getElementById("valueport1")
 var value_Port2 = document.getElementById("valueport2")
@@ -183,35 +212,49 @@ buttonSM_Port4.onclick = function() {
 }
 
 // Get Data
-buttonGD_Port1.onclick = function() {
+buttonGD_Port1.onmousemove = function() {
     sensor1.getData();
 }
-buttonGD_Port2.onclick = function() {
+buttonGD_Port2.onmousemove = function() {
     sensor2.getData();
 }
-buttonGD_Port3.onclick = function() {
+buttonGD_Port3.onmousemove = function() {
     sensor3.getData();
 }
-buttonGD_Port4.onclick = function() {
+buttonGD_Port4.onmousemove = function() {
     sensor4.getData();
+}
+
+// get State
+buttonGS_PortA.onclick = function() {
+    motorA.getState();
+}
+buttonGS_PortB.onclick = function() {
+    motorB.getState();
+}
+buttonGS_PortC.onclick = function() {
+    motorC.getState();
+}
+buttonGS_PortD.onclick = function() {
+    motorD.getState();
 }
 
 // Onchange Events für die Mode Selections
 mode_PortA.onchange = function() {
       motorA.setSelectedMode($("#modeportA :selected").text()); // Setzen des Modus
-      handleMotorMode(value_PortA)
+      handleMotorMode(motorA, value_PortA, degree_PortA, buttonVW_PortA, buttonRW_PortA)
 }
 mode_PortB.onchange = function() {
       motorB.setSelectedMode($("#modeportB :selected").text());
-      handleMotorMode(value_PortB)
+      handleMotorMode(motorB, value_PortB, degree_PortB, buttonVW_PortB, buttonRW_PortB)
 }
 mode_PortC.onchange = function() {
       motorC.setSelectedMode($("#modeportC :selected").text());
-      handleMotorMode(value_PortC)
+      handleMotorMode(motorC, value_PortC, degree_PortC, buttonVW_PortC, buttonRW_PortC)
 }
 mode_PortD.onchange = function() {
       motorD.setSelectedMode($("#modeportD :selected").text());
-      handleMotorMode(value_PortD)
+      handleMotorMode(motorD, value_PortD, degree_PortA, buttonVW_PortD, buttonRW_PortD)
 }
 mode_Port1.onchange = function() {
     sensor1.setSelectedMode($("#modeport1 :selected").text());
@@ -230,6 +273,19 @@ mode_Port4.onchange = function() {
     handleSensorMode(buttonSM_Port4, buttonGD_Port4)
 }
 
+stopmode_PortA.onchange = function() {
+    motorA.setStopAction($("#stopmodeportA :selected").text()); // Setzen des Modus
+}
+stopmode_PortB.onchange = function() {
+    motorB.setStopAction($("#stopmodeportB :selected").text()); // Setzen des Modus
+}
+stopmode_PortC.onchange = function() {
+    motorC.setStopAction($("#stopmodeportC :selected").text()); // Setzen des Modus
+}
+stopmode_PortD.onchange = function() {
+    motorD.setStopAction($("#stopmodeportD :selected").text()); // Setzen des Modus
+}
+
 // Onchange für das Value Feld der Motoren
 value_PortA.onchange = function () {
     handleMotorValueField(motorA, value_PortA, buttonRW_PortA, buttonVW_PortA)
@@ -244,15 +300,46 @@ value_PortD.onchange = function () {
     handleMotorValueField(motorD, value_PortD, buttonRW_PortD, buttonVW_PortD)
 }
 
+// Onchange für das Defree Feld der Motoren
+degree_PortA.onchange = function() {
+    handleMotorDegree(motorA, degree_PortA)
+}
+// Onchange für das Defree Feld der Motoren
+degree_PortB.onchange = function() {
+    handleMotorDegree(motorB, degree_PortB)
+}
+// Onchange für das Defree Feld der Motoren
+degree_PortC.onchange = function() {
+    handleMotorDegree(motorC, degree_PortC)
+}
+// Onchange für das Defree Feld der Motoren
+degree_PortD.onchange = function() {
+    handleMotorDegree(motorD, degree_PortD)
+}
+
+function handleMotorDegree(motor, degreeField) {
+    motor.setDegree(degreeField.value)
+    console.log(degreeField.value);
+}
+
+
 function handleSensorMode(buttonSM, buttonGD) {
     buttonSM.disabled = 0
     buttonGD.disabled = 1
 }
 
-
-function handleMotorMode(valuePort) {
+function handleMotorMode(motor, valuePort, degreePort, buttonVW, buttonRW) {
     valuePort.disabled = 0  // Value-Feld einblenden
     valuePort.value = ''    // Value-Feld = ''
+    degreePort.value = ''
+    buttonVW.disabled = 1
+    buttonRW.disabled = 1
+    if(motor.selectedMode == 'run-to-rel-position') {
+        degreePort.disabled = 0;
+    } else {
+        degreePort.disabled = 1;
+    }
+
 }
 
 function handleMotorValueField(motor, valuePort, buttonRW, buttonVW) {
@@ -263,7 +350,7 @@ function handleMotorValueField(motor, valuePort, buttonRW, buttonVW) {
         buttonVW.disabled = 1
         buttonRW.disabled = 1
         valuePort.value = ''
-        alert("Es wurde ein falscher Wert eingetragen. 'run-for-ever': 0-100; 'run-to-rel-position': 0-360")
+        alert("Es muss ein Wert zwischen 0 und 100 eingetragen werden!")
     }
 }
 
@@ -281,25 +368,25 @@ function createInstanz(input) {
             motorA = new Motor(input.port, input.type)
             handleModes(motorA, mode_PortA);
             document.getElementById("StatusportA").firstChild.data = "Connected: " + input.type
-            buttonST_PortA.disabled = 0
+            handleMotorModes(motorA, buttonST_PortA, buttonGS_PortA, stopmode_PortA)
             break;
         case "B":
             motorB = new Motor(input.port, input.type)
             handleModes(motorB, mode_PortB);
             document.getElementById("StatusportB").firstChild.data = "Connected: " + input.type
-            buttonST_PortB.disabled = 0
+            handleMotorModes(motorB, buttonST_PortB, buttonGS_PortB, stopmode_PortB)
             break;
         case "C":
             motorC = new Motor(input.port, input.type)
             handleModes(motorC, mode_PortC);
             document.getElementById("StatusportC").firstChild.data = "Connected: " + input.type
-            buttonST_PortC.disabled = 0
+            handleMotorModes(motorC, buttonST_PortC, buttonGS_PortC, stopmode_PortC)
             break;
         case "D":
             motorD = new Motor(input.port, input.type)
             handleModes(motorD, mode_PortD);
             document.getElementById("StatusportD").firstChild.data = "Connected: " + input.type
-            buttonST_PortD.disabled = 0
+            handleMotorModes(motorD, buttonST_PortD, buttonGS_PortD, stopmode_PortD)
             break;
         case "1":
             sensor1 = new Sensor(input.port, input.type)
@@ -326,24 +413,58 @@ function createInstanz(input) {
     }
 }
 
+function handleMotorModes(motor, buttonST, buttonGS, stopmode) {
+    buttonST.disabled = 0
+    buttonGS.disabled = 0
+    stopmode.disabled = 0
+    for( var i = 0; i < motor.stopAction.length; i++) {
+        var option = document.createElement('option');
+        option.text = motor.stopAction[i]
+        option.value = i;
+        stopmode.options[i+1] = option
+    }
+}
+
 // Bei Nachrichteneingang wird die dem Port entsprechende Nachricht in einem Textfeld angegeben.
 function handleMessages(message) {
     var data = eval(message);
     console.log(data);
     switch (data.port) {
+    case "A":
+        state_PortA.value = data.state;
+        motorA.setState(data.state);
+        break;
+    case "B":
+        state_PortB.value = data.state;
+        motorB.setState(data.state);
+        break;
+    case "C":
+        state_PortC.value = data.state;
+        motorC.setState(data.state);
+        break;
+    case "D":
+        state_PortD.value = data.state;
+        motorD.setState(data.state);
+        break;
     case '1':
         value_Port1.value = data.values;
+        sensor1.setValue(data.values)
         break;
     case '2':
         value_Port2.value = data.values;
+        sensor2.value = data.values;
+        sensor2.setValue(data.values)
         break;
     case '3':
         value_Port3.value = data.values;
+        sensor3.value = data.values;
+        sensor3.setValue(data.values)
         break;
     case '4':
         value_Port4.value = data.values;
+        sensor4.value = data.values;
+        sensor4.setValue(data.values)
         break;
-
     default:
         console.error("Es wurde kein passender Port gefunden.");
     }
@@ -394,7 +515,6 @@ function disabledAllMotorButton(yesno) {
     buttonVW_PortD.disabled = yesno
     buttonRW_PortD.disabled = yesno
 
-
     mode_PortA.disabled = yesno
     mode_PortB.disabled = yesno
     mode_PortC.disabled = yesno
@@ -405,6 +525,31 @@ function disabledAllMotorButton(yesno) {
     mode_PortC.value = 0
     mode_PortD.value = 0
 
+    buttonGS_PortA.disabled = yesno
+    buttonGS_PortB.disabled = yesno
+    buttonGS_PortC.disabled = yesno
+    buttonGS_PortD.disabled = yesno
+
+    stopmode_PortA.value = 0
+    stopmode_PortB.value = 0
+    stopmode_PortC.value = 0
+    stopmode_PortD.value = 0
+
+    stopmode_PortA.disabled = yesno
+    stopmode_PortB.disabled = yesno
+    stopmode_PortC.disabled = yesno
+    stopmode_PortD.disabled = yesno
+
+    state_PortA.value = ""
+    state_PortB.value = ""
+    state_PortC.value = ""
+    state_PortD.value = ""
+
+    state_PortA.disabled = yesno
+    state_PortB.disabled = yesno
+    state_PortC.disabled = yesno
+    state_PortD.disabled = yesno
+
     value_PortA.disabled = yesno
     value_PortB.disabled = yesno
     value_PortC.disabled = yesno
@@ -414,6 +559,16 @@ function disabledAllMotorButton(yesno) {
     value_PortB.value = ""
     value_PortC.value = ""
     value_PortD.value = ""
+
+    degree_PortA.disabled = yesno
+    degree_PortB.disabled = yesno
+    degree_PortC.disabled = yesno
+    degree_PortD.disabled = yesno
+
+    degree_PortA.value = ""
+    degree_PortB.value = ""
+    degree_PortC.value = ""
+    degree_PortD.value = ""
 
     buttonSM_Port1.disabled = yesno
     buttonSM_Port2.disabled = yesno
