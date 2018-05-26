@@ -33,9 +33,11 @@ class WebRTCPeerConnection {
             console.log('Connection state:', pc.connectionState);
         };
         pc.onicecandidate = function(event) {
-            sendMessage({ "type": "candidate", "sdp": event.candidate});
+            if(event.candidate === null){
+                sendMessage({"stop": true});
+            }
+            sendMessage(event.candidate);
             console.log('Local ICE candidate:', event.candidate);
-            // sendMessage(pc.localDescription);
         };
         pc.onicecandidateerror = (event) => {
             console.error('ICE candidate error:', event);
@@ -100,6 +102,7 @@ class WebRTCPeerConnection {
 
         // Apply local description
         await this.pc.setLocalDescription(description);
+        sendMessage(description);
         console.log('Local description:', description);
     }
 

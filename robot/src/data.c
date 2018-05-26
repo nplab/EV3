@@ -18,7 +18,9 @@ void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char cons
 void data_channel_helper_create(struct data_channel_helper** const channel_helperp, struct client* const client, char* const label);
 static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
-static void get_remote_description();
+static void get_remote_info();
+static void handle_remote_description(cJSON *desc_json);
+static void handle_remote_ICE_candidate(cJSON *candidate_json);
 void api_channel_open_handler(void* const arg);
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
 
@@ -61,7 +63,7 @@ wrtcr_rc data_channel_setup(){
   client_info.offering = true;
 
   initialise_client();
-  get_remote_description();
+  get_remote_info();
 
   re_main(default_signal_handler);
 
@@ -90,9 +92,7 @@ wrtcr_rc initialise_client(){
   //create parameters for data channel
   data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "api");
 
-  EORE(rawrtc_data_channel_parameters_create(
-                                           &dc_parameters, client_info.data_channel_negotiated->label,
-                                           RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0), "Could not create data channel parameters");
+  EORE(rawrtc_data_channel_parameters_create(&dc_parameters, client_info.data_channel_negotiated->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0), "Could not create data channel parameters");
 
   //create actual data channel
   EORE(rawrtc_peer_connection_create_data_channel(
@@ -132,7 +132,7 @@ static void negotiation_needed_handler(void* const arg) {
     struct rawrtc_peer_connection_description* description;
     EORE(rawrtc_peer_connection_create_offer(&description, client->connection, false), "Could not create offer");
     EORE(rawrtc_peer_connection_set_local_description(client->connection, description), "Could not create offer");
-    EOE(send_local_description(description), "COuld not send local description");
+    EOE(send_local_description(description), "Could not send local description");
     mem_deref(description);
   }
 }
@@ -397,34 +397,49 @@ bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_can
   return false;
 }
 
-static void get_remote_description() {
+static void get_remote_info(){
+  cJSON* root = NULL;
+  char *input = NULL;
+
+  EOE(sigserv_receive(&input), "Could not get remote information from signaling server");
+  while((root = cJSON_Parse(input))){
+    if(cJSON_GetObjectItem(root, "candidate") != NULL){
+      handle_remote_ICE_candidate(root);
+    } else if(cJSON_GetObjectItem(root, "type") != NULL){
+      handle_remote_description(root);
+    } else if(cJSON_GetObjectItem(root, "stop") != NULL){
+      free(input);
+      cJSON_Delete(root);
+      break;
+    }
+    else{
+      ZF_LOGE("Unknown type of remote information received.");
+    }
+    free(input);
+    cJSON_Delete(root);
+    EOE(sigserv_receive(&input), "Could not get remote information from signaling server");
+  }
+}
+
+static void handle_remote_ICE_candidate(cJSON *candidate_json){
+  
+}
+
+static void handle_remote_description(cJSON *desc_json) {
     enum rawrtc_code error;
-    bool do_exit = false;
     char *type_str = NULL;
     char *sdp_str = NULL;
-    char *input = NULL;
-    cJSON* root = NULL;
     enum rawrtc_sdp_type type;
     struct rawrtc_peer_connection_description* remote_description = NULL;
 
-
-    EOE(sigserv_receive(&input), "Could not get remote description from signaling server");
-    root = cJSON_Parse(input);
-    if (!root) {
-      ZF_LOGE("Could not parse remote description JSON");
-      do_exit = true;
-      goto out;
-    }
-
-
-    cJSON *temp = cJSON_GetObjectItem(root, "type");
+    cJSON *temp = cJSON_GetObjectItem(desc_json, "type");
     if( !cJSON_IsString(temp) && temp->valuestring == NULL){
       ZF_LOGE("Invalid remote description\n");
       goto out;
     }
     type_str = temp->valuestring;
 
-    temp = cJSON_GetObjectItem(root, "sdp");
+    temp = cJSON_GetObjectItem(desc_json, "sdp");
     if( !cJSON_IsString(temp) && temp->valuestring == NULL){
       ZF_LOGE("Invalid remote description\n");
       goto out;
@@ -450,18 +465,6 @@ static void get_remote_description() {
 out:
     // Un-reference
     mem_deref(remote_description);
-    free(input);
-    cJSON_Delete(root);
-
-    // Exit?
-    if (do_exit) {
-        ZF_LOGI("Exiting\n");
-
-        // Stop client_info & bye
-        /* tmr_cancel(&timer); */
-        data_channel_shutdown();
-        exit(0);
-    }
 }
 
 void api_channel_open_handler(void* const arg) {
