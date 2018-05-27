@@ -10,10 +10,15 @@ class Motor {
         this.type = type;               // Typ des Motors
         this.modes = null;              // Liste der wählbaren Modes
         this.selectedMode = mode;       // Ausgewählter Modus [Wird nicht überprüft]
-        this.value = null;
+        this.value = null;              // Geschwindigkeit
+        this.degree = 100;             // Grad bei 'run-to-rel-position'
+        this.state = null;              // State des Motors
+        this.stopAction = null;         // Stop Action
+        this.selectedStopAction = null; // Ausgewählte StopAction
 
         // Set List of modes
         this.getModes(allModes)
+        this.getStopModes()
     }
 
     // Je nach Typ des Sensors können unterschiedliche Modes genutzt werden. Zurzeit werden für beide Motoren die beiden gleichen Modi unterstützt.
@@ -32,6 +37,13 @@ class Motor {
         }
     }
 
+    //
+    getStopModes() {
+        var mode1 = 'hold'
+        var mode2 = 'coast'
+        this.stopAction = [mode1, mode2]
+    }
+
     // Setzt den selectedMode, wenn der Modus in der Modusliste existiert.
     setSelectedMode(mode) {
         if (this.modes.indexOf(mode) != -1) {
@@ -46,12 +58,23 @@ class Motor {
         sendingToRoboter(this.port, 'get-state')
     }
 
-    setStopAction(action) {
-        sendingToRoboter(this.port, 'set-stop-action', action)
+    //
+    setState(state) {
+        this.state = state;
     }
 
-    setPosition(degree) {
-        sendingToRoboter(this.port, 'set-position', degree)
+    setStopAction(action) {
+        sendingToRoboter(this.port, 'set-stop-action', action)
+        this.selectedStopAction = action
+    }
+
+    setPosition(position) {
+        sendingToRoboter(this.port, 'set-position', position)
+    }
+
+    setDegree(degree) {
+        // TODO Check Integer
+        this.degree = degree
     }
 
     // Setter value
@@ -65,24 +88,22 @@ class Motor {
 
     // Der Wert muss überprüft werden, weil der Roboter in den verschiedenen Modie nur unterschiedliche Werte erlauben. Zurzeit werden nur zwei Modie unterstützt.
     checkValue(value) {
-        if (this.selectedMode == "run-forever") {
-            if(value <= 100 && value >= 0) {
-                return true
-            }
-            // alert("Der Wert muss eine Zahl zwischen 0 und 100 sein.")
-            return false
-        } else  if (this.selectedMode = 'run-to-rel-position'){
-            if(value <= 360 && value >= 0) {
-                return true
-            }
-            // alert("Der Wert muss eine Zahl zwischen 0 und 360 sein.")
-            return false
+        if(value <= 100 && value >= 0) {
+            return true
         }
+        alert("Der Wert muss eine Zahl zwischen 0 und 100 sein.")
+        return false
     }
 
     // Fahren des Roboters. Es wird eine Richtung ('direction') definiert. "+" -> Vorwärts; "-" -> Rückwärts
     drive(direction) {
-        sendingToRoboter(this.port, this.selectedMode, this.value * direction);
+        if(this.selectedMode == 'run-to-rel-position') {
+            sendingToRoboter(this.port, this.selectedMode, [this.value, this.degree * direction]);
+        } else {
+            sendingToRoboter(this.port, this.selectedMode, this.value * direction);
+        }
+
+
     }
 
     // Stoppen des Motors
