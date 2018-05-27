@@ -421,21 +421,22 @@ static void get_remote_info(){
 int handle_remote_ICE_candidate(cJSON *candidate_json){
   struct rawrtc_peer_connection_ice_candidate* candidate;
   cJSON *sdp_item, *mid_item, *mli_item;
-  if(!cJSON_GetObjectItem(candidate_json, "candidate", sdp_item)){
+  if(!(sdp_item = cJSON_GetObjectItem(candidate_json, "candidate"))){
     ZF_LOGE("Could not get sdp string from remote ICE candidate JSON");
   }
   if(strlen(sdp_item->valuestring) == 0){ //last (empty) candidate
     return 1;
   }
-  if(!cJSON_GetObjectItem(candidate_json, "sdpMid", mid_item)){
+  if(!(mid_item = cJSON_GetObjectItem(candidate_json, "sdpMid"))){
     ZF_LOGE("Cnuld not get sdpMid string from remote ICE candidate JSON");
   }
-  if(!cJSON_GetObjectItem(candidate_json, "sdpMLineIndex", mli_item)){
+  if(!(mli_item = cJSON_GetObjectItem(candidate_json, "sdpMLineIndex"))){
     ZF_LOGE("Could not get sdpMLineIndex integer from remote ICE candidate JSON");
   }
 
-  EORE(rawrtc_peer_connection_ice_candidate_create(&candidate, sdp_item->valuestring, mid_item->valuestring, &(mli_item->valueint), null), "Could not create remote ICE candidate");
+  EORE(rawrtc_peer_connection_ice_candidate_create(&candidate, sdp_item->valuestring, mid_item->valuestring, &(mli_item->valueint), NULL), "Could not create remote ICE candidate");
 
+  ZF_LOGD("Adding remote ICE candidate");
   EORE(rawrtc_peer_connection_add_ice_candidate(client_info.connection, candidate), "Could not set remote ICE candidate");
   return 0;
 }
