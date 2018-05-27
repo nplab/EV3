@@ -226,7 +226,6 @@ wrtcr_rc send_local_description(struct rawrtc_peer_connection_description* descr
 
   // Print local description as JSON
   output = cJSON_Print(root);
-  ZF_LOGD("Local Description:%s", output);
   ret = sigserv_send(output);
 
   // Un-reference

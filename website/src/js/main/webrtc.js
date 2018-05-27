@@ -35,9 +35,10 @@ class WebRTCPeerConnection {
         pc.onicecandidate = function(event) {
             if(event.candidate === null){
                 sendMessage({"candidate": ""});
+            }else{
+                sendMessage(event.candidate);
+                console.log('Local ICE candidate:', event.candidate);
             }
-            sendMessage(event.candidate);
-            console.log('Local ICE candidate:', event.candidate);
         };
         pc.onicecandidateerror = (event) => {
             console.error('ICE candidate error:', event);
@@ -104,11 +105,19 @@ class WebRTCPeerConnection {
         await this.pc.setLocalDescription(description);
         sendMessage(description);
         console.log('Local description:', description);
+
+        for(var c in this.candidates) {
+            await this.pc.addIceCandidate(new RTCIceCandidate(this.candidates[c]));
+        }
     }
 
     async handleRemoteICECandidate(candidate){
         console.log("Add remote ICE candidate");
-        await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
+        if( !this.candidates ){
+            this.candidates = [];
+        }
+        this.candidates.push(candidate);
+        // await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
 }
 
