@@ -29,9 +29,6 @@ wrtcr_rc data_channel_setup(){
   unsigned int turn_urls_length;
   char **turn_urls;
 
-  //get servers from config
-  conf_get_string_array("stun_urls", &stun_urls, &stun_urls_length);
-  conf_get_string_array("turn_urls", &turn_urls, &turn_urls_length);
 
   //initialize RawRTC
   EORE(rawrtc_init(),"RawRTC Initialisaton failed");
@@ -39,18 +36,18 @@ wrtcr_rc data_channel_setup(){
   //set up configuration
   EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
 
-
-  if( *stun_urls != NULL){
+  //get servers from config
+  if(conf_get_string_array("stun_urls", &stun_urls, &stun_urls_length) == WRTCR_SUCCESS){
     EORE(rawrtc_peer_connection_configuration_add_ice_server(
-                                                          configuration, stun_urls, stun_urls_length,
-                                                          NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add STUN servers to RawRTC configuration");
+                                                             configuration, stun_urls, stun_urls_length,
+                                                             NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add STUN servers to RawRTC configuration");
   }
 
-  if( *turn_urls != NULL){
+  if(conf_get_string_array("turn_urls", &turn_urls, &turn_urls_length) == WRTCR_SUCCESS){
     EORE(rawrtc_peer_connection_configuration_add_ice_server(
-                                                          configuration, turn_urls, turn_urls_length,
-                                                          "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
-                                                          RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD), "Could not add TURN servers to  RawRTC configuration");
+                                                             configuration, turn_urls, turn_urls_length,
+                                                             "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
+                                                             RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD), "Could not add TURN servers to  RawRTC configuration");
   }
 
   //set up client information
