@@ -1,3 +1,4 @@
+#include <rawrtc.h>
 #include "data.h"
 
 static struct client client_info = {0};
@@ -523,19 +524,34 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
   return;
 }
 
-wrtcr_rc send_message_on_api_channel(char *msg){
+wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char *msg){
   struct mbuf *buf = mbuf_alloc(strlen(msg)+1);
   mbuf_printf(buf, "%s", msg);
   mbuf_set_pos(buf, 0);
 
-  //if the api channel is open, try to send data on it
-  if(client_info.data_channel_api->channel->state == RAWRTC_DATA_CHANNEL_STATE_OPEN && rawrtc_data_channel_send(client_info.data_channel_api->channel,  buf, false) == RAWRTC_CODE_SUCCESS){
+  //if the channel is open, try to send data on it
+  if(channel->state == RAWRTC_DATA_CHANNEL_STATE_OPEN && rawrtc_data_channel_send(channel,  buf, false) == RAWRTC_CODE_SUCCESS){
     mem_deref(buf);
     return WRTCR_SUCCESS;
   } else {
     mem_deref(buf);
+    return WRTCR_FAILURE;
+  }
+}
+
+wrtcr_rc send_message_on_api_channel(char *msg){
+  if(send_message_on_data_channel(client_info.data_channel_api->channel, msg) != WRTCR_SUCCESS){
     ZF_LOGE("Coudl not send message on api channel");
     return WRTCR_FAILURE;
   }
+  return WRTCR_FAILURE;
+}
+
+wrtcr_rc send_message_on_sensor_channel(char *msg){
+  if(send_message_on_data_channel(client_info.data_channel_sensors->channel, msg) != WRTCR_SUCCESS){
+    ZF_LOGE("Coudl not send message on sensors channel");
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_FAILURE;
 }
 

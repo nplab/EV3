@@ -37,3 +37,6 @@ wrtcr_rc data_channel_shutdown();
 
 //send string msg on the api channel
 wrtcr_rc send_message_on_api_channel(char *msg);
+
+//send string msg on the sensors channel
+wrtcr_rc send_message_on_sensor_channel(char *msg);
