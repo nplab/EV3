@@ -105,19 +105,10 @@ class WebRTCPeerConnection {
         await this.pc.setLocalDescription(description);
         sendMessage(description);
         console.log('Local description:', description);
-
-        for(var c in this.candidates) {
-            await this.pc.addIceCandidate(new RTCIceCandidate(this.candidates[c]));
-        }
     }
 
     async handleRemoteICECandidate(candidate){
-        console.log("Add remote ICE candidate");
-        if( !this.candidates ){
-            this.candidates = [];
-        }
-        this.candidates.push(candidate);
-        // await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
+        await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
 }
 

@@ -2,7 +2,12 @@
 config = getConfig();
 
 // Verbindung zum Signaling Server
-var socket = io.connect('https://localhost:3001');
+try{
+    var socket = io.connect('https://localhost:3001');
+}
+catch(e){
+    console.log(e);
+}
 
 // erhalte und gebe die "info Message" aus
 socket.on('info', function (data) {

@@ -98,9 +98,9 @@ wrtcr_rc initialise_client(){
                                                 api_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
                                                 robot_api_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
-
   //clean up
   mem_deref(dc_parameters);
+
   return WRTCR_SUCCESS;
 }
 
@@ -121,15 +121,16 @@ wrtcr_rc client_stop(){
 static void negotiation_needed_handler(void* const arg) {
   struct client* const client = arg;
 
-  // Print negotiation needed
   ZF_LOGI("(%s) Negotiation needed\n", client->name);
 
   // Offering: Create and set local description
   if (client->offering) {
     struct rawrtc_peer_connection_description* description;
+    //make sure to send the local description before setting, since setting it causes the first ICE candidate to be sent
+    //this is a bug, see https://github.com/rawrtc/rawrtc/issues/116
     EORE(rawrtc_peer_connection_create_offer(&description, client->connection, false), "Could not create offer");
-    EORE(rawrtc_peer_connection_set_local_description(client->connection, description), "Could not create offer");
     EOE(send_local_description(description), "Could not send local description");
+    EORE(rawrtc_peer_connection_set_local_description(client->connection, description), "Could not create offer");
     mem_deref(description);
   }
 }
@@ -424,7 +425,7 @@ int handle_remote_ICE_candidate(cJSON *candidate_json){
     return 1;
   }
   if(!(mid_item = cJSON_GetObjectItem(candidate_json, "sdpMid"))){
-    ZF_LOGE("Cnuld not get sdpMid string from remote ICE candidate JSON");
+    ZF_LOGE("Could not get sdpMid string from remote ICE candidate JSON");
   }
   if(!(mli_item = cJSON_GetObjectItem(candidate_json, "sdpMLineIndex"))){
     ZF_LOGE("Could not get sdpMLineIndex integer from remote ICE candidate JSON");
