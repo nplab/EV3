@@ -8,6 +8,7 @@
 
 #include "utils.h"
 #include "data.h"
+#include "map.h"
 
 wrtcr_rc setup_meta_devices();
 

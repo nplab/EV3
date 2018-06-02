@@ -6,7 +6,11 @@ document.getElementById("onstart").onclick = testMetaDevices
 
 function testMetaDevices() {
     sendingToRoboter("a", "start");
+    setTimeout(function(){
+        sendingToRoboter("a", "stop");
+    }, 10000);
 }
+
 
 
 // Test DataChannel
