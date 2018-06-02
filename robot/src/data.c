@@ -21,6 +21,8 @@ bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_can
 static void get_remote_description();
 void api_channel_open_handler(void* const arg);
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
+//helper functions
+wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char *msg);
 
 
 wrtcr_rc data_channel_setup(){
@@ -541,17 +543,17 @@ wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char 
 
 wrtcr_rc send_message_on_api_channel(char *msg){
   if(send_message_on_data_channel(client_info.data_channel_api->channel, msg) != WRTCR_SUCCESS){
-    ZF_LOGE("Coudl not send message on api channel");
+    ZF_LOGE("Could not send message on api channel");
     return WRTCR_FAILURE;
   }
-  return WRTCR_FAILURE;
+  return WRTCR_SUCCESS;
 }
 
 wrtcr_rc send_message_on_sensor_channel(char *msg){
   if(send_message_on_data_channel(client_info.data_channel_sensors->channel, msg) != WRTCR_SUCCESS){
-    ZF_LOGE("Coudl not send message on sensors channel");
+    ZF_LOGE("Could not send message on sensors channel");
     return WRTCR_FAILURE;
   }
-  return WRTCR_FAILURE;
+  return WRTCR_SUCCESS;
 }
 

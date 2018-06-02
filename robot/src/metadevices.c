@@ -7,16 +7,20 @@
 
 #include "metadevices.h"
 
+//define meta device ports
+#define COLLISION_PORT "a"
+
 //define meta device structures
 typedef wrtcr_rc (*meta_device_function)(cJSON *msg);
 typedef struct meta_device{
   meta_device_function handler;
   char *type;
+  uint8_t sn;
 } meta_device_t;
 typedef map_t(meta_device_t) meta_device_map_t;
-
 meta_device_map_t md_map;
 
+//define non-public function
 wrtcr_rc setup_collision_sensor();
 wrtcr_rc handle_collision_sensor_message(cJSON *msg);
 void* collision_routine(void *ign);
@@ -52,10 +56,23 @@ wrtcr_rc handle_meta_device_message(char *port, cJSON *message){
 }
 
 wrtcr_rc setup_collision_sensor(){
+  uint8_t sn;
+  //check for sensor
+  if(!ev3_search_sensor_plugged_in(INPUT_1, 0, &sn, 0)){
+    ZF_LOGE("Could not find sensor on port 1");
+    return WRTCR_FAILURE;
+  } else {
+    if( ev3_sensor_desc_type_inx(sn) != LEGO_EV3_TOUCH){
+      ZF_LOGE("Sensors attached to port 1 is not a touch sensor");
+      return WRTCR_FAILURE;
+    }
+  }
+
   meta_device_t dev;
   dev.handler = handle_collision_sensor_message;
   dev.type = "meta-collision";
-  map_set(&md_map, "a", dev);
+  dev.sn = sn;
+  map_set(&md_map, COLLISION_PORT, dev);
 
   return WRTCR_SUCCESS;
 }
@@ -87,7 +104,8 @@ wrtcr_rc handle_collision_sensor_message(cJSON *msg){
       return WRTCR_FAILURE;
     }
     pthread_join(collision_thread_id, NULL);
-    ZF_LOGI("Collision thread has ended.");
+    thread_exists = false;
+    ZF_LOGI("Collision detection thread has ended.");
   } else {
     ZF_LOGE("Got message for collision sensor with unknown mode. Ignoring!");
     return WRTCR_FAILURE;
@@ -97,11 +115,31 @@ wrtcr_rc handle_collision_sensor_message(cJSON *msg){
 }
 
 void* collision_routine(void *ign){
+  static meta_device_t* sensor = NULL;
+  static int last_value = 0;
+  static struct timespec sleeptime;
+  sleeptime.tv_sec = 0;
+  sleeptime.tv_nsec = 500 * 1000 * 1000;
+
+  //get sensor if necessary
+  if(!sensor){
+    sensor = map_get(&md_map, COLLISION_PORT);
+    if(sensor == NULL){
+      handle_err("Could not find collision sensor structure. Should never happen! Exiting!", true);
+    }
+  }
+
+  int cur_value;
+
   while(true){
-    struct timespec sleeptime;
-    sleeptime.tv_sec = 0;
-    sleeptime.tv_nsec = 10 *1000 * 1000;
-    ZF_LOGI("Hey there!");
+    if(!get_sensor_value( 0, sensor->sn, &cur_value)){
+      ZF_LOGE("Could not get value from collision sensor");
+    } else if( cur_value != last_value ){
+      char msg[30];
+      snprintf(msg, sizeof(msg), "{\"port\": \"%s\", \"value\":[%d]}", COLLISION_PORT, cur_value);
+      POE(send_message_on_sensor_channel(msg), "Could not send collision sensor message");
+      last_value = cur_value;
+    }
     nanosleep(&sleeptime, NULL);
   }
   return NULL;
