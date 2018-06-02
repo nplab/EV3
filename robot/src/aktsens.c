@@ -52,25 +52,35 @@ wrtcr_rc setup_robot(){
 wrtcr_rc get_port_description(char **out_string){
   char port[8];
   cJSON *root = cJSON_CreateArray();
-  cJSON *tempObj;
+  cJSON *temp_obj, *meta_devices, *mdev;
   map_iter_t iterator = map_iter(&port_map);
   const char *key;
   uint8_t sn;
+
+  //add physical devices
   while( (key = map_next(&port_map, &iterator))){
     sn = *map_get(&port_map, key);
-    tempObj = cJSON_CreateObject();
+    temp_obj = cJSON_CreateObject();
     if( *key<'A' ){
       ev3_sensor_port_name(sn, port);
-      cJSON_AddStringToObject(tempObj, "type", ev3_sensor_type( ev3_sensor[sn].type_inx ));
+      cJSON_AddStringToObject(temp_obj, "type", ev3_sensor_type( ev3_sensor[sn].type_inx ));
     } else {
       ev3_tacho_port_name(sn, port);
-      cJSON_AddStringToObject(tempObj, "type", ev3_tacho_type( ev3_tacho[sn].type_inx ));
+      cJSON_AddStringToObject(temp_obj, "type", ev3_tacho_type( ev3_tacho[sn].type_inx ));
     }
-    cJSON_AddStringToObject(tempObj, "port", port + strlen(port) -1);
-    cJSON_AddItemToArray(root, tempObj);
+    cJSON_AddStringToObject(temp_obj, "port", port + strlen(port) -1);
+    cJSON_AddItemToArray(root, temp_obj);
   }
+
+  //add meta devices
+  get_meta_device_description(&meta_devices);
+  cJSON_ArrayForEach(mdev, meta_devices){
+    cJSON_AddItemReferenceToArray(root, mdev);
+  }
+  
   *out_string = cJSON_Print(root);
   cJSON_Delete(root);
+  cJSON_Delete(meta_devices);
   return WRTCR_SUCCESS;
 }
 

@@ -9,6 +9,7 @@
 #include "utils.h"
 #include "map.h"
 #include "data.h"
+#include "metadevices.h"
 
 typedef struct port_serial_number {
   char *type;
