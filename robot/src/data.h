@@ -16,8 +16,8 @@ struct client {
   bool offering;
   struct rawrtc_peer_connection_configuration* configuration;
   struct rawrtc_peer_connection* connection;
-  struct data_channel_helper* data_channel_negotiated;
-  struct data_channel_helper* data_channel;
+  struct data_channel_helper* data_channel_api;
+  struct data_channel_helper* data_channel_sensors;
 };
 
 //Data channel helper structure

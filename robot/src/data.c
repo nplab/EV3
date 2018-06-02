@@ -62,6 +62,8 @@ wrtcr_rc data_channel_setup(){
 
   re_main(default_signal_handler);
 
+  data_channel_shutdown();
+
   return WRTCR_SUCCESS;
 }
 
@@ -84,22 +86,38 @@ wrtcr_rc initialise_client(){
                                     default_ice_gatherer_state_change_handler, connection_state_change_handler,
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
-  //create parameters for data channel
-  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "api");
+  //create parameters for api data channel
+  data_channel_helper_create(&client_info.data_channel_api,  &client_info, "api");
 
   EORE(rawrtc_data_channel_parameters_create(
-                                           &dc_parameters, client_info.data_channel_negotiated->label,
-                                           RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0), "Could not create data channel parameters");
+                                           &dc_parameters, client_info.data_channel_api->label,
+                                           RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0), "Could not create api data channel parameters");
 
   //create actual data channel
   EORE(rawrtc_peer_connection_create_data_channel(
-                                                &client_info.data_channel_negotiated->channel, client_info.connection,
+                                                &client_info.data_channel_api->channel, client_info.connection,
                                                 dc_parameters, NULL,
                                                 api_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
-                                                robot_api_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
-
+                                                robot_api_message_handler, client_info.data_channel_api), "Could not create api data channel");
   //clean up
+  mem_deref(dc_parameters);
+
+  //create parameters for sensor data channel
+  data_channel_helper_create(&client_info.data_channel_sensors, &client_info, "sensors");
+
+  EORE(rawrtc_data_channel_parameters_create(
+                                           &dc_parameters, client_info.data_channel_sensors->label,
+                                           RAWRTC_DATA_CHANNEL_TYPE_UNRELIABLE_ORDERED_RETRANSMIT, 0, NULL, true, 1), "Could not create sensors data channel parameters");
+
+  //create actual data channel
+  EORE(rawrtc_peer_connection_create_data_channel(
+                                                &client_info.data_channel_sensors->channel, client_info.connection,
+                                                dc_parameters, NULL,
+                                                default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
+                                                default_data_channel_error_handler, default_data_channel_close_handler,
+                                                default_data_channel_message_handler, client_info.data_channel_sensors), "Could not create sensors data channel");
+  //more clean up
   mem_deref(dc_parameters);
   return WRTCR_SUCCESS;
 }
@@ -110,8 +128,8 @@ wrtcr_rc client_stop(){
     handle_err("Could not close data channel", false);
     rc = WRTCR_FAILURE;
   }
-  client_info.data_channel = mem_deref(client_info.data_channel);
-  client_info.data_channel_negotiated = mem_deref(client_info.data_channel_negotiated);
+  client_info.data_channel_api = mem_deref(client_info.data_channel_api);
+  client_info.data_channel_sensors = mem_deref(client_info.data_channel_sensors);
   client_info.connection = mem_deref(client_info.connection);
   client_info.configuration = mem_deref(client_info.configuration);
 
