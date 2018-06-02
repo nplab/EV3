@@ -1,8 +1,8 @@
+#include <rawrtc.h>
 #include "data.h"
 
 static struct client client_info = {0};
 static struct rawrtc_peer_connection_configuration *configuration;
-struct rawrtc_data_channel* api_channel = NULL;
 
 //initialisation and shutdown functions
 wrtcr_rc initialise_client();
@@ -21,6 +21,8 @@ bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_can
 static void get_remote_description();
 void api_channel_open_handler(void* const arg);
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
+//helper functions
+wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char *msg);
 
 
 wrtcr_rc data_channel_setup(){
@@ -486,15 +488,9 @@ void api_channel_open_handler(void* const arg) {
 
   EOE(get_port_description(&description), "Could not get port description");
 
-  struct mbuf *desc_mbuf = mbuf_alloc(strlen(description)+1);
-  mbuf_printf(desc_mbuf, "%s", description);
-  mbuf_set_pos(desc_mbuf, 0);
+  EOE(send_message_on_api_channel(description), "Could not send port description message");
 
   free(description);
-
-  api_channel = channel->channel; //remember now open channel
-
-  EORE(rawrtc_data_channel_send(channel->channel,  desc_mbuf, false), "Could not send port description message");
 }
 
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg) {
@@ -519,24 +515,45 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
   }
 
   //call handler functions based on port
-  if( *port < 'A'){
-    handle_sensor_message(port, root);
-  } else {
+  if( *port >= 'a'){
+    handle_meta_device_message(port, root);
+  } else if ( *port >= 'A'){
     handle_tacho_message(port, root);
+  } else {
+    handle_sensor_message(port, root);
   }
   cJSON_Delete(root);
   return;
 }
 
-wrtcr_rc send_message_on_api_channel(char *msg){
+wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char *msg){
   struct mbuf *buf = mbuf_alloc(strlen(msg)+1);
   mbuf_printf(buf, "%s", msg);
   mbuf_set_pos(buf, 0);
 
-  //if the api channel exists, try to send data on it
-  if(!api_channel || rawrtc_data_channel_send(api_channel,  buf, false) == RAWRTC_CODE_SUCCESS){
+  //if the channel is open, try to send data on it
+  if(channel->state == RAWRTC_DATA_CHANNEL_STATE_OPEN && rawrtc_data_channel_send(channel,  buf, false) == RAWRTC_CODE_SUCCESS){
+    mem_deref(buf);
     return WRTCR_SUCCESS;
   } else {
+    mem_deref(buf);
     return WRTCR_FAILURE;
   }
 }
+
+wrtcr_rc send_message_on_api_channel(char *msg){
+  if(send_message_on_data_channel(client_info.data_channel_api->channel, msg) != WRTCR_SUCCESS){
+    ZF_LOGE("Could not send message on api channel");
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc send_message_on_sensor_channel(char *msg){
+  if(send_message_on_data_channel(client_info.data_channel_sensors->channel, msg) != WRTCR_SUCCESS){
+    ZF_LOGE("Could not send message on sensors channel");
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_SUCCESS;
+}
+
