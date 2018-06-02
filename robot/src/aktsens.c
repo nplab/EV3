@@ -4,12 +4,13 @@
 typedef wrtcr_rc (*tacho_api_function)(uint8_t sn, cJSON *value);
 typedef map_t(tacho_api_function) tacho_function_map_t;
 
+
 //print on error of the robot set or get functions which return the number of bytes written or read
 #define POSGE(rc, msg, fail) if(!(rc)){handle_err(msg, false); if(fail) return WRTCR_FAILURE;}
 map_int_t port_map;
 tacho_function_map_t tf_map;
 
-wrtcr_rc set_up_function_maps();
+wrtcr_rc set_up_maps();
 wrtcr_rc tacho_stop_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_run_forever_handler(uint8_t sn, cJSON *value);
 wrtcr_rc tacho_run_to_rel_pos_handler(uint8_t sn, cJSON *value);
@@ -43,8 +44,9 @@ wrtcr_rc setup_robot(){
       map_set(&port_map, &(port[3]), i);
     }
   }
+  set_up_maps();
 
-  set_up_function_maps();
+  POE(setup_meta_devices(), "Could not set up meta devices. Any attempts to use them may fail!");
 
   return WRTCR_SUCCESS;
 }
@@ -84,7 +86,7 @@ wrtcr_rc get_port_description(char **out_string){
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc set_up_function_maps(){
+wrtcr_rc set_up_maps(){
   map_init(&tf_map);
   map_set(&tf_map, "stop", tacho_stop_handler);
   map_set(&tf_map, "run-forever", tacho_run_forever_handler);
@@ -95,6 +97,7 @@ wrtcr_rc set_up_function_maps(){
 
   return WRTCR_SUCCESS;
 }
+
 
 wrtcr_rc handle_tacho_message(char *port, cJSON *message){
   uint8_t sn = *map_get(&port_map, port);
