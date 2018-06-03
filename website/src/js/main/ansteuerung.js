@@ -5,9 +5,13 @@ document.getElementById("onstart").onclick = testMetaDevices
 
 
 function testMetaDevices() {
-    sendingToRoboter("a", "start");
+    // sendingToRoboter("a", "start");
+    // setTimeout(function(){
+    //     sendingToRoboter("a", "stop");
+    // }, 10000);
+    sendingToRoboter("b", "start");
     setTimeout(function(){
-        sendingToRoboter("a", "stop");
+        sendingToRoboter("b", "stop");
     }, 10000);
 }
 
