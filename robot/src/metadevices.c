@@ -143,14 +143,6 @@ void* collision_routine(void *ign){
   sleeptime.tv_sec = 0;
   sleeptime.tv_nsec = 500 * 1000 * 1000;
 
-  //get sensor if necessary
-  if(!sensor){
-    sensor = map_get(&md_map, collision_port);
-    if(sensor == NULL){
-      handle_err("Could not find collision sensor structure. Should never happen! Exiting!", true);
-    }
-  }
-
   int cur_value;
   char msg[30];
 
