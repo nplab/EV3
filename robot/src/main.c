@@ -24,13 +24,13 @@ int main(int argc, char *argv[]) {
         conf_file_name = optarg;
         break;
       case '?':
-        if (optopt == 'c')
+        if (optopt == 'c'){
           ZF_LOGF("Option -c <config-file> requires the config file as an argument.");
-        else if (isprint (optopt))
+        } else if (isprint (optopt)){
           ZF_LOGF("Unknown option `-%c'.", optopt);
-        else
+        } else {
           ZF_LOGF("Unknown option character `\\x%x'.", optopt);
-        /* return WRTCR_FAILURE; */
+        }
       default:
         abort();
       }
@@ -47,6 +47,7 @@ int main(int argc, char *argv[]) {
   data_channel_setup();
 
   ZF_LOGI("Starting teardown procedure");
+  cleanup_robot();
   sigserv_disconnect();
   delete_config();
 

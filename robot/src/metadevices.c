@@ -48,6 +48,11 @@ wrtcr_rc setup_meta_devices(){
   return WRTCR_SUCCESS;
 }
 
+wrtcr_rc cleanup_meta_devices(){
+  map_deinit(&md_map);
+  return WRTCR_SUCCESS;
+}
+
 wrtcr_rc get_meta_device_description(cJSON **meta_devices){
   cJSON *root = cJSON_CreateArray();
   cJSON *dev;

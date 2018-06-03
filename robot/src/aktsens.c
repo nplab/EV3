@@ -51,6 +51,11 @@ wrtcr_rc setup_robot(){
   return WRTCR_SUCCESS;
 }
 
+wrtcr_rc cleanup_robot(){
+  cleanup_meta_devices();
+  map_deinit(&tf_map);
+}
+
 wrtcr_rc get_port_description(char **out_string){
   char port[8];
   cJSON *root = cJSON_CreateArray();
