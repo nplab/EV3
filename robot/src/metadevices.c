@@ -316,8 +316,9 @@ wrtcr_rc setup_compass_sensor(){
 }
 
 wrtcr_rc handle_compass_sensor_message(cJSON *msg){
-  static pthread_t collision_thread_id;
+  static pthread_t compass_thread_id;
   static bool thread_exists = false;
+  static int interval_value;
   cJSON *mode = cJSON_GetObjectItem(msg, "mode");
 
   if(strncmp("start", mode->valuestring, strlen("start")) == 0){
@@ -330,7 +331,8 @@ wrtcr_rc handle_compass_sensor_message(cJSON *msg){
       ZF_LOGW("Got message requiring start of compass thread, but it is already running");
       return WRTCR_FAILURE;
     }
-    if(pthread_create(&collision_thread_id, NULL, &collision_routine, &(interval->valueint)) == 0){
+    interval_value = interval->valueint;
+    if(pthread_create(&compass_thread_id, NULL, &compass_routine, &interval_value) == 0){
       thread_exists = true;
       ZF_LOGI("Created compass thread.");
     } else {
@@ -338,13 +340,13 @@ wrtcr_rc handle_compass_sensor_message(cJSON *msg){
       return WRTCR_FAILURE;
     }
   } else if(strncmp("stop", mode->valuestring, strlen("stop")) == 0){
-    if(pthread_cancel(collision_thread_id) != 0){
+    if(pthread_cancel(compass_thread_id) != 0){
       ZF_LOGE( "Could not send cancellation request to compass thread.");
       return WRTCR_FAILURE;
     }
-    pthread_join(collision_thread_id, NULL);
+    pthread_join(compass_thread_id, NULL);
     thread_exists = false;
-    ZF_LOGI("compass thread has ended.");
+    ZF_LOGI("Compass thread has ended.");
   } else {
     ZF_LOGE("Got message for compass with unknown mode. Ignoring!");
     return WRTCR_FAILURE;
