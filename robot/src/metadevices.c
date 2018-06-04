@@ -22,12 +22,14 @@ meta_device_map_t md_map;
 //define meta device ports
 char *collision_port = "a";
 char *sonar_port = "b";
+char *compass_port = "c";
 
 //save necessary serial numbers
 uint8_t collision_sn;
 uint8_t us_sn;
 uint8_t zero_sn;
 uint8_t sonar_motor_sn;
+uint8_t compass_sn;
 
 //define non-public functions
 // -- collision sensors
@@ -38,12 +40,17 @@ void* collision_routine(void *ign);
 wrtcr_rc setup_sonar_sensor();
 wrtcr_rc handle_sonar_sensor_message(cJSON *msg);
 void* sonar_routine(void *ign);
+// -- compass sensor
+wrtcr_rc setup_compass_sensor();
+wrtcr_rc handle_compass_sensor_message(cJSON *msg);
+void* compass_routine(void *ign);
 
 wrtcr_rc setup_meta_devices(){
   map_init(&md_map);
   
   EOE(setup_collision_sensor(), "Could not set up collision sensor. Quitting!");
   EOE(setup_sonar_sensor(), "Could not set up sonar sensor. Quitting!");
+  EOE(setup_compass_sensor(), "Could not set up compass sensor. Quitting!");
 
   return WRTCR_SUCCESS;
 }
@@ -140,14 +147,6 @@ void* collision_routine(void *ign){
   static struct timespec sleeptime;
   sleeptime.tv_sec = 0;
   sleeptime.tv_nsec = 500 * 1000 * 1000;
-
-  //get sensor if necessary
-  if(!sensor){
-    sensor = map_get(&md_map, collision_port);
-    if(sensor == NULL){
-      handle_err("Could not find collision sensor structure. Should never happen! Exiting!", true);
-    }
-  }
 
   int cur_value;
   char msg[30];
@@ -298,4 +297,86 @@ void* sonar_routine(void *ign){
     POSGE(set_tacho_position_sp( sonar_motor_sn, direction*step_degree) && set_tacho_command_inx(sonar_motor_sn, TACHO_RUN_TO_REL_POS), "Could not make sonar motor move", true);
     nanosleep(&sleeptime, NULL);
   }
+}
+
+//--------- compass sensor functions --------------------//
+wrtcr_rc setup_compass_sensor(){
+  //check for sensor
+  if(!ev3_search_sensor_plugged_in(INPUT_4, 0, &compass_sn, 0)){
+    ZF_LOGE("Could not find sensor on port 4");
+    return WRTCR_FAILURE;
+  } else {
+    if( ev3_sensor_desc_type_inx(compass_sn) != LEGO_EV3_GYRO){
+      ZF_LOGE("Sensor attached to port 4 is not a compass sensor");
+      return WRTCR_FAILURE;
+    }
+  }
+
+  meta_device_t dev;
+  dev.handler = handle_compass_sensor_message;
+  dev.type = "meta-compass";
+  map_set(&md_map, compass_port, dev);
+
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc handle_compass_sensor_message(cJSON *msg){
+  static pthread_t compass_thread_id;
+  static bool thread_exists = false;
+  static int interval_value;
+  cJSON *mode = cJSON_GetObjectItem(msg, "mode");
+
+  if(strncmp("start", mode->valuestring, strlen("start")) == 0){
+    cJSON *interval = cJSON_GetObjectItem(msg, "value");
+    if(interval == NULL || !cJSON_IsNumber(interval)){
+      ZF_LOGE("Got start message for compass meta device without mode or with invalid value. Ignoring!");
+      return WRTCR_FAILURE;
+    }
+    if(thread_exists){
+      ZF_LOGW("Got message requiring start of compass thread, but it is already running");
+      return WRTCR_FAILURE;
+    }
+    interval_value = interval->valueint;
+    if(pthread_create(&compass_thread_id, NULL, &compass_routine, &interval_value) == 0){
+      thread_exists = true;
+      ZF_LOGI("Created compass thread.");
+    } else {
+      ZF_LOGE("Could not compass detection thread.");
+      return WRTCR_FAILURE;
+    }
+  } else if(strncmp("stop", mode->valuestring, strlen("stop")) == 0){
+    if(pthread_cancel(compass_thread_id) != 0){
+      ZF_LOGE( "Could not send cancellation request to compass thread.");
+      return WRTCR_FAILURE;
+    }
+    pthread_join(compass_thread_id, NULL);
+    thread_exists = false;
+    ZF_LOGI("Compass thread has ended.");
+  } else {
+    ZF_LOGE("Got message for compass with unknown mode. Ignoring!");
+    return WRTCR_FAILURE;
+  }
+  
+  return WRTCR_SUCCESS;
+}
+
+//interval is pause between polling in milliseconds
+void* compass_routine(void *interval){
+  static struct timespec sleeptime;
+  sleeptime.tv_sec = 0;
+  sleeptime.tv_nsec = *(int*)interval * 1000 * 1000;
+
+  int value;
+  char msg[30];
+
+  while(true){
+    if(!get_sensor_value( 0, compass_sn, &value)){
+      ZF_LOGE("Could not get value from compass sensor");
+    } else {
+      snprintf(msg, sizeof(msg), "{\"port\": \"%s\", \"value\":[%d]}", compass_port, value);
+      POE(send_message_on_sensor_channel(msg), "Could not send compass sensor message");
+    }
+    nanosleep(&sleeptime, NULL);
+  }
+  return NULL;
 }

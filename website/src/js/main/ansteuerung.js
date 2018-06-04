@@ -9,9 +9,13 @@ function testMetaDevices() {
     // setTimeout(function(){
     //     sendingToRoboter("a", "stop");
     // }, 10000);
-    sendingToRoboter("b", "start");
+    // sendingToRoboter("b", "start");
+    // setTimeout(function(){
+    //     sendingToRoboter("b", "stop");
+    // }, 10000);
+    sendingData({"port": "c", "mode": "start", "value": 100});
     setTimeout(function(){
-        sendingToRoboter("b", "stop");
+        sendingToRoboter("c", "stop");
     }, 10000);
 }
 
