@@ -119,6 +119,11 @@ function getDistanceAngle(mouseX, mouseY) {
   // console.log("Winkel:" + angle);
   // console.log("Abstand:" + distance);
 
+  // set distance = 150 to max distance/value
+  if (distance > 150) {
+      distance = 150
+  }
+
  return {
       angle: Math.round(angle),
       distance: Math.round(distance),
@@ -128,6 +133,13 @@ function getDistanceAngle(mouseX, mouseY) {
 function sendMotorManagement(angleDistance) {
     console.log(angleDistance.angle);
     console.log(angleDistance.distance);
+
+    var message = {
+        angle: angleDistance.angle,
+        value: angleDistance.distance
+    }
+
+    sendingData(message)
 }
 
 // Wenn der Stoßsensor aktiv wird
@@ -143,29 +155,29 @@ function handleMessages(message) {
     console.log(message);
 }
 
-// Sending data to roboter
-function sendingToRoboter(mode = null, direction = null) {
-    var message = null;
-    if (direction != null) {
-        message = {
-            'port': port,
-            'mode': mode,
-            'value': direction,
-
-        }
-    } else if (mode != null) {
-        message = {
-            'port': port,
-            'mode': mode,
-        }
-    } else {
-        message = {
-            'port': port,
-        }
-    }
-
-    sendingData(message)
-}
+// // Sending data to roboter
+// function sendingToRoboter(mode = null, direction = null) {
+//     var message = null;
+//     if (direction != null) {
+//         message = {
+//             'port': port,
+//             'mode': mode,
+//             'value': direction,
+//
+//         }
+//     } else if (mode != null) {
+//         message = {
+//             'port': port,
+//             'mode': mode,
+//         }
+//     } else {
+//         message = {
+//             'port': port,
+//         }
+//     }
+//
+//     sendingData(message)
+// }
 
 /************
 WebRTC Connection
