@@ -50,12 +50,18 @@ function startupCanvas() {
 /**********
 Event Listener
  **********/
+
+// Canvas
 window.addEventListener('load', startupCanvas, false);
 canvasSteuerung.addEventListener('mousemove', function(evt) {
   var mousePos = getMousePos(canvasSteuerung, evt);
   angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
   sendMotorManagement(angleDistance)
 }, false);
+
+// Button
+document.getElementById('start_button').onclick = start
+document.getElementById('stop_button').onclick = stop
 
 // Create Motor and Sensor Instanz
 
@@ -92,6 +98,13 @@ var sensorStossNull = new Sensor('3', 'lego-ev3-touch')
 /************
 Functions
 ************/
+
+function start () {
+    console.log(123);
+}
+function stop () {
+    console.log(1234);
+}
 
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
