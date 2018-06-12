@@ -1,3 +1,7 @@
+/****************
+Controlling of Cancas Elements
+*****************/
+
 var canvasSteuerung = document.getElementById('canvasSteuerung');
 var canvasSteuerungContext = canvasSteuerung.getContext('2d');
 var canvasAbstand = document.getElementById('canvasAbstand');
@@ -43,58 +47,14 @@ function startupCanvas() {
   canvasAbstandContext.stroke();
 }
 
-// Wenn der Stoßsensor aktiv wird
-function runIntoWall() {
-  var oldhtml = document.getElementById('background');
-  oldhtml.style.background="red";
-  setTimeout(function() {
-    oldhtml.style.background="#dedede";
-  }, 1000);
-}
-
-
-function getDistanceAngle(mouseX, mouseY) {
-  var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)
-  var angle = 0;
-  if (mouseY < 0) {
-    var angle = Math.acos(mouseX/distance) * 180 / Math.PI;
-  } else {
-    var angle = Math.acos(-mouseX/distance) * 180 / Math.PI + 180;
-  }
-  // console.log("Winkel:" + angle);
-  // console.log("Abstand:" + distance);
-
-  var data = {
-      'angle': Math.round(angle),
-      'distance': Math.round(distance),
-  }
-  sendingData(JSON.stringify(data))
-}
-
-
-function getMousePos(canvas, evt) {
-  var rect = canvas.getBoundingClientRect();
-  var x = evt.clientX - rect.left - 267;
-  var y = evt.clientY - rect.top - 128;
-  // console.log("x" + x);
-  // console.log("y" + y);
-  // console.log(evt.clientX - rect.left);
-  // console.log(evt.clientY);
-
-  return {
-    x: x,
-    y: y
-  };
-}
-
-
 /**********
-Listener
+Event Listener
  **********/
 window.addEventListener('load', startupCanvas, false);
 canvasSteuerung.addEventListener('mousemove', function(evt) {
   var mousePos = getMousePos(canvasSteuerung, evt);
-  getDistanceAngle(mousePos.x, mousePos.y);
+  angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
+  sendMotorManagement(angleDistance)
 }, false);
 
 // Create Motor and Sensor Instanz
@@ -109,86 +69,79 @@ var sensorStoss = new Sensor('1', 'lego-ev3-touch')
 var sensorRadar = new Sensor('2', 'lego-ev3-us')
 var sensorStossNull = new Sensor('3', 'lego-ev3-touch')
 
-
-
-
-
-// Create peer connection instance
-const pc = new WebRTCPeerConnection();
-
-// Create Data Channel
-const dc = pc.createDataChannel('api', {
-    negotiated: true,
-    id: 0,
-})
-
-
-
 // Testcase
 
-// Test Anwednung - Erste Nachricht
-document.getElementById("onstart").onclick = testMetaDevices
+
+// function testMetaDevices() {
+//     // sendingToRoboter("a", "start");
+//     // setTimeout(function(){
+//     //     sendingToRoboter("a", "stop");
+//     // }, 10000);
+//     // sendingToRoboter("b", "start");
+//     // setTimeout(function(){
+//     //     sendingToRoboter("b", "stop");
+//     // }, 10000);
+//     sendingData({"port": "c", "mode": "start", "value": 100});
+//     setTimeout(function(){
+//         sendingToRoboter("c", "stop");
+//     }, 10000);
+// }
 
 
-function testMetaDevices() {
-    // sendingToRoboter("a", "start");
-    // setTimeout(function(){
-    //     sendingToRoboter("a", "stop");
-    // }, 10000);
-    // sendingToRoboter("b", "start");
-    // setTimeout(function(){
-    //     sendingToRoboter("b", "stop");
-    // }, 10000);
-    sendingData({"port": "c", "mode": "start", "value": 100});
-    setTimeout(function(){
-        sendingToRoboter("c", "stop");
-    }, 10000);
+
+/************
+Functions
+************/
+
+function getMousePos(canvas, evt) {
+  var rect = canvas.getBoundingClientRect();
+  var x = evt.clientX - rect.left - 337;
+  var y = evt.clientY - rect.top - 162;
+  // console.log("x" + x);
+  // console.log("y" + y);
+  // console.log(evt.clientX - rect.left);
+  // console.log(evt.clientY);
+
+  return {
+    x: x,
+    y: y
+  };
 }
 
+function getDistanceAngle(mouseX, mouseY) {
+  var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)
+  var angle = 0;
+  if (mouseY < 0) {
+    var angle = Math.acos(mouseX/distance) * 180 / Math.PI;
+  } else {
+    var angle = Math.acos(-mouseX/distance) * 180 / Math.PI + 180;
+  }
+  // console.log("Winkel:" + angle);
+  // console.log("Abstand:" + distance);
 
-
-// Test DataChannel
-
-document.getElementById("SetModeTest").onclick = SetModeTest
-document.getElementById("StartTest").onclick = StartTest
-document.getElementById("StopTest").onclick = StopTest
-
-var TestPortA = new Motor('A', 'tacho-motor-l', null, true)
-var TestPortB = new Motor('B', 'tacho-motor-l', null, true)
-
-function SetModeTest() {
-    // TestPortB.setPosition(10)
-    // sendingToRoboter('A', 'run-forever', 80)
-
-    handleMessages({port: "A", values: 'dasdasd'})
-    handleMessages({port: "B", values: 'dasdasd43214'})
-    handleMessages({port: "D", values: 'da31232sdasd'})
-    handleMessages({port: "C", values: '123dasdasd'})
+ return {
+      angle: Math.round(angle),
+      distance: Math.round(distance),
+  };
 }
 
-function StartTest() {
-    TestPortA.getState()
-    TestPortB.getState()
+function sendMotorManagement(angleDistance) {
+    console.log(angleDistance.angle);
+    console.log(angleDistance.distance);
 }
 
-function StopTest() {
-    TestPortA.setStopAction('hold')
-    TestPortB.setStopAction('coast')
+// Wenn der Stoßsensor aktiv wird
+function runIntoWall() {
+  var oldhtml = document.getElementById('background');
+  oldhtml.style.background="red";
+  setTimeout(function() {
+    oldhtml.style.background="#dedede";
+  }, 1000);
 }
 
-// Initialisierung der Motoren
-var motorA = null; //
-var motorB = null;
-var motorC = null;
-var motorD = null;
-
-// Initialisierung der Sensoren
-var sensor1 = null;
-var sensor2 = null;
-var sensor3 = null;
-var sensor4 = null;
-
-
+function handleMessages(message) {
+    console.log(message);
+}
 
 // Sending data to roboter
 function sendingToRoboter(mode = null, direction = null) {
@@ -213,15 +166,6 @@ function sendingToRoboter(mode = null, direction = null) {
 
     sendingData(message)
 }
-
-/************
-Functions
-************/
-
-function handleMessages(message) {
-    console.log(message);
-}
-
 
 /************
 WebRTC Connection
