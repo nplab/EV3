@@ -177,7 +177,7 @@ function StopTest() {
 }
 
 // Initialisierung der Motoren
-var motorA = null; // 
+var motorA = null; //
 var motorB = null;
 var motorC = null;
 var motorD = null;
@@ -214,6 +214,19 @@ function sendingToRoboter(mode = null, direction = null) {
     sendingData(message)
 }
 
+/************
+Functions
+************/
+
+function handleMessages(message) {
+    console.log(message);
+}
+
+
+/************
+WebRTC Connection
+*************/
+
 // Herstellen einer Peer Instanz
 const pc = new WebRTCPeerConnection();
 
@@ -230,22 +243,18 @@ const sensor_dc = pc.createDataChannel('sensors', {
 // Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
 var INTITIALPAGE = 0
 
-// Nachrichten Eingang des DataChannels
+// Messages api Data Channel
 api_dc.onmessage = (event) => {
     console.log(event.data);
 
-    if (INTITIALPAGE == 0) {
-        getDatafromRoboter(JSON.parse(event.data));
-        INTITIALPAGE = 1
-    } else {
-        try {
-            handleMessages(JSON.parse(event.data))
-        } catch (e) {
-            console.error("Es wurde kein JSON Object geschickt!");
-        }
-    }
+    try {
+        handleMessages(JSON.parse(event.data));
+    } catch (e) {
+        console.error("Es wurde kein JSON Object geschickt!");
+    };
 };
 
+// Messages sensor Data Channel
 sensor_dc.onmessage = (event) => {
-    console.log(event.data);
+    handleMessages(JSON.parse(event.data));
 }
