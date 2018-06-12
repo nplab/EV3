@@ -121,3 +121,131 @@ const dc = pc.createDataChannel('api', {
     negotiated: true,
     id: 0,
 })
+
+
+
+// Testcase
+
+// Test Anwednung - Erste Nachricht
+document.getElementById("onstart").onclick = testMetaDevices
+
+
+function testMetaDevices() {
+    // sendingToRoboter("a", "start");
+    // setTimeout(function(){
+    //     sendingToRoboter("a", "stop");
+    // }, 10000);
+    // sendingToRoboter("b", "start");
+    // setTimeout(function(){
+    //     sendingToRoboter("b", "stop");
+    // }, 10000);
+    sendingData({"port": "c", "mode": "start", "value": 100});
+    setTimeout(function(){
+        sendingToRoboter("c", "stop");
+    }, 10000);
+}
+
+
+
+// Test DataChannel
+
+document.getElementById("SetModeTest").onclick = SetModeTest
+document.getElementById("StartTest").onclick = StartTest
+document.getElementById("StopTest").onclick = StopTest
+
+var TestPortA = new Motor('A', 'tacho-motor-l', null, true)
+var TestPortB = new Motor('B', 'tacho-motor-l', null, true)
+
+function SetModeTest() {
+    // TestPortB.setPosition(10)
+    // sendingToRoboter('A', 'run-forever', 80)
+
+    handleMessages({port: "A", values: 'dasdasd'})
+    handleMessages({port: "B", values: 'dasdasd43214'})
+    handleMessages({port: "D", values: 'da31232sdasd'})
+    handleMessages({port: "C", values: '123dasdasd'})
+}
+
+function StartTest() {
+    TestPortA.getState()
+    TestPortB.getState()
+}
+
+function StopTest() {
+    TestPortA.setStopAction('hold')
+    TestPortB.setStopAction('coast')
+}
+
+// Initialisierung der Motoren
+var motorA = null; // 
+var motorB = null;
+var motorC = null;
+var motorD = null;
+
+// Initialisierung der Sensoren
+var sensor1 = null;
+var sensor2 = null;
+var sensor3 = null;
+var sensor4 = null;
+
+
+
+// Sending data to roboter
+function sendingToRoboter(mode = null, direction = null) {
+    var message = null;
+    if (direction != null) {
+        message = {
+            'port': port,
+            'mode': mode,
+            'value': direction,
+
+        }
+    } else if (mode != null) {
+        message = {
+            'port': port,
+            'mode': mode,
+        }
+    } else {
+        message = {
+            'port': port,
+        }
+    }
+
+    sendingData(message)
+}
+
+// Herstellen einer Peer Instanz
+const pc = new WebRTCPeerConnection();
+
+// Hestellen des DataChannels
+const api_dc = pc.createDataChannel('api', {
+    negotiated: true,
+    id: 0,
+})
+
+const sensor_dc = pc.createDataChannel('sensors', {
+    negotiated: true,
+    id: 1,
+})
+// Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
+var INTITIALPAGE = 0
+
+// Nachrichten Eingang des DataChannels
+api_dc.onmessage = (event) => {
+    console.log(event.data);
+
+    if (INTITIALPAGE == 0) {
+        getDatafromRoboter(JSON.parse(event.data));
+        INTITIALPAGE = 1
+    } else {
+        try {
+            handleMessages(JSON.parse(event.data))
+        } catch (e) {
+            console.error("Es wurde kein JSON Object geschickt!");
+        }
+    }
+};
+
+sensor_dc.onmessage = (event) => {
+    console.log(event.data);
+}
