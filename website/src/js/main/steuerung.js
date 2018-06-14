@@ -15,22 +15,7 @@ var angle = null;
 function startupCanvas() {
   var radius = 70;
 
-  // Canvas für die Steuerung
-  canvasSteuerungContext.beginPath();
-  canvasSteuerungContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
-  canvasSteuerungContext.fillStyle = '#f3f3f4';
-  canvasSteuerungContext.fill();
-  canvasSteuerungContext.lineWidth = 1;
-  canvasSteuerungContext.strokeStyle = '#6f6f6f';
-  canvasSteuerungContext.moveTo(80, 75 );
-  canvasSteuerungContext.lineTo(220, 75);
-  canvasSteuerungContext.stroke();
-  canvasSteuerungContext.moveTo(150, 2 );
-  canvasSteuerungContext.lineTo(150, 145);
-  canvasSteuerungContext.stroke();
-  canvasSteuerungContext.font = '18pt Calibri';
-  canvasSteuerungContext.fillStyle = '#fbba00';
-  canvasSteuerungContext.fillText("R", centerX-10, centerY+10);
+  drawControlingCanvas(radius);
 
   // Canvas für die Darstellung der Hinternisse
   canvasAbstandContext.beginPath();
@@ -101,9 +86,45 @@ Functions
 
 function start () {
     console.log(123);
+    runIntoWall();
 }
 function stop () {
     console.log(1234);
+}
+
+function drawControlingCanvas(radius) {
+    // Canvas für die Steuerung
+    canvasSteuerungContext.beginPath();
+    canvasSteuerungContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
+    canvasSteuerungContext.fillStyle = '#f3f3f4';
+    canvasSteuerungContext.fill();
+    canvasSteuerungContext.lineWidth = 1;
+    canvasSteuerungContext.strokeStyle = '#6f6f6f';
+    canvasSteuerungContext.moveTo(80, 75 );
+    canvasSteuerungContext.lineTo(220, 75);
+    canvasSteuerungContext.stroke();
+    canvasSteuerungContext.moveTo(150, 2 );
+    canvasSteuerungContext.lineTo(150, 145);
+    canvasSteuerungContext.stroke();
+    canvasSteuerungContext.font = '18pt Calibri';
+    canvasSteuerungContext.fillStyle = '#fbba00';
+    canvasSteuerungContext.fillText("R", centerX-10, centerY+10);
+}
+
+function drawImpedimentCanvas(radius, angle = null, distance = null) {
+    // Canvas für die Darstellung der Hinternisse
+    canvasAbstandContext.beginPath();
+    canvasAbstandContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
+    canvasAbstandContext.fillStyle = '#f3f3f4';
+    canvasAbstandContext.fill();
+    canvasAbstandContext.lineWidth = 1;
+    canvasAbstandContext.strokeStyle = '#6f6f6f';
+    canvasAbstandContext.moveTo(80, 75 );
+    canvasAbstandContext.lineTo(220, 75);
+    canvasAbstandContext.stroke();
+    canvasAbstandContext.moveTo(150, 2 );
+    canvasAbstandContext.lineTo(150, 145);
+    canvasAbstandContext.stroke();
 }
 
 function getMousePos(canvas, evt) {
@@ -143,16 +164,51 @@ function getDistanceAngle(mouseX, mouseY) {
   };
 }
 
-function sendMotorManagement(angleDistance) {
-    console.log(angleDistance.angle);
-    console.log(angleDistance.distance);
+//
+function calculateShare(number, left = false) {
+    var value = 0;
+    if(left == true) {
+        value = Math.round((100/180 * number));
+    } else {
+        value = Math.round((100 - 100/180 * number));
+    }
+    return value/100;
+}
 
-    var message = {
-        angle: angleDistance.angle,
-        value: angleDistance.distance
+// 
+function sendMotorManagement(angleDistance) {
+    var value_b;
+    var value_c;
+    var value_ges;
+    var message_b;
+    var message_c;
+
+    if(angleDistance.angle > 180) {
+        value_b = - 0.50;
+        value_c = - 0.50;
+        value_ges = 100;
+    } else {
+        value_b = calculateShare(angleDistance.angle, true);          // Werte zwischen 0 - 1
+        value_c = calculateShare(angleDistance.angle);         // Werte zwischen 0 - 1
+        value_ges = angleDistance.distance/150 * 100;          // Werte zwischen 0 - 100
     }
 
-    sendingData(message)
+    // // Debug
+    // console.log('Linker Motor: ' + value_b);
+    // console.log('Rechter Motor: ' + value_c);
+    // console.log('Geschwindigkeit: ' + value_ges);
+
+    message_b = {
+        port_b: "B",
+        values_b: value_b * value_ges,
+    }
+    message_c = {
+        port_c: "C",
+        value_c: value_c * value_ges,
+    }
+
+    sendingData(message_b)
+    sendingData(message_c)
 }
 
 // Wenn der Stoßsensor aktiv wird
