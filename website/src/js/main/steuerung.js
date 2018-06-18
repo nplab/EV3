@@ -10,6 +10,7 @@ var centerX = 150;
 var centerY = 73;
 var distance = null;
 var angle = null;
+var allowSending = false
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -18,18 +19,7 @@ function startupCanvas() {
   drawControlingCanvas(radius);
 
   // Canvas für die Darstellung der Hinternisse
-  canvasAbstandContext.beginPath();
-  canvasAbstandContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
-  canvasAbstandContext.fillStyle = '#f3f3f4';
-  canvasAbstandContext.fill();
-  canvasAbstandContext.lineWidth = 1;
-  canvasAbstandContext.strokeStyle = '#6f6f6f';
-  canvasAbstandContext.moveTo(80, 75 );
-  canvasAbstandContext.lineTo(220, 75);
-  canvasAbstandContext.stroke();
-  canvasAbstandContext.moveTo(150, 2 );
-  canvasAbstandContext.lineTo(150, 145);
-  canvasAbstandContext.stroke();
+  drawImpedimentCanvas(radius);
 }
 
 /**********
@@ -39,26 +29,30 @@ Event Listener
 // Canvas
 window.addEventListener('load', startupCanvas, false);
 canvasSteuerung.addEventListener('mousemove', function(evt) {
-  var mousePos = getMousePos(canvasSteuerung, evt);
-  angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
-  sendMotorManagement(angleDistance)
+    if(allowSending == true) {
+        var mousePos = getMousePos(canvasSteuerung, evt);
+        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
+        sendMotorManagement(angleDistance)
+    }
 }, false);
+
+canvasAbstand.addEventListener('mousemove', function(evt) {
+    var mousePos = getMousePos(canvasAbstand, evt);
+    if(allowSending == true) {
+        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
+        sendMotorManagement(angleDistance)
+    }
+}, false);
+
+// $(document).keyup(function(e) {
+//      if (e.keyCode == 27) { // escape key maps to keycode `27`
+//         stop()
+//     }
+// });
 
 // Button
 document.getElementById('start_button').onclick = start
 document.getElementById('stop_button').onclick = stop
-
-// Create Motor and Sensor Instanz
-
-var motorSteuerLinks = new Motor('A', 'tacho-motor-l', 'run-forever')
-
-var motorSteuerRechts = new Motor('B', 'tacho-motor-l', 'run-forever')
-
-var radarmotor = new Motor('C', 'tacho-motor-m', 'run-forever')
-
-var sensorStoss = new Sensor('1', 'lego-ev3-touch')
-var sensorRadar = new Sensor('2', 'lego-ev3-us')
-var sensorStossNull = new Sensor('3', 'lego-ev3-touch')
 
 // Testcase
 
@@ -85,11 +79,23 @@ Functions
 ************/
 
 function start () {
-    console.log(123);
-    runIntoWall();
+    // activ Canvas Event Listener
+    allowSending = true;
+
+    // activ all sensor
+    sendingData({"port": "a", "mode": "start"});
+    sendingData({"port": "b", "mode": "start"});
+    sendingData({"port": "c", "mode": "start", "value": 100}); // value gibt die Frequenz an
+
 }
 function stop () {
-    console.log(1234);
+    // inactiv Canvas Event Listener
+    allowSending = false
+
+    // inactive all sensor
+    sendingData({"port": "a", "mode": "stop"});
+    sendingData({"port": "b", "mode": "stop"});
+    sendingData({"port": "c", "mode": "stop"});
 }
 
 function drawControlingCanvas(radius) {
@@ -125,16 +131,19 @@ function drawImpedimentCanvas(radius, angle = null, distance = null) {
     canvasAbstandContext.moveTo(150, 2 );
     canvasAbstandContext.lineTo(150, 145);
     canvasAbstandContext.stroke();
+
+
+    // canvasAbstandContext.fillRect(25, 25, 100, 100);
+    canvasAbstandContext.clearRect(45, 45, 100, 100);
+    // canvasAbstandContext.strokeRect(50, 50, 50, 50);
 }
 
 function getMousePos(canvas, evt) {
   var rect = canvas.getBoundingClientRect();
-  var x = evt.clientX - rect.left - 337;
-  var y = evt.clientY - rect.top - 162;
-  // console.log("x" + x);
-  // console.log("y" + y);
-  // console.log(evt.clientX - rect.left);
-  // console.log(evt.clientY);
+  var x = evt.clientX - rect.left - 345;
+  var y = evt.clientY - rect.top - 150;
+  console.log("x" + x);
+  console.log("y" + y);
 
   return {
     x: x,
@@ -175,7 +184,7 @@ function calculateShare(number, left = false) {
     return value/100;
 }
 
-// 
+//
 function sendMotorManagement(angleDistance) {
     var value_b;
     var value_c;
@@ -186,12 +195,11 @@ function sendMotorManagement(angleDistance) {
     if(angleDistance.angle > 180) {
         value_b = - 0.50;
         value_c = - 0.50;
-        value_ges = 100;
     } else {
         value_b = calculateShare(angleDistance.angle, true);          // Werte zwischen 0 - 1
         value_c = calculateShare(angleDistance.angle);         // Werte zwischen 0 - 1
-        value_ges = angleDistance.distance/150 * 100;          // Werte zwischen 0 - 100
     }
+    value_ges = angleDistance.distance/150 * 100;          // Werte zwischen 0 - 100;
 
     // // Debug
     // console.log('Linker Motor: ' + value_b);
