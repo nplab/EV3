@@ -44,11 +44,11 @@ canvasAbstand.addEventListener('mousemove', function(evt) {
     }
 }, false);
 
-// $(document).keyup(function(e) {
-//      if (e.keyCode == 27) { // escape key maps to keycode `27`
-//         stop()
-//     }
-// });
+$(document).keyup(function(e) {
+     if (e.keyCode == 27) { // escape key maps to keycode `27`
+        stop()
+    }
+});
 
 // Button
 document.getElementById('start_button').onclick = start
