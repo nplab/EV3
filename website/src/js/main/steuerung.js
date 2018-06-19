@@ -96,6 +96,12 @@ function stop () {
     sendingData({"port": "a", "mode": "stop"});
     sendingData({"port": "b", "mode": "stop"});
     sendingData({"port": "c", "mode": "stop"});
+
+    //stop Motor
+    sendingData({"port": "A", "mode": "stop"});
+    sendingData({"port": "B", "mode": "stop"});
+    sendingData({"port": "C", "mode": "stop"});
+
 }
 
 function drawControlingCanvas(radius) {
@@ -115,6 +121,9 @@ function drawControlingCanvas(radius) {
     canvasSteuerungContext.font = '18pt Calibri';
     canvasSteuerungContext.fillStyle = '#fbba00';
     canvasSteuerungContext.fillText("R", centerX-10, centerY+10);
+    canvasSteuerungContext.font = '5pt Calibri';
+    canvasSteuerungContext.fillText("|", centerX-34, centerY);
+    canvasSteuerungContext.fillText("|", centerX+34, centerY);
 }
 
 function drawImpedimentCanvas(radius, angle = null, distance = null) {
@@ -133,9 +142,7 @@ function drawImpedimentCanvas(radius, angle = null, distance = null) {
     canvasAbstandContext.stroke();
 
 
-    // canvasAbstandContext.fillRect(25, 25, 100, 100);
-    canvasAbstandContext.clearRect(45, 45, 100, 100);
-    // canvasAbstandContext.strokeRect(50, 50, 50, 50);
+
 }
 
 function getMousePos(canvas, evt) {
