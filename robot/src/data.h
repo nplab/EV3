@@ -40,3 +40,6 @@ wrtcr_rc send_message_on_api_channel(char *msg);
 
 //send string msg on the sensors channel
 wrtcr_rc send_message_on_sensor_channel(char *msg);
+
+//print an ice candidate
+void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client);
