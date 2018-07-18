@@ -214,12 +214,14 @@ function sendMotorManagement(angleDistance) {
     // console.log('Geschwindigkeit: ' + value_ges);
 
     message_b = {
-        port_b: "B",
-        values_b: value_b * value_ges,
+        port: 'B',
+        mode: 'run-forever',
+        value: value_b * value_ges,
     }
     message_c = {
-        port_c: "C",
-        value_c: value_c * value_ges,
+        port: "C",
+        mode: 'run-forever',
+        value: value_c * value_ges,
     }
 
     sendingData(message_b)
