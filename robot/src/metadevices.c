@@ -141,8 +141,7 @@ wrtcr_rc handle_collision_sensor_message(cJSON *msg){
   return WRTCR_SUCCESS;
 }
 
-void* collision_routine(void *ign){
-  static meta_device_t* sensor = NULL;
+void* collision_routine(void *ign __attribute__ ((unused))){
   static int last_value = 0;
   static struct timespec sleeptime;
   sleeptime.tv_sec = 0;
@@ -240,7 +239,7 @@ wrtcr_rc handle_sonar_sensor_message(cJSON *msg){
   
 }
 
-void* sonar_routine(void *ign){
+void* sonar_routine(void *ign __attribute__ ((unused))){
   static const int sonar_rot_limit = 220; //sonar motor position at left and right stop, in motor degrees
   static const int step_degree = 15; //angle to turn between measurements, in motor degrees
   static const int sonar_speed = 1200; //speed with which to turn the sonar, in degree per Minute (max is 1560)
