@@ -1,6 +1,9 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
 #include <rawrtc.h>
+#pragma GCC diagnostic pop
 #include <stdbool.h>
 #include "signaling.h"
 #include "default_handlers.h"
