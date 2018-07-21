@@ -54,6 +54,7 @@ wrtcr_rc setup_robot(){
 wrtcr_rc cleanup_robot(){
   cleanup_meta_devices();
   map_deinit(&tf_map);
+  return WRTCR_SUCCESS;
 }
 
 wrtcr_rc get_port_description(char **out_string){
@@ -195,8 +196,7 @@ wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
-  (void*) value;
+wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value __attribute__ ((unused))){
   char state[20];
   char msg[50];
   char port[5];

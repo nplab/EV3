@@ -1,6 +1,10 @@
 #pragma once
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wignored-qualifiers"
 #include <rawrtc.h>
+#pragma GCC diagnostic pop
+
 #include "data.h"
 
 void default_ice_gatherer_state_change_handler(enum rawrtc_ice_gatherer_state const state, void* const arg);
