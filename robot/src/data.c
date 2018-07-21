@@ -27,9 +27,9 @@ wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char 
 
 
 wrtcr_rc data_channel_setup(){
-  unsigned int stun_urls_length;
+  unsigned int stun_urls_length = 0;
   char **stun_urls;
-  unsigned int turn_urls_length;
+  unsigned int turn_urls_length = 0;
   char **turn_urls;
 
 
@@ -40,17 +40,16 @@ wrtcr_rc data_channel_setup(){
   EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
 
   //get servers from config
-  if(conf_get_string_array("stun_servs", &stun_urls, &stun_urls_length) == WRTCR_SUCCESS){
+  if(conf_get_string_array("stun_servs", &stun_urls, &stun_urls_length) == WRTCR_SUCCESS && stun_urls_length != 0){
     EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                              configuration, stun_urls, stun_urls_length,
                                                              NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add STUN servers to RawRTC configuration");
   }
 
-  if(conf_get_string_array("turn_servs", &turn_urls, &turn_urls_length) == WRTCR_SUCCESS){
+  if(conf_get_string_array("turn_servs", &turn_urls, &turn_urls_length) == WRTCR_SUCCESS && turn_urls_length != 0){
     EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                              configuration, turn_urls, turn_urls_length,
-                                                             "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
-                                                             RAWRTC_ICE_CREDENTIAL_TYPE_PASSWORD), "Could not add TURN servers to  RawRTC configuration");
+                                                             NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add TURN servers to  RawRTC configuration");
   }
 
   //set up client information
