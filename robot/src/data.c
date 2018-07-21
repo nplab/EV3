@@ -40,13 +40,13 @@ wrtcr_rc data_channel_setup(){
   EORE(rawrtc_peer_connection_configuration_create(&configuration, RAWRTC_ICE_GATHER_POLICY_ALL), "Could not create RawRTC configuration");
 
   //get servers from config
-  if(conf_get_string_array("stun_urls", &stun_urls, &stun_urls_length) == WRTCR_SUCCESS){
+  if(conf_get_string_array("stun_servs", &stun_urls, &stun_urls_length) == WRTCR_SUCCESS){
     EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                              configuration, stun_urls, stun_urls_length,
                                                              NULL, NULL, RAWRTC_ICE_CREDENTIAL_TYPE_NONE), "Could not add STUN servers to RawRTC configuration");
   }
 
-  if(conf_get_string_array("turn_urls", &turn_urls, &turn_urls_length) == WRTCR_SUCCESS){
+  if(conf_get_string_array("turn_servs", &turn_urls, &turn_urls_length) == WRTCR_SUCCESS){
     EORE(rawrtc_peer_connection_configuration_add_ice_server(
                                                              configuration, turn_urls, turn_urls_length,
                                                              "threema-angular", "Uv0LcCq3kyx6EiRwQW5jVigkhzbp70CjN2CJqzmRxG3UGIdJHSJV6tpo7Gj7YnGB",
