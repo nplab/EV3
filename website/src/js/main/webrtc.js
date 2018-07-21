@@ -129,7 +129,7 @@ function handleICECandidate(message) {
 function sendingData(data) {
     console.log(data);
     try {
-        dc.send(JSON.stringify(data));
+        api_dc.send(JSON.stringify(data));
     } catch (error) {
         if (error.name === 'TypeError') {
             console.error(dc._name, 'message too large to send');

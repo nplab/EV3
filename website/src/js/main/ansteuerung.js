@@ -1,45 +1,24 @@
 // Testcase
 
 // Test Anwednung - Erste Nachricht
-document.getElementById("onstart").onclick = start
+document.getElementById("onstart").onclick = testMetaDevices
 
 
-function start() {
-    var input = [{
-        "port": "A", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "B", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "C", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "D", //Ausgabe des Address-Commands
-        "type": "tacho-motor-l", //alternativ tacho-motor-m
-    },
-    {
-        "port": "1", //Ausgabe des Address-Commands
-        "type": "lego-ev3-us", //alternativ tacho-motor-m
-    },
-    {
-        "port": "2", //Ausgabe des Address-Commands
-        "type": "lego-ev3-gyro", //alternativ tacho-motor-m
-    },
-    {
-        "port": "3", //Ausgabe des Address-Commands
-        "type": "lego-ev3-color", //alternativ tacho-motor-m
-    },
-    {
-        "port": "4", //Ausgabe des Address-Commands
-        "type": "lego-ev3-touch", //alternativ tacho-motor-m
-    }
-    ]
-    getDatafromRoboter(input);
+function testMetaDevices() {
+    // sendingToRoboter("a", "start");
+    // setTimeout(function(){
+    //     sendingToRoboter("a", "stop");
+    // }, 10000);
+    // sendingToRoboter("b", "start");
+    // setTimeout(function(){
+    //     sendingToRoboter("b", "stop");
+    // }, 10000);
+    sendingData({"port": "c", "mode": "start", "value": 100}); // 100 = Polling Frequenz
+    setTimeout(function(){
+        sendingToRoboter("c", "stop");
+    }, 10000);
 }
+
 
 
 // Test DataChannel
@@ -605,15 +584,20 @@ disabledAllMotorButton(1)
 const pc = new WebRTCPeerConnection();
 
 // Hestellen des DataChannels
-const dc = pc.createDataChannel('api', {
+const api_dc = pc.createDataChannel('api', {
     negotiated: true,
     id: 0,
+})
+
+const sensor_dc = pc.createDataChannel('sensors', {
+    negotiated: true,
+    id: 1,
 })
 // Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
 var INTITIALPAGE = 0
 
 // Nachrichten Eingang des DataChannels
-dc.onmessage = (event) => {
+api_dc.onmessage = (event) => {
     console.log(event.data);
 
     if (INTITIALPAGE == 0) {
@@ -627,3 +611,7 @@ dc.onmessage = (event) => {
         }
     }
 };
+
+sensor_dc.onmessage = (event) => {
+    console.log(event.data);
+}

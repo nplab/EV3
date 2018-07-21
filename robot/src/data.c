@@ -1,8 +1,8 @@
+#include <rawrtc.h>
 #include "data.h"
 
 static struct client client_info = {0};
 static struct rawrtc_peer_connection_configuration *configuration;
-struct rawrtc_data_channel* api_channel = NULL;
 
 //initialisation and shutdown functions
 wrtcr_rc initialise_client();
@@ -23,6 +23,8 @@ static void handle_remote_description(cJSON *desc_json);
 int handle_remote_ICE_candidate(cJSON *candidate_json);
 void api_channel_open_handler(void* const arg);
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
+//helper functions
+wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char *msg);
 
 
 wrtcr_rc data_channel_setup(){
@@ -64,6 +66,8 @@ wrtcr_rc data_channel_setup(){
 
   re_main(default_signal_handler);
 
+  data_channel_shutdown();
+
   return WRTCR_SUCCESS;
 }
 
@@ -86,21 +90,39 @@ wrtcr_rc initialise_client(){
                                     default_ice_gatherer_state_change_handler, connection_state_change_handler,
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
-  //create parameters for data channel
-  data_channel_helper_create(&client_info.data_channel_negotiated,  &client_info, "api");
+  //create parameters for api data channel
+  data_channel_helper_create(&client_info.data_channel_api,  &client_info, "api");
 
-  EORE(rawrtc_data_channel_parameters_create(&dc_parameters, client_info.data_channel_negotiated->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0), "Could not create data channel parameters");
+  EORE(rawrtc_data_channel_parameters_create(
+                                           &dc_parameters, client_info.data_channel_api->label,
+                                           RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 0), "Could not create api data channel parameters");
 
   //create actual data channel
   EORE(rawrtc_peer_connection_create_data_channel(
-                                                &client_info.data_channel_negotiated->channel, client_info.connection,
+                                                &client_info.data_channel_api->channel, client_info.connection,
                                                 dc_parameters, NULL,
                                                 api_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
-                                                robot_api_message_handler, client_info.data_channel_negotiated), "Could not create data channel");
+                                                robot_api_message_handler, client_info.data_channel_api), "Could not create api data channel");
   //clean up
   mem_deref(dc_parameters);
 
+  //create parameters for sensor data channel
+  data_channel_helper_create(&client_info.data_channel_sensors, &client_info, "sensors");
+
+  EORE(rawrtc_data_channel_parameters_create(
+                                           &dc_parameters, client_info.data_channel_sensors->label,
+                                           RAWRTC_DATA_CHANNEL_TYPE_UNRELIABLE_ORDERED_RETRANSMIT, 0, NULL, true, 1), "Could not create sensors data channel parameters");
+
+  //create actual data channel
+  EORE(rawrtc_peer_connection_create_data_channel(
+                                                &client_info.data_channel_sensors->channel, client_info.connection,
+                                                dc_parameters, NULL,
+                                                default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
+                                                default_data_channel_error_handler, default_data_channel_close_handler,
+                                                default_data_channel_message_handler, client_info.data_channel_sensors), "Could not create sensors data channel");
+  //more clean up
+  mem_deref(dc_parameters);
   return WRTCR_SUCCESS;
 }
 
@@ -110,8 +132,8 @@ wrtcr_rc client_stop(){
     handle_err("Could not close data channel", false);
     rc = WRTCR_FAILURE;
   }
-  client_info.data_channel = mem_deref(client_info.data_channel);
-  client_info.data_channel_negotiated = mem_deref(client_info.data_channel_negotiated);
+  client_info.data_channel_api = mem_deref(client_info.data_channel_api);
+  client_info.data_channel_sensors = mem_deref(client_info.data_channel_sensors);
   client_info.connection = mem_deref(client_info.connection);
   client_info.configuration = mem_deref(client_info.configuration);
 
@@ -487,15 +509,9 @@ void api_channel_open_handler(void* const arg) {
 
   EOE(get_port_description(&description), "Could not get port description");
 
-  struct mbuf *desc_mbuf = mbuf_alloc(strlen(description)+1);
-  mbuf_printf(desc_mbuf, "%s", description);
-  mbuf_set_pos(desc_mbuf, 0);
+  EOE(send_message_on_api_channel(description), "Could not send port description message");
 
   free(description);
-
-  api_channel = channel->channel; //remember now open channel
-
-  EORE(rawrtc_data_channel_send(channel->channel,  desc_mbuf, false), "Could not send port description message");
 }
 
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg) {
@@ -520,24 +536,45 @@ void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_chann
   }
 
   //call handler functions based on port
-  if( *port < 'A'){
-    handle_sensor_message(port, root);
-  } else {
+  if( *port >= 'a'){
+    handle_meta_device_message(port, root);
+  } else if ( *port >= 'A'){
     handle_tacho_message(port, root);
+  } else {
+    handle_sensor_message(port, root);
   }
   cJSON_Delete(root);
   return;
 }
 
-wrtcr_rc send_message_on_api_channel(char *msg){
+wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char *msg){
   struct mbuf *buf = mbuf_alloc(strlen(msg)+1);
   mbuf_printf(buf, "%s", msg);
   mbuf_set_pos(buf, 0);
 
-  //if the api channel exists, try to send data on it
-  if(!api_channel || rawrtc_data_channel_send(api_channel,  buf, false) == RAWRTC_CODE_SUCCESS){
+  //if the channel is open, try to send data on it
+  if(channel->state == RAWRTC_DATA_CHANNEL_STATE_OPEN && rawrtc_data_channel_send(channel,  buf, false) == RAWRTC_CODE_SUCCESS){
+    mem_deref(buf);
     return WRTCR_SUCCESS;
   } else {
+    mem_deref(buf);
     return WRTCR_FAILURE;
   }
 }
+
+wrtcr_rc send_message_on_api_channel(char *msg){
+  if(send_message_on_data_channel(client_info.data_channel_api->channel, msg) != WRTCR_SUCCESS){
+    ZF_LOGE("Could not send message on api channel");
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc send_message_on_sensor_channel(char *msg){
+  if(send_message_on_data_channel(client_info.data_channel_sensors->channel, msg) != WRTCR_SUCCESS){
+    ZF_LOGE("Could not send message on sensors channel");
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_SUCCESS;
+}
+
