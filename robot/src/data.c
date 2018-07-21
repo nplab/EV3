@@ -190,7 +190,6 @@ void stop_on_return_handler(
 
 //handle local candidata (print, send last one to signaling server)
 static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg) {
-  struct client* const client = arg;
   cJSON *root;
 
   if (candidate) {
@@ -452,7 +451,7 @@ int handle_remote_ICE_candidate(cJSON *candidate_json){
     ZF_LOGE("Could not get sdpMLineIndex integer from remote ICE candidate JSON");
   }
 
-  EORE(rawrtc_peer_connection_ice_candidate_create(&candidate, sdp_item->valuestring, mid_item->valuestring, &(mli_item->valueint), NULL), "Could not create remote ICE candidate");
+  EORE(rawrtc_peer_connection_ice_candidate_create(&candidate, sdp_item->valuestring, mid_item->valuestring, (const uint8_t * const)&(mli_item->valueint), NULL), "Could not create remote ICE candidate");
 
   ZF_LOGD("Adding remote ICE candidate");
   EORE(rawrtc_peer_connection_add_ice_candidate(client_info.connection, candidate), "Could not set remote ICE candidate");
