@@ -10,7 +10,9 @@ var centerX = 150;
 var centerY = 73;
 var distance = null;
 var angle = null;
-var allowSending = false
+
+var ALLOWSENDING = false;
+var TASTSENSORAKTIV = false;
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -29,7 +31,7 @@ Event Listener
 // Canvas
 window.addEventListener('load', startupCanvas, false);
 canvasSteuerung.addEventListener('mousemove', function(evt) {
-    if(allowSending == true) {
+    if(ALLOWSENDING == true) {
         var mousePos = getMousePos(canvasSteuerung, evt);
         angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
         sendMotorManagement(angleDistance)
@@ -94,17 +96,22 @@ Functions
 
 function start () {
     // activ Canvas Event Listener
-    allowSending = true;
+    ALLOWSENDING = true;
 
     // activ all sensor
     sendingData({"port": "a", "mode": "start"});
     sendingData({"port": "b", "mode": "start"});
     sendingData({"port": "c", "mode": "start", "value": 100}); // value gibt die Frequenz an
 
+    // var message = {
+    //     value: "tastsensor",
+    // }
+    //
+    // handleMessages(message)
 }
 function stop () {
     // inactiv Canvas Event Listener
-    allowSending = false
+    ALLOWSENDING = false
 
     // inactive all sensor
     sendingData({"port": "a", "mode": "stop"});
@@ -265,15 +272,26 @@ function drawpoint(value, angle) {
 
 // Wenn der Stoßsensor aktiv wird
 function runIntoWall() {
-  var oldhtml = document.getElementById('background');
-  oldhtml.style.background="red";
-  setTimeout(function() {
-    oldhtml.style.background="#dedede";
-  }, 1000);
+    var oldhtml = document.getElementById('background');
+    if(TASTSENSORAKTIV == true) {
+        oldhtml.style.background="red";
+        TASTSENSORAKTIV = false;
+    } else {
+        oldhtml.style.background="#dedede";
+        TASTSENSORAKTIV = true;
+    }
 }
 
 function handleMessages(message) {
     console.log(message);
+
+    switch (message.value) {
+        case "tastsensor":
+            runIntoWall();
+            break;
+        default:
+            print("Nichts passendes gefunden!")
+    }
 }
 
 // // Sending data to roboter
@@ -317,8 +335,6 @@ const sensor_dc = pc.createDataChannel('sensors', {
     negotiated: true,
     id: 1,
 })
-// Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
-var INTITIALPAGE = 0
 
 // Messages api Data Channel
 api_dc.onmessage = (event) => {
@@ -333,5 +349,9 @@ api_dc.onmessage = (event) => {
 
 // Messages sensor Data Channel
 sensor_dc.onmessage = (event) => {
-    handleMessages(JSON.parse(event.data));
+    try {
+        handleMessages(JSON.parse(event.data));
+    } catch (e) {
+        console.error("Es wurde kein JSON Object geschickt!");
+    };
 }
