@@ -45,6 +45,7 @@ $(document).keyup(function(e) {
 });
 
 // Button
+document.getElementById('test_button').onclick = test
 document.getElementById('start_button').onclick = start
 document.getElementById('stop_button').onclick = stop
 
@@ -93,6 +94,15 @@ canvasAbstand.onmousemove = function(event) {
 /************
 Functions
 ************/
+function test () {
+    var message = {
+        value: "tastsensor",
+    }
+
+    handleMessages(message)
+}
+
+
 
 function start () {
     // activ Canvas Event Listener
@@ -103,11 +113,6 @@ function start () {
     sendingData({"port": "b", "mode": "start"});
     sendingData({"port": "c", "mode": "start", "value": 100}); // value gibt die Frequenz an
 
-    // var message = {
-    //     value: "tastsensor",
-    // }
-    //
-    // handleMessages(message)
 }
 function stop () {
     // inactiv Canvas Event Listener
@@ -273,12 +278,12 @@ function drawpoint(value, angle) {
 // Wenn der Stoßsensor aktiv wird
 function runIntoWall() {
     var oldhtml = document.getElementById('background');
-    if(TASTSENSORAKTIV == true) {
+    if(TASTSENSORAKTIV == false) {
         oldhtml.style.background="red";
-        TASTSENSORAKTIV = false;
+        TASTSENSORAKTIV = true;
     } else {
         oldhtml.style.background="#dedede";
-        TASTSENSORAKTIV = true;
+        TASTSENSORAKTIV = false;
     }
 }
 
