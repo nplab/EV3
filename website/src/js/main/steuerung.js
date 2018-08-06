@@ -36,14 +36,6 @@ canvasSteuerung.addEventListener('mousemove', function(evt) {
     }
 }, false);
 
-canvasAbstand.addEventListener('mousemove', function(evt) {
-    var mousePos = getMousePos(canvasAbstand, evt);
-    if(allowSending == true) {
-        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
-        sendMotorManagement(angleDistance)
-    }
-}, false);
-
 $(document).keyup(function(e) {
      if (e.keyCode == 27) { // escape key maps to keycode `27`
         stop()
@@ -54,23 +46,45 @@ $(document).keyup(function(e) {
 document.getElementById('start_button').onclick = start
 document.getElementById('stop_button').onclick = stop
 
-// Testcase
 
 
-// function testMetaDevices() {
-//     // sendingToRoboter("a", "start");
-//     // setTimeout(function(){
-//     //     sendingToRoboter("a", "stop");
-//     // }, 10000);
-//     // sendingToRoboter("b", "start");
-//     // setTimeout(function(){
-//     //     sendingToRoboter("b", "stop");
-//     // }, 10000);
-//     sendingData({"port": "c", "mode": "start", "value": 100});
-//     setTimeout(function(){
-//         sendingToRoboter("c", "stop");
-//     }, 10000);
-// }
+// Testcase - Canvas Abstand
+
+canvasAbstand.onmousemove = function(event) {
+    // var x = event.clientX - canvasAbstand.offsetLeft;
+    // var y = event.clientY - canvasAbstand.offsetTop;
+    // var context = canvasAbstand.getContext('2d');
+    //
+    // console.log("x", x);
+    // console.log(y);
+    //
+    //
+    // context.fillStyle = '#fbba00';
+    // context.fillRect(x,y,10,10);
+    //
+    // // Mitte
+    // context.fillRect(145,70,10,10);
+    //
+    // // Oben und Unten
+    // context.fillRect(145,0,10,10);
+    // context.fillRect(145,140,10,10);
+    //
+    // // Links und rechts
+    // context.fillRect(75,70,10,10);
+    // context.fillRect(215,70,10,10);
+
+    drawpoint(0, 45)
+    console.log("0-----");
+    drawpoint(50, 45)
+    console.log("-----");
+    drawpoint(100, 45)
+    console.log("-----");
+    drawpoint(150, 45)
+    console.log("-----");
+    drawpoint(200, 45)
+
+
+}
 
 
 
@@ -227,6 +241,27 @@ function sendMotorManagement(angleDistance) {
     sendingData(message_b)
     sendingData(message_c)
 }
+
+// Zeichnen
+function drawpoint(value, angle) {
+    var pointAb = value * 70/250;
+
+    var y = Math.sin(angle) * pointAb;
+    console.log(Math.sin(y));
+    var x = Math.sqrt(pointAb * pointAb - y * y);
+
+    var context = canvasAbstand.getContext('2d');
+
+    console.log("x", x);
+    console.log(y);
+
+
+    context.fillStyle = '#fbba00';
+    context.fillRect(x + 140,y + 70,10,10);
+
+
+}
+
 
 // Wenn der Stoßsensor aktiv wird
 function runIntoWall() {
