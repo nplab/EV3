@@ -593,6 +593,15 @@ const sensor_dc = pc.createDataChannel('sensors', {
     negotiated: true,
     id: 1,
 })
+
+const ping_dc = pc.createDataChannel('ping', {
+    negotiated: true,
+    id: 2,
+})
+
+ping_dc.onmessage = (event) => {
+    console.log(event)
+}
 // Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
 var INTITIALPAGE = 0
 

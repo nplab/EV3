@@ -12,7 +12,6 @@ var distance = null;
 var angle = null;
 
 var ALLOWSENDING = false;
-var TASTSENSORAKTIV = false;
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -109,9 +108,9 @@ function start () {
     ALLOWSENDING = true;
 
     // activ all sensor
-    sendingData({"port": "a", "mode": "start"});
-    sendingData({"port": "b", "mode": "start"});
-    sendingData({"port": "c", "mode": "start", "value": 100}); // value gibt die Frequenz an
+    // sendingData({"port": "a", "mode": "start"});
+    // sendingData({"port": "b", "mode": "start"});
+    sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
 
 }
 function stop () {
@@ -242,12 +241,12 @@ function sendMotorManagement(angleDistance) {
     message_b = {
         port: 'B',
         mode: 'run-forever',
-        value: value_b * value_ges,
+        value: value_c * value_ges,
     }
     message_c = {
         port: "C",
         mode: 'run-forever',
-        value: value_c * value_ges,
+        value: value_b * value_ges,
     }
 
     sendingData(message_b)
@@ -275,32 +274,34 @@ function drawpoint(value, angle) {
 }
 
 // Wenn der Stoßsensor aktiv wird
-function runIntoWall() {
+function runIntoWall(trigger) {
     var oldhtml = document.getElementById('background');
-    if(TASTSENSORAKTIV == false) {
+    if(trigger == true) {
         oldhtml.style.background="red";
-        TASTSENSORAKTIV = true;
     } else {
         oldhtml.style.background="#dedede";
-        TASTSENSORAKTIV = false;
     }
 }
 
 function handleMessages(message) {
     console.log(message);
 
-    switch (message.value) {
-        case "tastsensor":
-            runIntoWall();
+    switch (message.port) {
+        case "a":
+            if(message.value[0] === 1){
+                runIntoWall(true);
+            } else if (message.value[0] == 0){
+                runIntoWall(false);
+            }
             break;
-        case "gyro":
-            handleGyroSensor(message);
-            break;
-        case "sonar":
+        case "b":
             handleSonar(message);
             break;
+        case "c":
+            handleGyroSensor(message);
+            break;
         default:
-            print("Nichts passendes gefunden!")
+            console.log("Nichts passendes gefunden!")
     }
 }
 
