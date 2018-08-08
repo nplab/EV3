@@ -274,7 +274,6 @@ function drawpoint(value, angle) {
 
 }
 
-
 // Wenn der Stoßsensor aktiv wird
 function runIntoWall() {
     var oldhtml = document.getElementById('background');
@@ -312,30 +311,6 @@ function handleGyroSensor(message) {
 function handleSonar(message) {
     console.log(message);
 }
-
-// // Sending data to roboter
-// function sendingToRoboter(mode = null, direction = null) {
-//     var message = null;
-//     if (direction != null) {
-//         message = {
-//             'port': port,
-//             'mode': mode,
-//             'value': direction,
-//
-//         }
-//     } else if (mode != null) {
-//         message = {
-//             'port': port,
-//             'mode': mode,
-//         }
-//     } else {
-//         message = {
-//             'port': port,
-//         }
-//     }
-//
-//     sendingData(message)
-// }
 
 /************
 WebRTC Connection
