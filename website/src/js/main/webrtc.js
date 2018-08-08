@@ -101,6 +101,13 @@ class WebRTCPeerConnection {
         await this.pc.setLocalDescription(description);
         console.log('Local description:', description);
     }
+
+    async close(){
+        console.log(this.pc);
+        this.pc.close();
+        console.log(this.pc);
+        this.pc = null;
+    }
 }
 
 // Handle einer Offer-Nachricht
@@ -123,3 +130,8 @@ function sendingData(data) {
     }
 
 }
+
+//make sure we close the connection before we close the page
+// window.onbeforeunload = function(e){
+//     pc.close();
+// }

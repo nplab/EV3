@@ -379,3 +379,18 @@ void* compass_routine(void *interval){
   }
   return NULL;
 }
+
+void* ping_routine(void *ign __attribute__ ((unused))){
+
+  static struct timespec sleeptime;
+  sleeptime.tv_sec = 0;
+  sleeptime.tv_nsec = 10 * 1000 * 1000; //one second
+
+  while( send_message_on_ping_channel("") == WRTCR_SUCCESS){
+    ZF_LOGI("Blubb");
+    nanosleep(&sleeptime, NULL);
+  }
+  ZF_LOGI("Blobb");
+
+  return NULL;
+}

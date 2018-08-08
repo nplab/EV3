@@ -1,7 +1,9 @@
+#include <pthread.h>
 #include "data.h"
 
 static struct client client_info = {0};
 static struct rawrtc_peer_connection_configuration *configuration;
+static pthread_t ping_thread_id;
 
 //initialisation and shutdown functions
 wrtcr_rc initialise_client();
@@ -19,9 +21,11 @@ static void data_channel_helper_destroy(void* arg);
 bool ice_candidate_type_enabled(struct client* const client, enum rawrtc_ice_candidate_type const type);
 static void get_remote_description();
 void api_channel_open_handler(void* const arg);
+void ping_channel_open_handler(void* const arg);
 void robot_api_message_handler(struct mbuf* const buffer, enum rawrtc_data_channel_message_flag const flags, void* const arg);
 //helper functions
 wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char *msg);
+void* ping_routine(void *p_channel);
 
 
 wrtcr_rc data_channel_setup(){
@@ -118,6 +122,21 @@ wrtcr_rc initialise_client(){
                                                 default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler,
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
                                                 default_data_channel_message_handler, client_info.data_channel_sensors), "Could not create sensors data channel");
+
+  //create parameters for ping data channel
+  data_channel_helper_create(&client_info.data_channel_ping,  &client_info, "ping");
+
+  EORE(rawrtc_data_channel_parameters_create(
+                                           &dc_parameters, client_info.data_channel_ping->label,
+                                           RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, true, 2), "Could not create ping data channel parameters");
+
+  //create actual data channel
+  EORE(rawrtc_peer_connection_create_data_channel(
+                                                &client_info.data_channel_ping->channel, client_info.connection,
+                                                dc_parameters, NULL,
+                                                ping_channel_open_handler, default_data_channel_buffered_amount_low_handler,
+                                                default_data_channel_error_handler, default_data_channel_close_handler,
+                                                default_data_channel_message_handler, client_info.data_channel_ping), "Could not create ping data channel");
   //more clean up
   mem_deref(dc_parameters);
   return WRTCR_SUCCESS;
@@ -540,6 +559,14 @@ wrtcr_rc send_message_on_data_channel(struct rawrtc_data_channel* channel, char 
   }
 }
 
+wrtcr_rc send_message_on_ping_channel(char *msg){
+  if(send_message_on_data_channel(client_info.data_channel_ping->channel, msg) != WRTCR_SUCCESS){
+    ZF_LOGE("Could not send message on ping channel");
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_SUCCESS;
+}
+
 wrtcr_rc send_message_on_api_channel(char *msg){
   if(send_message_on_data_channel(client_info.data_channel_api->channel, msg) != WRTCR_SUCCESS){
     ZF_LOGE("Could not send message on api channel");
@@ -555,4 +582,15 @@ wrtcr_rc send_message_on_sensor_channel(char *msg){
   }
   return WRTCR_SUCCESS;
 }
+
+void ping_channel_open_handler(void* const arg){
+  struct data_channel_helper* const channel = arg;
+  ZF_LOGI("(%s) Data channel open: %s\n", channel->client->name, channel->label);
+
+  if(pthread_create(&ping_thread_id, NULL, &ping_routine, (void*)channel) != 0){
+    ZF_LOGE("Could not create ping thread. Exiting!");
+    exit(-1);
+  }
+}
+
 

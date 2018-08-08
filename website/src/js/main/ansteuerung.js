@@ -13,10 +13,11 @@ function testMetaDevices() {
     // setTimeout(function(){
     //     sendingToRoboter("b", "stop");
     // }, 10000);
-    sendingData({"port": "c", "mode": "start", "value": 100});
-    setTimeout(function(){
-        sendingToRoboter("c", "stop");
-    }, 10000);
+    // sendingData({"port": "c", "mode": "start", "value": 100});
+    // setTimeout(function(){
+    //     sendingToRoboter("c", "stop");
+    // }, 10000);
+    pc.close()
 }
 
 

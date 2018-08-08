@@ -21,6 +21,7 @@ struct client {
   struct rawrtc_peer_connection* connection;
   struct data_channel_helper* data_channel_api;
   struct data_channel_helper* data_channel_sensors;
+  struct data_channel_helper* data_channel_ping;
 };
 
 //Data channel helper structure
@@ -37,6 +38,9 @@ wrtcr_rc data_channel_setup();
 
 //shut down data channel and clean up
 wrtcr_rc data_channel_shutdown();
+
+//send message on ping data channel
+wrtcr_rc send_message_on_ping_channel(char *msg);
 
 //send string msg on the api channel
 wrtcr_rc send_message_on_api_channel(char *msg);
