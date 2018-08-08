@@ -96,7 +96,7 @@ Functions
 ************/
 function test () {
     var message = {
-        value: "tastsensor",
+        value: "sonar",
     }
 
     handleMessages(message)
@@ -294,9 +294,23 @@ function handleMessages(message) {
         case "tastsensor":
             runIntoWall();
             break;
+        case "gyro":
+            handleGyroSensor(message);
+            break;
+        case "sonar":
+            handleSonar(message);
+            break;
         default:
             print("Nichts passendes gefunden!")
     }
+}
+
+function handleGyroSensor(message) {
+    console.log(message);
+}
+
+function handleSonar(message) {
+    console.log(message);
 }
 
 // // Sending data to roboter
