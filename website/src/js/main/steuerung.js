@@ -43,37 +43,24 @@ $(document).keyup(function(e) {
     }
 });
 
-// Button
+/************
+Button
+************/
 document.getElementById('test_button').onclick = test
 document.getElementById('start_button').onclick = start
 document.getElementById('stop_button').onclick = stop
 
 
+/************
+Functions
+************/
 
-// Testcase - Canvas Abstand
+function test () {
+    var message = {
+        value: "sonar",
+    }
 
-canvasAbstand.onmousemove = function(event) {
-    // var x = event.clientX - canvasAbstand.offsetLeft;
-    // var y = event.clientY - canvasAbstand.offsetTop;
-    // var context = canvasAbstand.getContext('2d');
-    //
-    // console.log("x", x);
-    // console.log(y);
-    //
-    //
-    // context.fillStyle = '#fbba00';
-    // context.fillRect(x,y,10,10);
-    //
-    // // Mitte
-    // context.fillRect(145,70,10,10);
-    //
-    // // Oben und Unten
-    // context.fillRect(145,0,10,10);
-    // context.fillRect(145,140,10,10);
-    //
-    // // Links und rechts
-    // context.fillRect(75,70,10,10);
-    // context.fillRect(215,70,10,10);
+    handleMessages(message)
 
     var g = 45
 
@@ -83,21 +70,6 @@ canvasAbstand.onmousemove = function(event) {
     drawpoint(1500, toRadiant(g))
     drawpoint(2000, toRadiant(g))
     drawpoint(2550, toRadiant(g))
-
-
-}
-
-
-
-/************
-Functions
-************/
-function test () {
-    var message = {
-        value: "sonar",
-    }
-
-    handleMessages(message)
 }
 
 
@@ -190,8 +162,6 @@ function getDistanceAngle(mouseX, mouseY) {
   } else {
     var angle = Math.acos(-mouseX/distance) * 180 / Math.PI + 180;
   }
-  // console.log("Winkel:" + angle);
-  // console.log("Abstand:" + distance);
 
   // set distance = 150 to max distance/value
   if (distance > 150) {
@@ -204,24 +174,11 @@ function getDistanceAngle(mouseX, mouseY) {
   };
 }
 
-//
-function calculateShare(number, left = false) {
-    var value = 0;
-    if(left == true) {
-        value = Math.round((100/180 * number));
-    } else {
-        value = Math.round((100 - 100/180 * number));
-    }
-    return value/100;
-}
-
-//
+// send value of motors to roboter
 function sendMotorManagement(angleDistance) {
     var value_b;
     var value_c;
     var value_ges;
-    var message_b;
-    var message_c;
 
     if(angleDistance.angle > 180) {
         value_b = - 0.50;
@@ -232,17 +189,12 @@ function sendMotorManagement(angleDistance) {
     }
     value_ges = angleDistance.distance/150 * 100;          // Werte zwischen 0 - 100;
 
-    // // Debug
-    // console.log('Linker Motor: ' + value_b);
-    // console.log('Rechter Motor: ' + value_c);
-    // console.log('Geschwindigkeit: ' + value_ges);
-
-    message_b = {
+    var message_b = {
         port: 'B',
         mode: 'run-forever',
         value: value_c * value_ges,
     }
-    message_c = {
+    var message_c = {
         port: "C",
         mode: 'run-forever',
         value: value_b * value_ges,
@@ -250,6 +202,17 @@ function sendMotorManagement(angleDistance) {
 
     sendingData(message_b)
     sendingData(message_c)
+}
+
+//
+function calculateShare(number, left = false) {
+    var value = 0;
+    if(left == true) {
+        value = Math.round((100/180 * number));
+    } else {
+        value = Math.round((100 - 100/180 * number));
+    }
+    return value/100;
 }
 
 // Zeichnen
