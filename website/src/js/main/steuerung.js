@@ -75,15 +75,14 @@ canvasAbstand.onmousemove = function(event) {
     // context.fillRect(75,70,10,10);
     // context.fillRect(215,70,10,10);
 
-    drawpoint(0, 45)
-    console.log("0-----");
-    drawpoint(50, 45)
-    console.log("-----");
-    drawpoint(100, 45)
-    console.log("-----");
-    drawpoint(150, 45)
-    console.log("-----");
-    drawpoint(200, 45)
+    var g = 45
+
+    drawpoint(0, toRadiant(g))
+    drawpoint(500, toRadiant(g))
+    drawpoint(1000, toRadiant(g))
+    drawpoint(1500, toRadiant(g))
+    drawpoint(2000, toRadiant(g))
+    drawpoint(2550, toRadiant(g))
 
 
 }
@@ -255,11 +254,10 @@ function sendMotorManagement(angleDistance) {
 
 // Zeichnen
 function drawpoint(value, angle) {
-    var pointAb = value * 70/250;
+    var pointAb = value * 70/2550;
 
-    var y = Math.sin(angle) * pointAb;
-    console.log(Math.sin(y));
-    var x = Math.sqrt(pointAb * pointAb - y * y);
+    var y = Math.sin(-angle) * pointAb;
+    var x = Math.cos(angle) * pointAb;
 
     var context = canvasAbstand.getContext('2d');
 
@@ -310,8 +308,15 @@ function handleGyroSensor(message) {
 }
 
 function handleSonar(message) {
+    // console.log(message.value[0] Winkel);
     console.log(message);
 }
+
+
+function toRadiant (angle) {
+  return angle * (Math.PI / 180);
+}
+
 
 /************
 WebRTC Connection
