@@ -72,8 +72,7 @@ function test () {
     drawpoint(2550, toRadiant(g))
 }
 
-
-
+// handle button
 function start () {
     // activ Canvas Event Listener
     ALLOWSENDING = true;
@@ -84,6 +83,7 @@ function start () {
     sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
 
 }
+
 function stop () {
     // inactiv Canvas Event Listener
     ALLOWSENDING = false
@@ -215,41 +215,12 @@ function calculateShare(number, left = false) {
     return value/100;
 }
 
-// Zeichnen
-function drawpoint(value, angle) {
-    var pointAb = value * 70/2550;
-
-    var y = Math.sin(-angle) * pointAb;
-    var x = Math.cos(angle) * pointAb;
-
-    var context = canvasAbstand.getContext('2d');
-
-    console.log("x", x);
-    console.log(y);
-
-
-    context.fillStyle = '#fbba00';
-    context.fillRect(x + 140,y + 70,10,10);
-
-
-}
-
-// if taster send a message
-function runIntoWall(value) {
-    var background = document.getElementById('background');
-    if(value[0] === 1) {
-        background.style.background="red";
-    } else {
-        background.style.background="#dedede";
-    }
-}
-
 function handleMessages(message) {
     console.log(message);
 
     switch (message.port) {
         case "a":
-        runIntoWall(message.value);
+        runIntoWall(message);
             break;
         case "b":
             handleSonar(message);
@@ -262,12 +233,30 @@ function handleMessages(message) {
     }
 }
 
-function handleGyroSensor(message) {
+function handleTast(message) {
     console.log(message);
+    runIntoWall(message.value);
+}
+
+// if taster send a message
+function runIntoWall(value) {
+    var background = document.getElementById('background');
+    if(value[0] === 1) {
+        background.style.background="red";
+    } else {
+        background.style.background="#dedede";
+    }
 }
 
 function handleSonar(message) {
     // console.log(message.value[0] Winkel);
+    console.log(message);
+}
+
+
+
+
+function handleGyroSensor(message) {
     console.log(message);
 }
 
