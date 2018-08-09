@@ -234,13 +234,13 @@ function drawpoint(value, angle) {
 
 }
 
-// Wenn der Stoßsensor aktiv wird
-function runIntoWall(trigger) {
-    var oldhtml = document.getElementById('background');
-    if(trigger == true) {
-        oldhtml.style.background="red";
+// if taster send a message
+function runIntoWall(value) {
+    var background = document.getElementById('background');
+    if(value[0] === 1) {
+        background.style.background="red";
     } else {
-        oldhtml.style.background="#dedede";
+        background.style.background="#dedede";
     }
 }
 
@@ -249,11 +249,7 @@ function handleMessages(message) {
 
     switch (message.port) {
         case "a":
-            if(message.value[0] === 1){
-                runIntoWall(true);
-            } else if (message.value[0] == 0){
-                runIntoWall(false);
-            }
+        runIntoWall(message.value);
             break;
         case "b":
             handleSonar(message);
