@@ -79,8 +79,8 @@ function start () {
     ALLOWSENDING = true;
 
     // activ all sensor
-    // sendingData({"port": "a", "mode": "start"});
-    // sendingData({"port": "b", "mode": "start"});
+    sendingData({"port": "a", "mode": "start"});
+    sendingData({"port": "b", "mode": "start"});
     sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
 
 }
