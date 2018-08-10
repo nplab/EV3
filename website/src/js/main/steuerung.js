@@ -23,6 +23,8 @@ function startupCanvas() {
   drawImpedimentCanvas(radius);
 }
 
+var points = []
+
 /**********
 Event Listener
  **********/
@@ -56,20 +58,21 @@ Functions
 ************/
 
 function test () {
-    var message = {
-        value: "sonar",
+
+
+    for (var i = 0; i < 40; i++) {
+        var pointtt = [45, 0]
+        savePoint(pointtt)
     }
 
-    handleMessages(message)
+    console.log(points);
 
-    var g = 45
+    drawPoints(points)
 
-    drawpoint(0, toRadiant(g))
-    drawpoint(500, toRadiant(g))
-    drawpoint(1000, toRadiant(g))
-    drawpoint(1500, toRadiant(g))
-    drawpoint(2000, toRadiant(g))
-    drawpoint(2550, toRadiant(g))
+    var message = {
+        port: 'b',
+        value: [90, 8],
+    }
 }
 
 // handle button
@@ -234,7 +237,6 @@ function handleMessages(message) {
 }
 
 function handleTast(message) {
-    console.log(message);
     runIntoWall(message.value);
 }
 
@@ -249,12 +251,38 @@ function runIntoWall(value) {
 }
 
 function handleSonar(message) {
-    // console.log(message.value[0] Winkel);
-    console.log(message);
+    drawImpedimentCanvas(70)        // radius is 70
+    savePoint(message.value)
+    drawPoints(points)
 }
 
+var pointNr = 0
+function savePoint(value) {
+    var xy = getXY(value[1], toRadiant(value[0]))       // 0 Angle, 1 Value
 
+    points[pointNr++%20] = xy;
+    // pointNr++;
+}
 
+function getXY(value, angle) {
+    var pointAb = value * 70/2550;
+    var y = Math.sin(-angle) * pointAb;
+    var x = Math.cos(angle) * pointAb;
+
+    return {x, y};
+}
+
+function drawPoints(xy) {
+    for (var i = 0; i < xy.length; i++) {
+        drawPoint(xy[i]);
+    }
+}
+
+function drawPoint(xy) {
+    var context = canvasAbstand.getContext('2d');
+    context.fillStyle = '#fbba00';
+    context.fillRect(xy.x + 147,xy.y + 73,5,5);
+}
 
 function handleGyroSensor(message) {
     console.log(message);
