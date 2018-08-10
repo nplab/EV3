@@ -62,10 +62,16 @@ Functions
 function test () {
 
 
-    for (var i = 0; i < 40; i++) {
-        var pointtt = [45, 0]
-        savePoint(pointtt)
-    }
+    // for (var i = 0; i < 40; i++) {
+    //     var pointtt = [-90, 2550]
+    //     savePoint(pointtt)
+    // }
+    var pointtt = [-90, 2550]
+    savePoint(pointtt)
+    pointtt = [0, 2550]
+    savePoint(pointtt)
+    // pointtt = [90, 2550]
+    // savePoint(pointtt)
 
     console.log(points);
 
@@ -259,7 +265,7 @@ function handleSonar(message) {
 }
 
 function savePoint(value) {
-    var xy = getXY(value[1], toRadiant(value[0]))       // 0 Angle, 1 Value
+    var xy = getXY(value[1], toRadiant(value[0] -90))       // 0 Angle, 1 Value
 
     points[pointNr++%20] = xy;
 }
@@ -270,7 +276,7 @@ function toRadiant (angle) {
 
 function getXY(value, angle) {
     var pointAb = value * 70/2550;
-    var y = Math.sin(-angle) * pointAb;
+    var y = Math.sin(angle) * pointAb;
     var x = Math.cos(angle) * pointAb;
 
     return {x, y};
