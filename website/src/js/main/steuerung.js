@@ -23,7 +23,9 @@ function startupCanvas() {
   drawImpedimentCanvas(radius);
 }
 
+// var for paint points
 var points = []
+var pointNr = 0
 
 /**********
 Event Listener
@@ -256,12 +258,14 @@ function handleSonar(message) {
     drawPoints(points)
 }
 
-var pointNr = 0
 function savePoint(value) {
     var xy = getXY(value[1], toRadiant(value[0]))       // 0 Angle, 1 Value
 
     points[pointNr++%20] = xy;
-    // pointNr++;
+}
+
+function toRadiant (angle) {
+  return angle * (Math.PI / 180);
 }
 
 function getXY(value, angle) {
@@ -288,10 +292,6 @@ function handleGyroSensor(message) {
     console.log(message);
 }
 
-
-function toRadiant (angle) {
-  return angle * (Math.PI / 180);
-}
 
 
 /************
