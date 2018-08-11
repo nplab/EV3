@@ -121,3 +121,17 @@ const dc = pc.createDataChannel('api', {
     negotiated: true,
     id: 0,
 })
+
+const ping_dc = pc.createDataChannel('ping', {
+    negotiated: true,
+    id: 2,
+})
+
+ping_dc.onopen = (event) => {
+    console.log("ping open")
+    setInterval(function(){
+        if(ping_dc.readyState == "open"){
+            ping_dc.send("Ping");
+        }
+    }, 1000);
+}

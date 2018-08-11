@@ -131,7 +131,3 @@ function sendingData(data) {
 
 }
 
-//make sure we close the connection before we close the page
-// window.onbeforeunload = function(e){
-//     pc.close();
-// }

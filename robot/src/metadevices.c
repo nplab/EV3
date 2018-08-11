@@ -380,17 +380,22 @@ void* compass_routine(void *interval){
   return NULL;
 }
 
-void* ping_routine(void *ign __attribute__ ((unused))){
+void* ping_routine(void *ping_ts ){
+  time_t *timestamp = (time_t *)ping_ts;
+  time_t now;
 
   static struct timespec sleeptime;
-  sleeptime.tv_sec = 0;
-  sleeptime.tv_nsec = 10 * 1000 * 1000; //one second
+  sleeptime.tv_sec = 1;
+  sleeptime.tv_nsec = 0;
 
-  while( send_message_on_ping_channel("") == WRTCR_SUCCESS){
-    ZF_LOGI("Blubb");
+  //if last ping timestamp is older than three seconds, quit
+  do{
     nanosleep(&sleeptime, NULL);
-  }
-  ZF_LOGI("Blobb");
+    time(&now);
+    
+  } while( difftime(now, *timestamp) < 5.0);
 
+  ZF_LOGF("Ping timeout. Ending!");
+  exit(-1);
   return NULL;
 }
