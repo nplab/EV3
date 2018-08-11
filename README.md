@@ -23,10 +23,10 @@ Robot demonstrator for WebRTC datachannels.
 ### Process
 
 1. Set up WebRTC connection
-2. Create a reliable, ordered data channel named "api"
-3. After the data channel has been opened the robot sends a message containing a JSON-array of JSON-objects consisting of "port" – the number or letter of the port –  and "type" - the type of sensor or motor that is attached. E.g. `{"port": "A", "type": "tacho-motor-l", //or "tacho-motor-m"}`.
-4. The website send messages containing JSON-strings addressing a sensor or motor by its port. Depending on the mesagge, the robot will answer. See below for details.
-5. If the WebRTC connection ends, the software on the robot restarts.
+2. Create three data channels named `api`, `sensors` and `ping`
+3. After the `api` channel has been opened the robot sends a message containing a JSON-array of JSON-objects consisting of "port" – the number or letter of the port –  and "type" - the type of sensor or motor that is attached. E.g. `{"port": "A", "type": "tacho-motor-l", //or "tacho-motor-m"}`.
+4. The website sends messages on the `api` channel containing JSON-strings addressing a sensor or motor by its port. Depending on the message, the robot will answer. See below for details.
+5. If the WebRTC connection ends, the software on the robot restarts (see section *Ping*).
 
 ### Messages
 
