@@ -24,11 +24,13 @@ Robot demonstrator for WebRTC datachannels.
 
 1. Set up WebRTC connection
 2. Create a reliable, ordered data channel named "api"
-3. After the data channel has been opened the robot sends a message containing a JSON-array of JSON-objects consisting of "port" – the number or number of the port –  and "type" - the type of sensor or motor that is attached. E.g. `{"port": "A", "type": "tacho-motor-l", //or "tacho-motor-m"}`.
-4. The website send messages containing JSON-strings addressing a sensor or motor by its port. See below for details.
-5. If the WebRTC connection collapses, the software on the robot restarts.
+3. After the data channel has been opened the robot sends a message containing a JSON-array of JSON-objects consisting of "port" – the number or letter of the port –  and "type" - the type of sensor or motor that is attached. E.g. `{"port": "A", "type": "tacho-motor-l", //or "tacho-motor-m"}`.
+4. The website send messages containing JSON-strings addressing a sensor or motor by its port. Depending on the mesagge, the robot will answer. See below for details.
+5. If the WebRTC connection ends, the software on the robot restarts.
 
 ### Messages
+
+Messages from the website addressing motors, sensors or metadevices (see below), are sent on the `api` data channel. The response to requests for data will be returned on the `data` channel as well.
 
 #### Motors
 
@@ -108,6 +110,10 @@ Possible values for mode are `"start"` for starting and `"stop"` for stopping a 
 | meta-collision | Collision sensor. Sends data only when value of touch sensor at the front of the robot changes.                               | %                                                       | 0=no collision, 1=collision |
 | meta-sonar     | The ultrasound distance sensor, mounted on a base that swivels 180 degrees in steps, measuring the distance after every step. | %                                                       |  \[-90 – 90(°), 0 – 2550(mm)\] |
 | meta-compass   | Angle the sensor has turned around its horizontal axis since initialization.                                                  | 0-2^32 , milliseconds to wait between polling the sensor | -32768 – 32767 (°)          |
+
+### Ping
+
+A third data channel called `ping` is used to monitor the connection. The website is expected to send messages – with arbitrary content – at one second intervals. If the robot does not receive a message on the `ping` channel for five seconds, the software restarts.
 
 
 [^1]: `hold` = motor attempts to hold position; `coast` = motor is free to be turned
