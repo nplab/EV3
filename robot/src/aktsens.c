@@ -52,7 +52,17 @@ wrtcr_rc setup_robot(){
 }
 
 wrtcr_rc cleanup_robot(){
-  cleanup_meta_devices();
+  const char *key;
+  uint8_t sn;
+
+  //iterate over known attachments
+  while( (key = map_next(&port_map, &iterator))){
+    if( *key >= 'A'){ //if this a motor, stop it
+      sn = *map_get(&port_map, key);
+      set_tacho_command_inx(sn, TACHO_STOP);     
+    }
+  }
+
   map_deinit(&tf_map);
   return WRTCR_SUCCESS;
 }
