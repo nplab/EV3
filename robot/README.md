@@ -55,9 +55,17 @@ In order to build, please execute the following:
     cd robot
     ../container/run_ev3wrtc.sh
 ```
-The resulting binary will be `robot/bin/wrtcrobot` and needs to be copied to the EV3 brick along with `wrtc_robot.conf`.
+The resulting binary will be `robot/bin/wrtcrobot` and needs to be copied to the EV3 brick along with `wrtc_robot.conf` (see below).
 
 ## Further Setup
+
+### Installation
+
+The binary file needs to be moved from `robot/bin/wrtcrobot` to `/usr/bin/wrtcrobot` on the robot. The configuration is expected to be in `/etc/wrtcrobot/wrtcr_conf.json`.
+
+In order for the software to be started automatically the systemd unit file `wrtcrobot.service` has been provided. It will also ensure that the software is restarted after it quits when the connection to the website has been closed. This unit file needs to be moved to `/etc/systemd/system/wrtcrobot.service` on the robot and enabled with `sudo systemctl enable wrtcrobot.service`. 
+
+The log messages can be viewed with `sudo journalctl --system -u wrtcrobot.service`. 
 
 ### DNS
 If you would like to use Hostnames instead of IP addresses in the config file, change the `host: ` line in `/etc/nsswitch.conf` to `hosts: files [NOTFOUND=continue UNAVAIL=continue FOUND=return] dns [NOTFOUND=return UNAVAIL=return TRYAGAIN=return FOUND=return] files`.

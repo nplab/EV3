@@ -379,3 +379,23 @@ void* compass_routine(void *interval){
   }
   return NULL;
 }
+
+void* ping_routine(void *ping_ts ){
+  time_t *timestamp = (time_t *)ping_ts;
+  time_t now;
+
+  static struct timespec sleeptime;
+  sleeptime.tv_sec = 1;
+  sleeptime.tv_nsec = 0;
+
+  //if last ping timestamp is older than three seconds, quit
+  do{
+    nanosleep(&sleeptime, NULL);
+    time(&now);
+    
+  } while( difftime(now, *timestamp) < 5.0);
+
+  ZF_LOGF("Ping timeout. Ending!");
+  exit(-1);
+  return NULL;
+}

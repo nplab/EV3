@@ -13,10 +13,11 @@ function testMetaDevices() {
     // setTimeout(function(){
     //     sendingToRoboter("b", "stop");
     // }, 10000);
-    sendingData({"port": "c", "mode": "start", "value": 100});
-    setTimeout(function(){
-        sendingToRoboter("c", "stop");
-    }, 10000);
+    // sendingData({"port": "c", "mode": "start", "value": 100});
+    // setTimeout(function(){
+    //     sendingToRoboter("c", "stop");
+    // }, 10000);
+    pc.close()
 }
 
 
@@ -593,6 +594,22 @@ const sensor_dc = pc.createDataChannel('sensors', {
     negotiated: true,
     id: 1,
 })
+
+const ping_dc = pc.createDataChannel('ping', {
+    negotiated: true,
+    id: 2,
+})
+
+
+ping_dc.onopen = (event) => {
+    console.log("ping open")
+    setInterval(function(){
+        if(ping_dc.readyState == "open"){
+            ping_dc.send("Ping");
+        }
+    }, 1000);
+}
+
 // Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
 var INTITIALPAGE = 0
 
