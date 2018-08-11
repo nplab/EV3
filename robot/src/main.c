@@ -1,14 +1,11 @@
-#include <stdio.h>
-#include <unistd.h>
-#include <getopt.h>
-#include <ctype.h>
-
+#include "main.h"
 #include "pthread.h"
 #include "config.h"
 #include "signaling.h"
 #include "aktsens.h"
 #include "data.h"
 #include "utils.h"
+
 
 int main(int argc, char *argv[]) {
   char *def_conf_file_name = "wrtcr_conf.json";
@@ -47,10 +44,18 @@ int main(int argc, char *argv[]) {
   sigserv_connect();
   data_channel_setup();
 
+  clean_exit();
+
+  return WRTCR_SUCCESS;
+}
+
+void clean_exit(){
   ZF_LOGI("Starting teardown procedure");
+  data_channel_shutdown();
+  cleanup_meta_devices();
   cleanup_robot();
   sigserv_disconnect();
   delete_config();
-
-  return WRTCR_SUCCESS;
+  
+  exit(0);
 }
