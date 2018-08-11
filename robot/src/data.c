@@ -69,8 +69,6 @@ wrtcr_rc data_channel_setup(){
 
   re_main(default_signal_handler);
 
-  data_channel_shutdown();
-
   return WRTCR_SUCCESS;
 }
 
