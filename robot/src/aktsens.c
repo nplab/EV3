@@ -53,6 +53,7 @@ wrtcr_rc setup_robot(){
 
 wrtcr_rc cleanup_robot(){
   const char *key;
+  map_iter_t iterator = map_iter(&port_map);
   uint8_t sn;
 
   //iterate over known attachments
