@@ -91,6 +91,7 @@ wrtcr_rc initialise_client(){
                                     default_ice_gatherer_state_change_handler, connection_state_change_handler,
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
+  //----------------------------- create API data channel ---------------------------------------
   //create parameters for api data channel
   data_channel_helper_create(&client_info.data_channel_api,  &client_info, "api");
 
@@ -108,6 +109,7 @@ wrtcr_rc initialise_client(){
   //clean up
   mem_deref(dc_parameters);
 
+  //----------------------------- create sensors data channel ---------------------------------------
   //create parameters for sensor data channel
   data_channel_helper_create(&client_info.data_channel_sensors, &client_info, "sensors");
 
@@ -123,6 +125,10 @@ wrtcr_rc initialise_client(){
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
                                                 default_data_channel_message_handler, client_info.data_channel_sensors), "Could not create sensors data channel");
 
+  //clean up
+  mem_deref(dc_parameters);
+
+  //----------------------------- create ping data channel ---------------------------------------
   //create parameters for ping data channel
   data_channel_helper_create(&client_info.data_channel_ping,  &client_info, "ping");
 
@@ -139,6 +145,7 @@ wrtcr_rc initialise_client(){
                                                 ping_message_handler, client_info.data_channel_ping), "Could not create ping data channel");
   //more clean up
   mem_deref(dc_parameters);
+
   return WRTCR_SUCCESS;
 }
 
