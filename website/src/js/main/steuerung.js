@@ -10,6 +10,8 @@ var centerX = 150;
 var centerY = 73;
 var distance = null;
 var angle = null;
+var sensorAuswertung = 0;
+var gyroSensor = 0;
 
 var ALLOWSENDING = false;
 
@@ -47,6 +49,11 @@ $(document).keyup(function(e) {
     }
 });
 
+document.getElementById("sensorAuswertung").onchange = function() {
+    sensorAuswertung =  this.value;
+}
+
+
 /************
 Button
 ************/
@@ -61,26 +68,22 @@ Functions
 
 function test () {
 
-
-    // for (var i = 0; i < 40; i++) {
-    //     var pointtt = [-90, 2550]
-    //     savePoint(pointtt)
-    // }
-    var pointtt = [-90, 2550]
-    savePoint(pointtt)
-    pointtt = [0, 2550]
-    savePoint(pointtt)
-    // pointtt = [90, 2550]
-    // savePoint(pointtt)
-
-    console.log(points);
-
-    drawPoints(points)
-
-    var message = {
-        port: 'b',
-        value: [90, 8],
+    var message1 = {
+        port: 'c',
+        value: 180,
     }
+    var message2 = {
+        port: 'c',
+        value: 90,
+    }
+    var message3 = {
+        port: 'c',
+        value: 140,
+    }
+
+    handleGyroSensor(message1)
+    handleGyroSensor(message2)
+    handleGyroSensor(message3)
 }
 
 // handle button
@@ -259,14 +262,15 @@ function runIntoWall(value) {
 }
 
 function handleSonar(message) {
-    drawImpedimentCanvas(70)        // radius is 70
-    savePoint(message.value)
-    drawPoints(points)
+    if (sensorAuswertung == 0) {
+        drawImpedimentCanvas(70)        // radius is 70
+        savePoint(message.value)
+        drawPoints(points)
+    }
 }
 
 function savePoint(value) {
     var xy = getXY(value[1], toRadiant(value[0] -90))       // 0 Angle, 1 Value
-
     points[pointNr++%20] = xy;
 }
 
@@ -275,7 +279,7 @@ function toRadiant (angle) {
 }
 
 function getXY(value, angle) {
-    var pointAb = value * 70/2550;
+    var pointAb = value * 70/2750;
     var y = Math.sin(angle) * pointAb;
     var x = Math.cos(angle) * pointAb;
 
@@ -295,9 +299,14 @@ function drawPoint(xy) {
 }
 
 function handleGyroSensor(message) {
-    console.log(message);
+    if (sensorAuswertung == 1) {
+        drawImpedimentCanvas(70)        // radius is 70
+        var xy = getXY(2550, toRadiant(message.value - 90))
+        var context = canvasAbstand.getContext('2d');
+        context.fillStyle = '#000000';
+        context.fillRect(xy.x + 147,xy.y + 73,5,5);
+    }
 }
-
 
 
 /************
