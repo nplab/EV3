@@ -84,6 +84,22 @@ function test () {
     handleGyroSensor(message1)
     handleGyroSensor(message2)
     handleGyroSensor(message3)
+
+    var message4 = {
+        port: 'c',
+        value: [90, 2550]
+    }
+    var message5 = {
+        port: 'c',
+        value: [90, 890]
+    }
+    var message6 = {
+        port: 'c',
+        value: [45, 766]
+    }
+    handleSonar(message4)
+    handleSonar(message5)
+    handleSonar(message6)
 }
 
 // handle button
