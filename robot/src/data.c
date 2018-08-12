@@ -14,7 +14,6 @@ wrtcr_rc client_stop();
 //signal handlers
 static void negotiation_needed_handler(void* const arg);
 static void connection_state_change_handler(enum rawrtc_peer_connection_state const state, void* const arg);
-void stop_on_return_handler(int flags, void* arg);
 static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg);
 static void send_local_description(struct client* const client);
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client);
@@ -70,8 +69,6 @@ wrtcr_rc data_channel_setup(){
 
   re_main(default_signal_handler);
 
-  data_channel_shutdown();
-
   return WRTCR_SUCCESS;
 }
 
@@ -94,6 +91,7 @@ wrtcr_rc initialise_client(){
                                     default_ice_gatherer_state_change_handler, connection_state_change_handler,
                                     default_data_channel_handler, &client_info), "Could not create peer connection");
 
+  //----------------------------- create API data channel ---------------------------------------
   //create parameters for api data channel
   data_channel_helper_create(&client_info.data_channel_api,  &client_info, "api");
 
@@ -111,6 +109,7 @@ wrtcr_rc initialise_client(){
   //clean up
   mem_deref(dc_parameters);
 
+  //----------------------------- create sensors data channel ---------------------------------------
   //create parameters for sensor data channel
   data_channel_helper_create(&client_info.data_channel_sensors, &client_info, "sensors");
 
@@ -126,6 +125,10 @@ wrtcr_rc initialise_client(){
                                                 default_data_channel_error_handler, default_data_channel_close_handler,
                                                 default_data_channel_message_handler, client_info.data_channel_sensors), "Could not create sensors data channel");
 
+  //clean up
+  mem_deref(dc_parameters);
+
+  //----------------------------- create ping data channel ---------------------------------------
   //create parameters for ping data channel
   data_channel_helper_create(&client_info.data_channel_ping,  &client_info, "ping");
 
@@ -142,6 +145,7 @@ wrtcr_rc initialise_client(){
                                                 ping_message_handler, client_info.data_channel_ping), "Could not create ping data channel");
   //more clean up
   mem_deref(dc_parameters);
+
   return WRTCR_SUCCESS;
 }
 
@@ -153,6 +157,7 @@ wrtcr_rc client_stop(){
   }
   client_info.data_channel_api = mem_deref(client_info.data_channel_api);
   client_info.data_channel_sensors = mem_deref(client_info.data_channel_sensors);
+  client_info.data_channel_ping = mem_deref(client_info.data_channel_ping);
   client_info.connection = mem_deref(client_info.connection);
   client_info.configuration = mem_deref(client_info.configuration);
 
@@ -180,52 +185,9 @@ static void connection_state_change_handler(enum rawrtc_peer_connection_state co
     //print the new state
     char const * const state_name = rawrtc_peer_connection_state_to_name(state);
     ZF_LOGD("(%s) Peer connection state change: %s\n", client->name, state_name);
-
-    // Only create a new channel if none exist yet (in case we disconnect and then reconnect)
-    /* if (!client->data_channel && state == RAWRTC_PEER_CONNECTION_STATE_CONNECTED) { */
-    /*     struct rawrtc_data_channel_parameters* channel_parameters; */
-
-    /*     // Create data channel helper for in-band negotiated data channel */
-    /*     data_channel_helper_create( */
-    /*             &client->data_channel, (struct client *) client, "wrtc_robot_2"); */
-
-    /*     // Create data channel parameters */
-    /*     EORE(rawrtc_data_channel_parameters_create(&channel_parameters, client->data_channel->label, RAWRTC_DATA_CHANNEL_TYPE_RELIABLE_ORDERED, 0, NULL, false, 0), "Could not create data channel parameters"); */
-
-    /*     // Create data channel */
-    /*     EORE(rawrtc_peer_connection_create_data_channel(&client->data_channel->channel, client->connection, channel_parameters, NULL, default_data_channel_open_handler, default_data_channel_buffered_amount_low_handler, default_data_channel_error_handler, default_data_channel_close_handler, default_data_channel_message_handler, client->data_channel), "Could not create data channel"); */
-
-    /*     // Un-reference data channel parameters */
-    /*     mem_deref(channel_parameters); */
-    /* } */
 }
 
-
-// FD-listener that stops the main loop in case the input buffer contains a line feed or a carriage return.
-void stop_on_return_handler(
-        int flags,
-        void* arg
-) {
-    char buffer[128];
-    size_t length;
-    (void) flags;
-    (void) arg;
-
-    // Get message from stdin
-    if (!fgets((char*) buffer, 128, stdin)) {
-      handle_errno("Could not get message from stdin", true);
-    }
-    length = strlen(buffer);
-
-    // Exit?
-    if (length > 0 && length < 3 && (buffer[0] == '\n' || buffer[0] == '\r')) {
-        // Stop main loop
-        ZF_LOGI("Exiting\n");
-        re_cancel();
-    }
-}
-
-//handle local candidata (print, send last one to signaling server)
+//handle local candidate 
 static void local_candidate_handler(struct rawrtc_peer_connection_ice_candidate* const candidate, char const * const url, void* const arg) {
   struct client* const client = arg;
 
