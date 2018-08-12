@@ -110,6 +110,13 @@ class WebRTCPeerConnection {
     async handleRemoteICECandidate(candidate){
         await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
+
+    async close(){
+        console.log(this.pc);
+        this.pc.close();
+        console.log(this.pc);
+        this.pc = null;
+    }
 }
 
 // Handle einer Offer-Nachricht
@@ -139,3 +146,4 @@ function sendingData(data) {
     }
 
 }
+

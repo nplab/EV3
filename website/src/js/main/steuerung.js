@@ -291,3 +291,17 @@ api_dc.onmessage = (event) => {
 sensor_dc.onmessage = (event) => {
     handleMessages(JSON.parse(event.data));
 }
+
+const ping_dc = pc.createDataChannel('ping', {
+    negotiated: true,
+    id: 2,
+})
+
+ping_dc.onopen = (event) => {
+    console.log("ping open")
+    setInterval(function(){
+        if(ping_dc.readyState == "open"){
+            ping_dc.send("Ping");
+        }
+    }, 1000);
+}

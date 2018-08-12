@@ -6,6 +6,7 @@
 #include <time.h>
 
 #include "metadevices.h"
+#include "main.h"
 
 //error handling macro
 #define POSGE(rc, msg, fail) if(!(rc)){handle_err(msg, false); if(fail) return NULL;}
@@ -30,6 +31,11 @@ uint8_t us_sn;
 uint8_t zero_sn;
 uint8_t sonar_motor_sn;
 uint8_t compass_sn;
+
+//public thread ids, for cleanup
+pthread_t collision_thread_id;
+pthread_t sonar_thread_id;
+pthread_t compass_thread_id;
 
 //define non-public functions
 // -- collision sensors
@@ -57,6 +63,9 @@ wrtcr_rc setup_meta_devices(){
 
 wrtcr_rc cleanup_meta_devices(){
   map_deinit(&md_map);
+  pthread_cancel(collision_thread_id);
+  pthread_cancel(sonar_thread_id);
+  pthread_cancel(compass_thread_id);
   return WRTCR_SUCCESS;
 }
 
@@ -109,7 +118,6 @@ wrtcr_rc setup_collision_sensor(){
 }
 
 wrtcr_rc handle_collision_sensor_message(cJSON *msg){
-  static pthread_t collision_thread_id;
   static bool thread_exists = false;
   cJSON *mode = cJSON_GetObjectItem(msg, "mode");
 
@@ -206,7 +214,6 @@ wrtcr_rc setup_sonar_sensor(){
 }
 
 wrtcr_rc handle_sonar_sensor_message(cJSON *msg){
-  static pthread_t sonar_thread_id;
   static bool thread_exists = false;
   cJSON *mode = cJSON_GetObjectItem(msg, "mode");
 
@@ -320,7 +327,6 @@ wrtcr_rc setup_compass_sensor(){
 }
 
 wrtcr_rc handle_compass_sensor_message(cJSON *msg){
-  static pthread_t compass_thread_id;
   static bool thread_exists = false;
   static int interval_value;
   cJSON *mode = cJSON_GetObjectItem(msg, "mode");
@@ -377,5 +383,25 @@ void* compass_routine(void *interval){
     }
     nanosleep(&sleeptime, NULL);
   }
+  return NULL;
+}
+
+void* ping_routine(void *ping_ts ){
+  time_t *timestamp = (time_t *)ping_ts;
+  time_t now;
+
+  static struct timespec sleeptime;
+  sleeptime.tv_sec = 1;
+  sleeptime.tv_nsec = 0;
+
+  //if last ping timestamp is older than three seconds, quit
+  do{
+    nanosleep(&sleeptime, NULL);
+    time(&now);
+    
+  } while( difftime(now, *timestamp) < 5.0);
+
+  ZF_LOGF("Ping timeout. Ending!");
+  clean_exit();
   return NULL;
 }

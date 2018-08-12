@@ -18,3 +18,6 @@ wrtcr_rc get_meta_device_description(cJSON **meta_devices);
 
 wrtcr_rc handle_meta_device_message(char *port, cJSON *message);
 
+//ping remote peer routinely
+//needs to be here to avoid dependency hell
+void* ping_routine(void *ign);
