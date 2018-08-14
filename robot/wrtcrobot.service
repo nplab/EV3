@@ -1,0 +1,13 @@
+[Unit]
+Description=(Re-)starts the WebRTC Demonstrator Robot.
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/wrtcrobot -c /etc/wrtcrobot/wrtcr_conf.json
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

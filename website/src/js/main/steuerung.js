@@ -343,6 +343,11 @@ const sensor_dc = pc.createDataChannel('sensors', {
     id: 1,
 })
 
+const ping_dc = pc.createDataChannel('ping', {
+    negotiated: true,
+    id: 2,
+})
+
 // Messages api Data Channel
 api_dc.onmessage = (event) => {
     console.log(event.data);
@@ -361,4 +366,13 @@ sensor_dc.onmessage = (event) => {
     } catch (e) {
         console.error("Es wurde kein JSON Object geschickt!");
     };
+}
+
+ping_dc.onopen = (event) => {
+    console.log("ping open")
+    setInterval(function(){
+        if(ping_dc.readyState == "open"){
+            ping_dc.send("Ping");
+        }
+    }, 1000);
 }

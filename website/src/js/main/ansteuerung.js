@@ -599,9 +599,15 @@ const ping_dc = pc.createDataChannel('ping', {
     id: 2,
 })
 
-ping_dc.onmessage = (event) => {
-    console.log(event)
+ping_dc.onopen = (event) => {
+    console.log("ping open")
+    setInterval(function(){
+        if(ping_dc.readyState == "open"){
+            ping_dc.send("Ping");
+        }
+    }, 1000);
 }
+
 // Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
 var INTITIALPAGE = 0
 

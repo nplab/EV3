@@ -52,8 +52,20 @@ wrtcr_rc setup_robot(){
 }
 
 wrtcr_rc cleanup_robot(){
-  cleanup_meta_devices();
+  const char *key;
+  map_iter_t iterator = map_iter(&port_map);
+  uint8_t sn;
+
+  //iterate over known attachments
+  while( (key = map_next(&port_map, &iterator))){
+    if( *key >= 'A'){ //if this a motor, stop it
+      sn = *map_get(&port_map, key);
+      set_tacho_command_inx(sn, TACHO_STOP);     
+    }
+  }
+
   map_deinit(&tf_map);
+  return WRTCR_SUCCESS;
 }
 
 wrtcr_rc get_port_description(char **out_string){
@@ -195,8 +207,7 @@ wrtcr_rc tacho_set_stop_action_handler(uint8_t sn, cJSON *value){
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value){
-  (void*) value;
+wrtcr_rc tacho_get_state_handler(uint8_t sn, cJSON *value __attribute__ ((unused))){
   char state[20];
   char msg[50];
   char port[5];
