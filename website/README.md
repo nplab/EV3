@@ -13,9 +13,15 @@ This folder contains:
 
  - Starting up the [signaling server](https://github.com/nplab/WebRTC-Signaling-Server)
 
-### insert certificate
+### Insert certificate
+
+**Firefox**
 
 Browsersotionen -> Privacy & Security -> Certificates -> View Certificates -> Servers -> Add Exception -> insert localhost:3001, Get Certificate -> Confirm Security Exception
+
+**Chrome**
+
+Open 'chrome://flags/#allow-insecure-localhost' -> Enable ,,Allow invalid certificates for resources loaded from localhost.''
 
 ## Steps
 

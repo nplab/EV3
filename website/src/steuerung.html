@@ -8,7 +8,7 @@
     <meta name="Startseite" content="Startseite der Webanwednung um einen Lego Minestorm Roboter über
     ein Webinterface mit WebRTC zusteuern.">
     <!--<Verweise auf CSS und javascript>-->
-    <link rel="stylesheet" type="text/css" href="../css/main/main1.css"/>
+    <link rel="stylesheet" type="text/css" href="../css/main/main.css"/>
     <link rel="stylesheet" type="text/css" href="../css/main/materilize.css"/>
     <link rel="stylesheet" href="css/font-awesome/font-awesome.min.css"> <!--ICONS-->
 
@@ -32,8 +32,6 @@
         </div>
     </header>
 
-
-
     <div class="main" id="background">
 
         <div class="row">
@@ -42,10 +40,38 @@
                     <p>
                         <i class="fa fa-rocket" aria-hidden="true"></i>
                         Steuerung
+                        <button class="btn waves-effect waves-light" type="submit" name="action" id="test_button">test</button>
                     </p>
                 </div>
             </div>
         </div>
+
+        <div class="text_inhalt">
+            <div class="row">
+                <div class="col s3">
+                    <div class="port">
+                        <div class="row">
+                        </div>
+
+                        <div class="row">
+                            <button class="btn waves-effect waves-light" type="submit" name="action" id="start_button">Start</button>
+                            <button class="btn waves-effect waves-light" type="submit" name="action" id="stop_button">Stop</button>
+                        </div>
+                        <div class="row">
+                            <label>Sensorauswertung</label>
+                            <select id="sensorAuswertung" class="browser-default selectfield">
+                                <option value="0" selected>Sonar</option>
+                                <option value="1">Gyrosensor</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
 
         <div class="text_inhalt">
             <div class="row">
