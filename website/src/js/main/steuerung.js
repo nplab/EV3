@@ -302,13 +302,12 @@ function drawPoint(xy, color) {
 }
 
 function handleGyroSensor(message) {
+    xy_gyro = getXY(2550, toRadiant(message.value - 90))
     if (sensorAuswertung == 1) {
         drawImpedimentCanvas(70)        // radius is 70
-        xy_gyro = getXY(2550, toRadiant(message.value - 90))
         drawPoint(xy_gyro, '#000000')
     } else if (sensorAuswertung == 2) {
         drawImpedimentCanvas(70)        // radius is 70
-        xy_gyro = getXY(2550, toRadiant(message.value - 90))
         drawPoint(xy_gyro, '#000000')
         drawPoints(points)
     }
