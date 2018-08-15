@@ -130,7 +130,7 @@ function drawControlingCanvas(radius) {
     canvasSteuerungContext.stroke();
     canvasSteuerungContext.font = '18pt Calibri';
     canvasSteuerungContext.fillStyle = '#fbba00';
-    canvasSteuerungContext.fillText("R", centerX-10, centerY+10);
+    canvasSteuerungContext.fillText("R", centerX-9, centerY+10);
     canvasSteuerungContext.font = '5pt Calibri';
     canvasSteuerungContext.fillText("|", centerX-34, centerY);
     canvasSteuerungContext.fillText("|", centerX+34, centerY);
