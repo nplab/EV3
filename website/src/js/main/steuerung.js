@@ -250,7 +250,7 @@ function handleMessages(message) {
 
     switch (message.port) {
         case "a":
-        runIntoWall(message);
+        handleTast(message);
             break;
         case "b":
             handleSonar(message);
