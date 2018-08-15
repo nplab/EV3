@@ -136,7 +136,7 @@ function drawControlingCanvas(radius) {
     canvasSteuerungContext.fillText("|", centerX+34, centerY);
 }
 
-function drawImpedimentCanvas(radius, angle = null, distance = null) {
+function drawImpedimentCanvas(radius) {
     // Canvas für die Darstellung der Hinternisse
     canvasAbstandContext.beginPath();
     canvasAbstandContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
@@ -262,13 +262,12 @@ function runIntoWall(value) {
 }
 
 function handleSonar(message) {
+    savePoint(message.value)
     if (sensorAuswertung == 0) {
         drawImpedimentCanvas(70)        // radius is 70
-        savePoint(message.value)
         drawPoints(points)
     } else if (sensorAuswertung == 2) {
         drawImpedimentCanvas(70)        // radius is 70
-        savePoint(message.value)
         drawPoints(points)
         drawPoint(xy_gyro, '#000000')
     }
