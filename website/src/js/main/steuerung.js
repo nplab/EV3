@@ -11,7 +11,11 @@ var centerY = 73;
 var distance = null;
 var angle = null;
 var sensorAuswertung = 0;
-var gyroSensor = 0;
+var xy_gyro;
+// var for paint points
+var points = []
+var pointNr = 0
+
 
 var ALLOWSENDING = false;
 
@@ -24,10 +28,6 @@ function startupCanvas() {
   // Canvas für die Darstellung der Hinternisse
   drawImpedimentCanvas(radius);
 }
-
-// var for paint points
-var points = []
-var pointNr = 0
 
 /**********
 Event Listener
@@ -68,38 +68,22 @@ Functions
 
 function test () {
 
-    var message1 = {
-        port: 'c',
-        value: 180,
+    var message4 = {
+        port: 'a',
+        value: 0
     }
-    var message2 = {
-        port: 'c',
-        value: 90,
+    var message5 = {
+        port: 'b',
+        value: [Math.random() * -90, Math.random() * 2500]
     }
     var message3 = {
         port: 'c',
-        value: 140,
+        value: Math.random() * 360,
     }
 
-    handleGyroSensor(message1)
-    handleGyroSensor(message2)
-    handleGyroSensor(message3)
-
-    var message4 = {
-        port: 'c',
-        value: [90, 2550]
-    }
-    var message5 = {
-        port: 'c',
-        value: [90, 890]
-    }
-    var message6 = {
-        port: 'c',
-        value: [45, 766]
-    }
-    handleSonar(message4)
-    handleSonar(message5)
-    handleSonar(message6)
+    handleMessages(message3)
+    handleMessages(message5)
+    handleMessages(message4)
 }
 
 // handle button
@@ -146,7 +130,7 @@ function drawControlingCanvas(radius) {
     canvasSteuerungContext.stroke();
     canvasSteuerungContext.font = '18pt Calibri';
     canvasSteuerungContext.fillStyle = '#fbba00';
-    canvasSteuerungContext.fillText("R", centerX-10, centerY+10);
+    canvasSteuerungContext.fillText("R", centerX-9, centerY+10);
     canvasSteuerungContext.font = '5pt Calibri';
     canvasSteuerungContext.fillText("|", centerX-34, centerY);
     canvasSteuerungContext.fillText("|", centerX+34, centerY);
@@ -282,6 +266,11 @@ function handleSonar(message) {
         drawImpedimentCanvas(70)        // radius is 70
         savePoint(message.value)
         drawPoints(points)
+    } else if (sensorAuswertung == 2) {
+        drawImpedimentCanvas(70)        // radius is 70
+        savePoint(message.value)
+        drawPoints(points)
+        drawPoint(xy_gyro, '#000000')
     }
 }
 
@@ -304,23 +293,25 @@ function getXY(value, angle) {
 
 function drawPoints(xy) {
     for (var i = 0; i < xy.length; i++) {
-        drawPoint(xy[i]);
+        drawPoint(xy[i], '#fbba00');
     }
 }
 
-function drawPoint(xy) {
-    var context = canvasAbstand.getContext('2d');
-    context.fillStyle = '#fbba00';
-    context.fillRect(xy.x + 147,xy.y + 73,5,5);
+function drawPoint(xy, color) {
+    canvasAbstandContext.fillStyle = color;
+    canvasAbstandContext.fillRect(xy.x + 147,xy.y + 73,5,5);
 }
 
 function handleGyroSensor(message) {
     if (sensorAuswertung == 1) {
         drawImpedimentCanvas(70)        // radius is 70
-        var xy = getXY(2550, toRadiant(message.value - 90))
-        var context = canvasAbstand.getContext('2d');
-        context.fillStyle = '#000000';
-        context.fillRect(xy.x + 147,xy.y + 73,5,5);
+        xy_gyro = getXY(2550, toRadiant(message.value - 90))
+        drawPoint(xy_gyro, '#000000')
+    } else if (sensorAuswertung == 2) {
+        drawImpedimentCanvas(70)        // radius is 70
+        xy_gyro = getXY(2550, toRadiant(message.value - 90))
+        drawPoint(xy_gyro, '#000000')
+        drawPoints(points)
     }
 }
 
