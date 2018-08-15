@@ -12,6 +12,10 @@ var distance = null;
 var angle = null;
 var sensorAuswertung = 0;
 var xy_gyro;
+// var for paint points
+var points = []
+var pointNr = 0
+
 
 var ALLOWSENDING = false;
 
@@ -24,10 +28,6 @@ function startupCanvas() {
   // Canvas für die Darstellung der Hinternisse
   drawImpedimentCanvas(radius);
 }
-
-// var for paint points
-var points = []
-var pointNr = 0
 
 /**********
 Event Listener
@@ -298,9 +298,8 @@ function drawPoints(xy) {
 }
 
 function drawPoint(xy, color) {
-    var context = canvasAbstand.getContext('2d');
-    context.fillStyle = color;
-    context.fillRect(xy.x + 147,xy.y + 73,5,5);
+    canvasAbstandContext.fillStyle = color;
+    canvasAbstandContext.fillRect(xy.x + 147,xy.y + 73,5,5);
 }
 
 function handleGyroSensor(message) {
