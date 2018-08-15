@@ -75,7 +75,8 @@ var sensor2 = null;
 var sensor3 = null;
 var sensor4 = null;
 
-// Klick Events für die Button
+// Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
+var INTITIALPAGE = 0
 
 // Stop
 buttonST_PortA.onclick = function () {
@@ -352,6 +353,17 @@ function handleMotorModes(motor, buttonST, buttonGS, stopmode) {
     }
 }
 
+function handleModes(motor, modeMotor) {
+    for( var i = 0; i < motor.modes.length; i++) {
+        var option = document.createElement('option');
+        option.text = motor.modes[i]
+        option.value = i;
+        modeMotor.options[i+1] = option
+    }
+    modeMotor.disabled = 0
+}
+
+
 // Bei Nachrichteneingang wird die dem Port entsprechende Nachricht in einem Textfeld angegeben.
 function handleMessages(message) {
     var data = eval(message);
@@ -417,18 +429,7 @@ function sendingToRoboter(port, mode = null, direction = null) {
             'port': port,
         }
     }
-
     sendingData(message)
-}
-
-function handleModes(motor, modeMotor) {
-    for( var i = 0; i < motor.modes.length; i++) {
-        var option = document.createElement('option');
-        option.text = motor.modes[i]
-        option.value = i;
-        modeMotor.options[i+1] = option
-    }
-    modeMotor.disabled = 0
 }
 
 // Stellt eine Grundstatus der Button und Felder her
@@ -523,10 +524,13 @@ function disabledAllMotorButton(yesno) {
     buttonST_PortD.disabled = yesno
 }
 
-// ON Start
 
+// ON Start
 disabledAllMotorButton(1)
 
+/************
+WebRTC Connection
+*************/
 
 // Herstellen einer Peer Instanz
 const pc = new WebRTCPeerConnection();
@@ -555,9 +559,6 @@ ping_dc.onopen = (event) => {
         }
     }, 1000);
 }
-
-// Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
-var INTITIALPAGE = 0
 
 // Nachrichten Eingang des DataChannels
 api_dc.onmessage = (event) => {
