@@ -11,7 +11,7 @@ var centerY = 73;
 var distance = null;
 var angle = null;
 var sensorAuswertung = 0;
-var gyroSensor = 0;
+var xy_gyro;
 
 var ALLOWSENDING = false;
 
@@ -302,8 +302,6 @@ function drawPoint(xy, color) {
     context.fillStyle = color;
     context.fillRect(xy.x + 147,xy.y + 73,5,5);
 }
-
-var xy_gyro;
 
 function handleGyroSensor(message) {
     if (sensorAuswertung == 1) {
