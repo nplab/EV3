@@ -9,6 +9,11 @@ This folder contains:
 
 ## Configuration
 
+### Configure url and port of signaling server
+
+- define in file `wrtcr_conf.js` a varibale 'wrtcr_conf'.
+- Copy the contents of the configuration file `wrtcr_conf.json` and add it to the variable.
+
 ### Start signaling server
 
  - Starting up the [signaling server](https://github.com/nplab/WebRTC-Signaling-Server)
@@ -29,4 +34,6 @@ Open 'chrome://flags/#allow-insecure-localhost' -> Enable ,,Allow invalid certif
  - Run `python3 -m http.server 8001`
  - Open page: localhost:8001
  - Click on Button "Connection"
+
+
 
