@@ -16,9 +16,12 @@ var xy_gyro;
 var points = []
 var pointNr = 0
 
-
 var ALLOWSENDING = false;
 var INTITIALPAGE = 0;
+
+var button_start = document.getElementById("start_button");
+var button_stop = document.getElementById("stop_button");
+var select_sensorAuswertung = document.getElementById("sensorAuswertung");
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -50,7 +53,7 @@ $(document).keyup(function(e) {
     }
 });
 
-document.getElementById("sensorAuswertung").onchange = function() {
+select_sensorAuswertung.onchange = function() {
     sensorAuswertung =  this.value;
 }
 
@@ -58,10 +61,7 @@ document.getElementById("sensorAuswertung").onchange = function() {
 /************
 Button
 ************/
-var button_start = document.getElementById("start_button")
-var button_stop = document.getElementById("stop_button")
 
-// handle button
 button_start.onclick = function () {
     // activ Canvas Event Listener
     ALLOWSENDING = true;
@@ -292,6 +292,8 @@ function handleGyroSensor(message) {
 function handlButton() {
     button_start.disabled = 0;
     button_stop.disabled = 0;
+    select_sensorAuswertung.disabled = 0;
+    
 }
 
 /************
