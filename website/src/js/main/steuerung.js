@@ -113,6 +113,7 @@ function drawControlingCanvas(radius) {
 function drawImpedimentCanvas(radius) {
     // Canvas für die Darstellung der Hinternisse
     canvasAbstandContext.beginPath();
+    canvasAbstandContext.clearRect(0, 0, canvasAbstand.width, canvasAbstand.height);
     canvasAbstandContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
     canvasAbstandContext.fillStyle = '#f3f3f4';
     canvasAbstandContext.fill();
@@ -257,7 +258,7 @@ function toRadiant (angle) {
 }
 
 function getXY(value, angle) {
-    var pointAb = value * 70/2750;
+    var pointAb = value * 70/2550;
     var y = Math.sin(angle) * pointAb;
     var x = Math.cos(angle) * pointAb;
 
@@ -272,7 +273,7 @@ function drawPoints(xy) {
 
 function drawPoint(xy, color) {
     canvasAbstandContext.fillStyle = color;
-    canvasAbstandContext.fillRect(xy.x + 147,xy.y + 73,5,5);
+    canvasAbstandContext.fillRect(xy.x + 148,xy.y + 71.5,5,5);
 }
 
 function handleGyroSensor(message) {
