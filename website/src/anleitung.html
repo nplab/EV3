@@ -56,7 +56,7 @@
         </div>
         <div class="text_inhalt">
             <div class="row">
-                <p>So verbindet man den Roboter mit einem Signaling Server.</p>
+                <p>Die Verbindung zum Signaling Server wird beim Seitenaufruf hergestellt. Anschließend wartet die Webseite auf die Initialisierungsnachricht des Roboters.</p>
             </div>
         </div>
 
@@ -90,7 +90,6 @@
                     <p>Nachdem die Verdinung aufgebaut ist und die entsprechenden Steuereinheiten initialisiert wurden, kann mit dem Roboter kommuniziert werden. Dafür muss zunächst ein passender Modus gewählt werden. Im Fall des großen Motors ist es zum Beispiel "run-forever". Das bedeutet, dass der Motor solange läuft, bis er entweder ein "Stop" Kommando erhält, oder der Modus gewechselt wird. Zunätzlich zum Modus muss ein Wert angegeben werden, der für die Geschwindigkeit des Motors zuständig ist. In skizzierten Fall verwenden wir "100", damit der Motor mit voller Leistung fährt. </p>
                     <p>Anschließend kann der Motor mit den beiden Button "Forward" bzw. "Backward" Vorwärts bzw. Rückwärts gefahren werden. Der Button "Stop" sorgt dafür, dass der Motor aufhört zu laufen. </p>
                     <p>Die Steuerung der Sensoren läuft ein wenig anders. Nach der Initialisierungsnachricht können für jeden Sensor unterschiedliche Modi ausgesucht werden. Ein wichtiger und entscheidener Unterscheid ist, dass zuerst ein bestimmter Modus gesetzt werden muss, bevor Daten ausgelesen werden können. Allerdings sorgt die Oberfläche für diesen Schritt, weil sie den Button "Get Data" erst aktiviert, wenn ein Modus an den Roboter übermittelt wurde. </p>
-                    <p>Auf dem Tab <a href="steuerung.html"> Steuerung</a> kann der Lego Minestorm Roboter mit Hilfe eines Kreises gesteuert werden.</p>
                 </div>
             </div>
         </div>
@@ -104,6 +103,13 @@
         <div class="text_inhalt">
             <div class="row">
                 <p>Auf dem Tab <a href="steuerung.html"> Steuerung</a> kann der Lego Minestorm Roboter mit Hilfe eines Kreises gesteuert werden.</p>
+                <p>Wie auf dem anderen Tab, wartet die Oberfläche auf die erste Nachricht, erst anschließend können die beiden Button "Start" und "Stop" gedrückt werden. Sobald "Start gedrückt wird, kann die Maus über den linken Kreis bewegt werden und der Roboter beginnt sich in die entsprechenede Richtung zu bewegen. Je weiter die Maus vom Mittelpunkt entfernt ist, umso schneller fährt der Roboter. Bewegt man die Maus nach Rechts bzw. Links fährt der Roboter entsprechend nach Links bzw. Rechts. Soll der Roboter anhalten, kann der Button "Stop" bzw. die "Escapetaste" gedrückt werden.</p>
+                <p>Auf dem rechten Kreis können zwei unterschiedliche Sensoren ausgewertet werden.</p>
+                <ol>
+                    <li>Der Sonarsensor: Bei dieser Option werden Winkel und Abstand zu den Umliegenden Objekten angezeigt. Es kann also die Gegend rund um den Roboter analysiert werden.</li>
+                    <li>Der Gyrosensor: Bei dieser Option wird der Winkel des Gyrosensors angezeigt. Es kann also die Drehrichtung, basierend auf der ersten Initialisierung, angezeigt werden.</li>
+                </ol>
+                <p>Diese beiden Optionen können mit Hilfe des Drop-Downs ausgewählt werden. Zusätzlich gibt es die Option "Beide", bei der beide Sensoren angezeigt werden.</p>
             </div>
         </div>
         <div class="footer">
