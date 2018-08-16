@@ -18,6 +18,7 @@ var pointNr = 0
 
 
 var ALLOWSENDING = false;
+var INTITIALPAGE = 0;
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -217,9 +218,6 @@ function handleMessages(message) {
         case "c":
             handleGyroSensor(message);
             break;
-        case "1":
-            handlebutton();
-            break;
         default:
             console.log("Nichts passendes gefunden!")
     }
@@ -292,7 +290,8 @@ function handleGyroSensor(message) {
 }
 
 function handlButton() {
-    start_button.disabled = 0;
+    button_start.disabled = 0;
+    button_stop.disabled = 0;
 }
 
 /************
@@ -322,11 +321,16 @@ const ping_dc = pc.createDataChannel('ping', {
 api_dc.onmessage = (event) => {
     console.log(event.data);
 
-    try {
-        handleMessages(JSON.parse(event.data));
-    } catch (e) {
-        console.error("Es wurde kein JSON Object geschickt!");
-    };
+    if (INTITIALPAGE == 0) {
+        getDatafromRoboter(JSON.parse(event.data));
+        INTITIALPAGE = 1
+    } else {
+        try {
+            handleMessages(JSON.parse(event.data));
+        } catch (e) {
+            console.error("Es wurde kein JSON Object geschickt!");
+        };
+    }
 };
 
 // Messages sensor Data Channel
