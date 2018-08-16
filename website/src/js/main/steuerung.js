@@ -57,11 +57,11 @@ document.getElementById("sensorAuswertung").onchange = function() {
 /************
 Button
 ************/
-document.getElementById('test_button').onclick = test
-document.getElementById('start_button').onclick = start
+var button_start = document.getElementById("start_button")
+var button_stop = document.getElementById("stop_button")
 
 // handle button
-function start () {
+button_start.onclick = function () {
     // activ Canvas Event Listener
     ALLOWSENDING = true;
 
@@ -72,7 +72,7 @@ function start () {
 
 }
 
-function stop () {
+button_stop.onclick = function () {
     // inactiv Canvas Event Listener
     ALLOWSENDING = false
 
@@ -217,6 +217,9 @@ function handleMessages(message) {
         case "c":
             handleGyroSensor(message);
             break;
+        case "1":
+            handlebutton();
+            break;
         default:
             console.log("Nichts passendes gefunden!")
     }
@@ -288,6 +291,9 @@ function handleGyroSensor(message) {
     }
 }
 
+function handlButton() {
+    start_button.disabled = 0;
+}
 
 /************
 WebRTC Connection
