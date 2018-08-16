@@ -140,16 +140,16 @@ buttonSM_Port4.onclick = function() {
 }
 
 // Get Data
-buttonGD_Port1.onmousemove = function() {
+buttonGD_Port1.onclick = function() {
     sensor1.getData();
 }
-buttonGD_Port2.onmousemove = function() {
+buttonGD_Port2.onclick = function() {
     sensor2.getData();
 }
-buttonGD_Port3.onmousemove = function() {
+buttonGD_Port3.onclick = function() {
     sensor3.getData();
 }
-buttonGD_Port4.onmousemove = function() {
+buttonGD_Port4.onclick = function() {
     sensor4.getData();
 }
 
