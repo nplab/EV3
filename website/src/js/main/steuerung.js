@@ -59,32 +59,6 @@ Button
 ************/
 document.getElementById('test_button').onclick = test
 document.getElementById('start_button').onclick = start
-document.getElementById('stop_button').onclick = stop
-
-
-/************
-Functions
-************/
-
-function test () {
-
-    var message4 = {
-        port: 'a',
-        value: 0
-    }
-    var message5 = {
-        port: 'b',
-        value: [Math.random() * -90, Math.random() * 2500]
-    }
-    var message3 = {
-        port: 'c',
-        value: Math.random() * 360,
-    }
-
-    handleMessages(message3)
-    handleMessages(message5)
-    handleMessages(message4)
-}
 
 // handle button
 function start () {
