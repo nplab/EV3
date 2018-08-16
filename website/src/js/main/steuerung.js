@@ -89,6 +89,11 @@ button_stop.onclick = function () {
 
 }
 
+/************
+Function
+************/
+
+// controll roboter
 function drawControlingCanvas(radius) {
     // Canvas für die Steuerung
     canvasSteuerungContext.beginPath();
@@ -111,6 +116,7 @@ function drawControlingCanvas(radius) {
     canvasSteuerungContext.fillText("|", centerX+34, centerY);
 }
 
+// show sensor data
 function drawImpedimentCanvas(radius) {
     // Canvas für die Darstellung der Hinternisse
     canvasAbstandContext.beginPath();
@@ -126,9 +132,6 @@ function drawImpedimentCanvas(radius) {
     canvasAbstandContext.moveTo(150, 2 );
     canvasAbstandContext.lineTo(150, 145);
     canvasAbstandContext.stroke();
-
-
-
 }
 
 function getMousePos(canvas, evt) {
@@ -144,6 +147,7 @@ function getMousePos(canvas, evt) {
   };
 }
 
+// calculate distance and angle
 function getDistanceAngle(mouseX, mouseY) {
   var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)
   var angle = 0;
@@ -165,6 +169,10 @@ function getDistanceAngle(mouseX, mouseY) {
 }
 
 // send value of motors to roboter
+/*
+Two speeds are calculated from the distance and the angle. Depending on the direction, one motor must rotate slower than the other. This is done by a quotient.
+*/
+
 function sendMotorManagement(angleDistance) {
     var value_b;
     var value_c;
@@ -174,10 +182,10 @@ function sendMotorManagement(angleDistance) {
         value_b = - 0.50;
         value_c = - 0.50;
     } else {
-        value_b = calculateShare(angleDistance.angle, true);          // Werte zwischen 0 - 1
-        value_c = calculateShare(angleDistance.angle);         // Werte zwischen 0 - 1
+        value_b = calculateShare(angleDistance.angle, true);    // Werte zwischen 0 - 1
+        value_c = calculateShare(angleDistance.angle);          // Werte zwischen 0 - 1
     }
-    value_ges = angleDistance.distance/150 * 100;          // Werte zwischen 0 - 100;
+    value_ges = angleDistance.distance/150 * 100;               // Werte zwischen 0 - 100;
 
     var message_b = {
         port: 'B',
@@ -194,7 +202,7 @@ function sendMotorManagement(angleDistance) {
     sendingData(message_c)
 }
 
-//
+// calculate quotient
 function calculateShare(number, left = false) {
     var value = 0;
     if(left == true) {
@@ -205,6 +213,7 @@ function calculateShare(number, left = false) {
     return value/100;
 }
 
+// All incomming messages are sorted and the correspondig function were called
 function handleMessages(message) {
     console.log(message);
 
@@ -242,7 +251,7 @@ function handleSonar(message) {
     if (sensorAuswertung == 0) {
         drawImpedimentCanvas(70)        // radius is 70
         drawPoints(points)
-    } else if (sensorAuswertung == 2) {
+    } else if (sensorAuswertung == 2) { // option = 'Beide'
         drawImpedimentCanvas(70)        // radius is 70
         drawPoints(points)
         drawPoint(xy_gyro, '#000000')
@@ -282,18 +291,19 @@ function handleGyroSensor(message) {
     if (sensorAuswertung == 1) {
         drawImpedimentCanvas(70)        // radius is 70
         drawPoint(xy_gyro, '#000000')
-    } else if (sensorAuswertung == 2) {
+    } else if (sensorAuswertung == 2) { // option = 'Beide'
         drawImpedimentCanvas(70)        // radius is 70
         drawPoint(xy_gyro, '#000000')
         drawPoints(points)
     }
 }
 
+// objects are inactiv at start: first message -> activ 
 function handlButton() {
     button_start.disabled = 0;
     button_stop.disabled = 0;
     select_sensorAuswertung.disabled = 0;
-    
+
 }
 
 /************
