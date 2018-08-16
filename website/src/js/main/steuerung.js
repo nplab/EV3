@@ -16,8 +16,12 @@ var xy_gyro;
 var points = []
 var pointNr = 0
 
-
 var ALLOWSENDING = false;
+var INTITIALPAGE = 0;
+
+var button_start = document.getElementById("start_button");
+var button_stop = document.getElementById("stop_button");
+var select_sensorAuswertung = document.getElementById("sensorAuswertung");
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -49,7 +53,7 @@ $(document).keyup(function(e) {
     }
 });
 
-document.getElementById("sensorAuswertung").onchange = function() {
+select_sensorAuswertung.onchange = function() {
     sensorAuswertung =  this.value;
 }
 
@@ -57,37 +61,8 @@ document.getElementById("sensorAuswertung").onchange = function() {
 /************
 Button
 ************/
-document.getElementById('test_button').onclick = test
-document.getElementById('start_button').onclick = start
-document.getElementById('stop_button').onclick = stop
 
-
-/************
-Functions
-************/
-
-function test () {
-
-    var message4 = {
-        port: 'a',
-        value: 0
-    }
-    var message5 = {
-        port: 'b',
-        value: [Math.random() * -90, Math.random() * 2500]
-    }
-    var message3 = {
-        port: 'c',
-        value: Math.random() * 360,
-    }
-
-    handleMessages(message3)
-    handleMessages(message5)
-    handleMessages(message4)
-}
-
-// handle button
-function start () {
+button_start.onclick = function () {
     // activ Canvas Event Listener
     ALLOWSENDING = true;
 
@@ -98,7 +73,7 @@ function start () {
 
 }
 
-function stop () {
+button_stop.onclick = function () {
     // inactiv Canvas Event Listener
     ALLOWSENDING = false
 
@@ -114,6 +89,11 @@ function stop () {
 
 }
 
+/************
+Function
+************/
+
+// controll roboter
 function drawControlingCanvas(radius) {
     // Canvas für die Steuerung
     canvasSteuerungContext.beginPath();
@@ -136,9 +116,11 @@ function drawControlingCanvas(radius) {
     canvasSteuerungContext.fillText("|", centerX+34, centerY);
 }
 
-function drawImpedimentCanvas(radius, angle = null, distance = null) {
+// show sensor data
+function drawImpedimentCanvas(radius) {
     // Canvas für die Darstellung der Hinternisse
     canvasAbstandContext.beginPath();
+    canvasAbstandContext.clearRect(0, 0, canvasAbstand.width, canvasAbstand.height);
     canvasAbstandContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
     canvasAbstandContext.fillStyle = '#f3f3f4';
     canvasAbstandContext.fill();
@@ -150,9 +132,6 @@ function drawImpedimentCanvas(radius, angle = null, distance = null) {
     canvasAbstandContext.moveTo(150, 2 );
     canvasAbstandContext.lineTo(150, 145);
     canvasAbstandContext.stroke();
-
-
-
 }
 
 function getMousePos(canvas, evt) {
@@ -168,6 +147,7 @@ function getMousePos(canvas, evt) {
   };
 }
 
+// calculate distance and angle
 function getDistanceAngle(mouseX, mouseY) {
   var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)
   var angle = 0;
@@ -189,6 +169,10 @@ function getDistanceAngle(mouseX, mouseY) {
 }
 
 // send value of motors to roboter
+/*
+Two speeds are calculated from the distance and the angle. Depending on the direction, one motor must rotate slower than the other. This is done by a quotient.
+*/
+
 function sendMotorManagement(angleDistance) {
     var value_b;
     var value_c;
@@ -198,10 +182,10 @@ function sendMotorManagement(angleDistance) {
         value_b = - 0.50;
         value_c = - 0.50;
     } else {
-        value_b = calculateShare(angleDistance.angle, true);          // Werte zwischen 0 - 1
-        value_c = calculateShare(angleDistance.angle);         // Werte zwischen 0 - 1
+        value_b = calculateShare(angleDistance.angle, true);    // Werte zwischen 0 - 1
+        value_c = calculateShare(angleDistance.angle);          // Werte zwischen 0 - 1
     }
-    value_ges = angleDistance.distance/150 * 100;          // Werte zwischen 0 - 100;
+    value_ges = angleDistance.distance/150 * 100;               // Werte zwischen 0 - 100;
 
     var message_b = {
         port: 'B',
@@ -218,7 +202,7 @@ function sendMotorManagement(angleDistance) {
     sendingData(message_c)
 }
 
-//
+// calculate quotient
 function calculateShare(number, left = false) {
     var value = 0;
     if(left == true) {
@@ -229,6 +213,7 @@ function calculateShare(number, left = false) {
     return value/100;
 }
 
+// All incomming messages are sorted and the correspondig function were called
 function handleMessages(message) {
     console.log(message);
 
@@ -262,13 +247,12 @@ function runIntoWall(value) {
 }
 
 function handleSonar(message) {
+    savePoint(message.value)
     if (sensorAuswertung == 0) {
         drawImpedimentCanvas(70)        // radius is 70
-        savePoint(message.value)
         drawPoints(points)
-    } else if (sensorAuswertung == 2) {
+    } else if (sensorAuswertung == 2) { // option = 'Beide'
         drawImpedimentCanvas(70)        // radius is 70
-        savePoint(message.value)
         drawPoints(points)
         drawPoint(xy_gyro, '#000000')
     }
@@ -284,7 +268,7 @@ function toRadiant (angle) {
 }
 
 function getXY(value, angle) {
-    var pointAb = value * 70/2750;
+    var pointAb = value * 70/2550;
     var y = Math.sin(angle) * pointAb;
     var x = Math.cos(angle) * pointAb;
 
@@ -299,22 +283,28 @@ function drawPoints(xy) {
 
 function drawPoint(xy, color) {
     canvasAbstandContext.fillStyle = color;
-    canvasAbstandContext.fillRect(xy.x + 147,xy.y + 73,5,5);
+    canvasAbstandContext.fillRect(xy.x + 148,xy.y + 71.5,5,5);
 }
 
 function handleGyroSensor(message) {
+    xy_gyro = getXY(2550, toRadiant(message.value - 90))
     if (sensorAuswertung == 1) {
         drawImpedimentCanvas(70)        // radius is 70
-        xy_gyro = getXY(2550, toRadiant(message.value - 90))
         drawPoint(xy_gyro, '#000000')
-    } else if (sensorAuswertung == 2) {
+    } else if (sensorAuswertung == 2) { // option = 'Beide'
         drawImpedimentCanvas(70)        // radius is 70
-        xy_gyro = getXY(2550, toRadiant(message.value - 90))
         drawPoint(xy_gyro, '#000000')
         drawPoints(points)
     }
 }
 
+// objects are inactiv at start: first message -> activ 
+function handlButton() {
+    button_start.disabled = 0;
+    button_stop.disabled = 0;
+    select_sensorAuswertung.disabled = 0;
+
+}
 
 /************
 WebRTC Connection
@@ -343,11 +333,16 @@ const ping_dc = pc.createDataChannel('ping', {
 api_dc.onmessage = (event) => {
     console.log(event.data);
 
-    try {
-        handleMessages(JSON.parse(event.data));
-    } catch (e) {
-        console.error("Es wurde kein JSON Object geschickt!");
-    };
+    if (INTITIALPAGE == 0) {
+        getDatafromRoboter(JSON.parse(event.data));
+        INTITIALPAGE = 1
+    } else {
+        try {
+            handleMessages(JSON.parse(event.data));
+        } catch (e) {
+            console.error("Es wurde kein JSON Object geschickt!");
+        };
+    }
 };
 
 // Messages sensor Data Channel
