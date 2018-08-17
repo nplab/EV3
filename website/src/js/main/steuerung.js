@@ -54,7 +54,25 @@ $(document).keyup(function(e) {
 });
 
 select_sensorAuswertung.onchange = function() {
-    sensorAuswertung =  this.value;
+    sensorAuswertung =  this.value; // Select for canvas
+
+    switch (sensorAuswertung) {
+        case "0":
+            sendingData({"port": "b", "mode": "start"});
+            sendingData({"port": "c", "mode": "stop"}); // value gibt die Frequenz an
+            break;
+        case "1":
+            sendingData({"port": "b", "mode": "stop"});
+            sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
+            break;
+        case "2":
+            sendingData({"port": "b", "mode": "start"});
+            sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
+            break;
+        default:
+            console.log("Konnte nichts Starten");
+    }
+
 }
 
 
@@ -66,10 +84,14 @@ button_start.onclick = function () {
     // activ Canvas Event Listener
     ALLOWSENDING = true;
 
+    // erst nach dem Klick auf den Button kann der Drop Down geändert werden.
+    select_sensorAuswertung.disabled = 0;
+
     // activ all sensor
     sendingData({"port": "a", "mode": "start"});
     sendingData({"port": "b", "mode": "start"});
-    sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
+    sendingData({"port": "c", "mode": "stop"}); // value gibt die Frequenz an
+
 
 }
 
@@ -298,12 +320,10 @@ function handleGyroSensor(message) {
     }
 }
 
-// objects are inactiv at start: first message -> activ 
-function handlButton() {
+// objects are inactiv at start: first message -> activ
+function handleButton() {
     button_start.disabled = 0;
     button_stop.disabled = 0;
-    select_sensorAuswertung.disabled = 0;
-
 }
 
 /************
@@ -334,7 +354,7 @@ api_dc.onmessage = (event) => {
     console.log(event.data);
 
     if (INTITIALPAGE == 0) {
-        getDatafromRoboter(JSON.parse(event.data));
+        handleButton();
         INTITIALPAGE = 1
     } else {
         try {
