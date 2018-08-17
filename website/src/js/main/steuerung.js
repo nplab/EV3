@@ -298,12 +298,11 @@ function handleGyroSensor(message) {
     }
 }
 
-// objects are inactiv at start: first message -> activ 
-function handlButton() {
+// objects are inactiv at start: first message -> activ
+function handleButton() {
     button_start.disabled = 0;
     button_stop.disabled = 0;
     select_sensorAuswertung.disabled = 0;
-
 }
 
 /************
@@ -334,7 +333,7 @@ api_dc.onmessage = (event) => {
     console.log(event.data);
 
     if (INTITIALPAGE == 0) {
-        getDatafromRoboter(JSON.parse(event.data));
+        handleButton();
         INTITIALPAGE = 1
     } else {
         try {
