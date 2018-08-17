@@ -1,8 +1,0 @@
-{
-    "sig_serv": {
-        "host": "localhost",
-        "port": 5001,
-        "room": 10,
-        "portWebsite": 3001
-    }
-}

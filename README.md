@@ -118,4 +118,19 @@ A third data channel called `ping` is used to monitor the connection. The websit
 
 [^1]: `hold` = motor attempts to hold position; `coast` = motor is free to be turned
 [^2]: `running` = motor is running; `ramping` = motor is accelerating or decelerating; `holding` = motor is trying to hold position; `overloaded` = motor can not reach specified speed due to lack of power; `stalled` = motor has stalled because of insufficient torque
+
+## Configuration File
+
+The configuration file `wrtcr_conf.json` contains the following options:
+
+| name                  | type             | meaning                                                                                                      |
+|-----------------------|------------------|--------------------------------------------------------------------------------------------------------------|
+| sig_serv              | object           | Object describing how to connect to the signaling server.                                                    |
+| sig_serv.host         | strings          | IPv4/IPv6-address or hostname of the signaling server.                                                       |
+| sig_serv.port         | integer          | Port to send signaling messages to.                                                                          |
+| sig_serv.room         | integer          | Room in which the communication will occur.                                                                  |
+| sig_serv.port_website | integer          | Port under which the signaling server will serve it's website.                                               |
+| stun_servs            | Array of Strings | STUN servers to use for generating ICE candidates. Will be passed to WebRTC. Format `stun:<hostname>:<port>`. |
+| turn_servs            | Array of Strings | TURN servers to use for generating ICE candidates. Will be passed to WebRTC. Format `turn:<hostname>:<port>`. |
+
 [^3]: `0` = none; `1` = black; `2` = blue, `3` = green, `4` = yellow, `5` = red, `6` = white, `7` = brown

@@ -1,20 +1,13 @@
-// Lade Konfiguration
-config = getConfig();
-
 // Verbindung zum Signaling Server
-try{
-    var socket = io.connect('https://localhost:3001');
-}
-catch(e){
-    console.log(e);
-}
+var host = "https://" + wrtcr_conf.sig_serv.host + ":" + wrtcr_conf.sig_serv.port_website;
+var socket = io.connect(host);
 
 // erhalte und gebe die "info Message" aus
 socket.on('info', function (data) {
     console.info(data);
 
     // Betrete den Raum
-    socket.emit('roomJoin', config.sig_serv.room);
+    socket.emit('roomJoin', wrtcr_conf.sig_serv.room);
 })
 
 // Erhalte alle Nachrichten, die im Raum gesendet werden

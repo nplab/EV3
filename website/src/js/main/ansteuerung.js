@@ -1,56 +1,3 @@
-// Testcase
-
-// Test Anwednung - Erste Nachricht
-document.getElementById("onstart").onclick = testMetaDevices
-
-
-function testMetaDevices() {
-    // sendingToRoboter("a", "start");
-    // setTimeout(function(){
-    //     sendingToRoboter("a", "stop");
-    // }, 10000);
-    // sendingToRoboter("b", "start");
-    // setTimeout(function(){
-    //     sendingToRoboter("b", "stop");
-    // }, 10000);
-    // sendingData({"port": "c", "mode": "start", "value": 100});
-    // setTimeout(function(){
-    //     sendingToRoboter("c", "stop");
-    // }, 10000);
-    pc.close()
-}
-
-
-
-// Test DataChannel
-
-document.getElementById("SetModeTest").onclick = SetModeTest
-document.getElementById("StartTest").onclick = StartTest
-document.getElementById("StopTest").onclick = StopTest
-
-var TestPortA = new Motor('A', 'tacho-motor-l', null, true)
-var TestPortB = new Motor('B', 'tacho-motor-l', null, true)
-
-function SetModeTest() {
-    // TestPortB.setPosition(10)
-    // sendingToRoboter('A', 'run-forever', 80)
-
-    handleMessages({port: "A", values: 'dasdasd'})
-    handleMessages({port: "B", values: 'dasdasd43214'})
-    handleMessages({port: "D", values: 'da31232sdasd'})
-    handleMessages({port: "C", values: '123dasdasd'})
-}
-
-function StartTest() {
-    TestPortA.getState()
-    TestPortB.getState()
-}
-
-function StopTest() {
-    TestPortA.setStopAction('hold')
-    TestPortB.setStopAction('coast')
-}
-
 // Variablen für die Oberflächenaktionen
 var buttonVW_PortA = document.getElementById("button_portA_vw")
 var buttonRW_PortA = document.getElementById("button_portA_rw")
@@ -128,7 +75,8 @@ var sensor2 = null;
 var sensor3 = null;
 var sensor4 = null;
 
-// Klick Events für die Button
+// Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
+var INTITIALPAGE = 0
 
 // Stop
 buttonST_PortA.onclick = function () {
@@ -192,16 +140,16 @@ buttonSM_Port4.onclick = function() {
 }
 
 // Get Data
-buttonGD_Port1.onmousemove = function() {
+buttonGD_Port1.onclick = function() {
     sensor1.getData();
 }
-buttonGD_Port2.onmousemove = function() {
+buttonGD_Port2.onclick = function() {
     sensor2.getData();
 }
-buttonGD_Port3.onmousemove = function() {
+buttonGD_Port3.onclick = function() {
     sensor3.getData();
 }
-buttonGD_Port4.onmousemove = function() {
+buttonGD_Port4.onclick = function() {
     sensor4.getData();
 }
 
@@ -405,6 +353,17 @@ function handleMotorModes(motor, buttonST, buttonGS, stopmode) {
     }
 }
 
+function handleModes(motor, modeMotor) {
+    for( var i = 0; i < motor.modes.length; i++) {
+        var option = document.createElement('option');
+        option.text = motor.modes[i]
+        option.value = i;
+        modeMotor.options[i+1] = option
+    }
+    modeMotor.disabled = 0
+}
+
+
 // Bei Nachrichteneingang wird die dem Port entsprechende Nachricht in einem Textfeld angegeben.
 function handleMessages(message) {
     var data = eval(message);
@@ -470,18 +429,7 @@ function sendingToRoboter(port, mode = null, direction = null) {
             'port': port,
         }
     }
-
     sendingData(message)
-}
-
-function handleModes(motor, modeMotor) {
-    for( var i = 0; i < motor.modes.length; i++) {
-        var option = document.createElement('option');
-        option.text = motor.modes[i]
-        option.value = i;
-        modeMotor.options[i+1] = option
-    }
-    modeMotor.disabled = 0
 }
 
 // Stellt eine Grundstatus der Button und Felder her
@@ -576,10 +524,13 @@ function disabledAllMotorButton(yesno) {
     buttonST_PortD.disabled = yesno
 }
 
-// ON Start
 
+// ON Start
 disabledAllMotorButton(1)
 
+/************
+WebRTC Connection
+*************/
 
 // Herstellen einer Peer Instanz
 const pc = new WebRTCPeerConnection();
@@ -600,7 +551,6 @@ const ping_dc = pc.createDataChannel('ping', {
     id: 2,
 })
 
-
 ping_dc.onopen = (event) => {
     console.log("ping open")
     setInterval(function(){
@@ -609,9 +559,6 @@ ping_dc.onopen = (event) => {
         }
     }, 1000);
 }
-
-// Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
-var INTITIALPAGE = 0
 
 // Nachrichten Eingang des DataChannels
 api_dc.onmessage = (event) => {

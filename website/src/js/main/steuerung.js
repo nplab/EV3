@@ -10,7 +10,18 @@ var centerX = 150;
 var centerY = 73;
 var distance = null;
 var angle = null;
-var allowSending = false
+var sensorAuswertung = 0;
+var xy_gyro;
+// var for paint points
+var points = []
+var pointNr = 0
+
+var ALLOWSENDING = false;
+var INTITIALPAGE = 0;
+
+var button_start = document.getElementById("start_button");
+var button_stop = document.getElementById("stop_button");
+var select_sensorAuswertung = document.getElementById("sensorAuswertung");
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -29,16 +40,8 @@ Event Listener
 // Canvas
 window.addEventListener('load', startupCanvas, false);
 canvasSteuerung.addEventListener('mousemove', function(evt) {
-    if(allowSending == true) {
+    if(ALLOWSENDING == true) {
         var mousePos = getMousePos(canvasSteuerung, evt);
-        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
-        sendMotorManagement(angleDistance)
-    }
-}, false);
-
-canvasAbstand.addEventListener('mousemove', function(evt) {
-    var mousePos = getMousePos(canvasAbstand, evt);
-    if(allowSending == true) {
         angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
         sendMotorManagement(angleDistance)
     }
@@ -50,54 +53,69 @@ $(document).keyup(function(e) {
     }
 });
 
-// Button
-document.getElementById('start_button').onclick = start
-document.getElementById('stop_button').onclick = stop
+select_sensorAuswertung.onchange = function() {
+    sensorAuswertung =  this.value; // Select for canvas
 
-// Testcase
+    switch (sensorAuswertung) {
+        case "0":
+            sendingData({"port": "b", "mode": "start"});
+            sendingData({"port": "c", "mode": "stop"}); // value gibt die Frequenz an
+            break;
+        case "1":
+            sendingData({"port": "b", "mode": "stop"});
+            sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
+            break;
+        case "2":
+            sendingData({"port": "b", "mode": "start"});
+            sendingData({"port": "c", "mode": "start", "value": 5000}); // value gibt die Frequenz an
+            break;
+        default:
+            console.log("Konnte nichts Starten");
+    }
 
-
-// function testMetaDevices() {
-//     // sendingToRoboter("a", "start");
-//     // setTimeout(function(){
-//     //     sendingToRoboter("a", "stop");
-//     // }, 10000);
-//     // sendingToRoboter("b", "start");
-//     // setTimeout(function(){
-//     //     sendingToRoboter("b", "stop");
-//     // }, 10000);
-//     sendingData({"port": "c", "mode": "start", "value": 100});
-//     setTimeout(function(){
-//         sendingToRoboter("c", "stop");
-//     }, 10000);
-// }
-
+}
 
 
 /************
-Functions
+Button
 ************/
 
-function start () {
+button_start.onclick = function () {
     // activ Canvas Event Listener
-    allowSending = true;
+    ALLOWSENDING = true;
+
+    // erst nach dem Klick auf den Button kann der Drop Down geändert werden.
+    select_sensorAuswertung.disabled = 0;
 
     // activ all sensor
     sendingData({"port": "a", "mode": "start"});
     sendingData({"port": "b", "mode": "start"});
-    sendingData({"port": "c", "mode": "start", "value": 100}); // value gibt die Frequenz an
+    sendingData({"port": "c", "mode": "stop"}); // value gibt die Frequenz an
+
 
 }
-function stop () {
+
+button_stop.onclick = function () {
     // inactiv Canvas Event Listener
-    allowSending = false
+    ALLOWSENDING = false
 
     // inactive all sensor
     sendingData({"port": "a", "mode": "stop"});
     sendingData({"port": "b", "mode": "stop"});
     sendingData({"port": "c", "mode": "stop"});
+
+    //stop Motor
+    sendingData({"port": "A", "mode": "stop"});
+    sendingData({"port": "B", "mode": "stop"});
+    sendingData({"port": "C", "mode": "stop"});
+
 }
 
+/************
+Function
+************/
+
+// controll roboter
 function drawControlingCanvas(radius) {
     // Canvas für die Steuerung
     canvasSteuerungContext.beginPath();
@@ -114,12 +132,17 @@ function drawControlingCanvas(radius) {
     canvasSteuerungContext.stroke();
     canvasSteuerungContext.font = '18pt Calibri';
     canvasSteuerungContext.fillStyle = '#fbba00';
-    canvasSteuerungContext.fillText("R", centerX-10, centerY+10);
+    canvasSteuerungContext.fillText("R", centerX-9, centerY+10);
+    canvasSteuerungContext.font = '5pt Calibri';
+    canvasSteuerungContext.fillText("|", centerX-34, centerY);
+    canvasSteuerungContext.fillText("|", centerX+34, centerY);
 }
 
-function drawImpedimentCanvas(radius, angle = null, distance = null) {
+// show sensor data
+function drawImpedimentCanvas(radius) {
     // Canvas für die Darstellung der Hinternisse
     canvasAbstandContext.beginPath();
+    canvasAbstandContext.clearRect(0, 0, canvasAbstand.width, canvasAbstand.height);
     canvasAbstandContext.arc(centerX, centerY, radius, 0, 2 * Math.PI, true);
     canvasAbstandContext.fillStyle = '#f3f3f4';
     canvasAbstandContext.fill();
@@ -131,11 +154,6 @@ function drawImpedimentCanvas(radius, angle = null, distance = null) {
     canvasAbstandContext.moveTo(150, 2 );
     canvasAbstandContext.lineTo(150, 145);
     canvasAbstandContext.stroke();
-
-
-    // canvasAbstandContext.fillRect(25, 25, 100, 100);
-    canvasAbstandContext.clearRect(45, 45, 100, 100);
-    // canvasAbstandContext.strokeRect(50, 50, 50, 50);
 }
 
 function getMousePos(canvas, evt) {
@@ -151,6 +169,7 @@ function getMousePos(canvas, evt) {
   };
 }
 
+// calculate distance and angle
 function getDistanceAngle(mouseX, mouseY) {
   var distance = Math.sqrt(mouseX * mouseX + mouseY * mouseY)
   var angle = 0;
@@ -159,8 +178,6 @@ function getDistanceAngle(mouseX, mouseY) {
   } else {
     var angle = Math.acos(-mouseX/distance) * 180 / Math.PI + 180;
   }
-  // console.log("Winkel:" + angle);
-  // console.log("Abstand:" + distance);
 
   // set distance = 150 to max distance/value
   if (distance > 150) {
@@ -173,7 +190,41 @@ function getDistanceAngle(mouseX, mouseY) {
   };
 }
 
-//
+// send value of motors to roboter
+/*
+Two speeds are calculated from the distance and the angle. Depending on the direction, one motor must rotate slower than the other. This is done by a quotient.
+*/
+
+function sendMotorManagement(angleDistance) {
+    var value_b;
+    var value_c;
+    var value_ges;
+
+    if(angleDistance.angle > 180) {
+        value_b = - 0.50;
+        value_c = - 0.50;
+    } else {
+        value_b = calculateShare(angleDistance.angle, true);    // Werte zwischen 0 - 1
+        value_c = calculateShare(angleDistance.angle);          // Werte zwischen 0 - 1
+    }
+    value_ges = angleDistance.distance/150 * 100;               // Werte zwischen 0 - 100;
+
+    var message_b = {
+        port: 'B',
+        mode: 'run-forever',
+        value: value_c * value_ges,
+    }
+    var message_c = {
+        port: "C",
+        mode: 'run-forever',
+        value: value_b * value_ges,
+    }
+
+    sendingData(message_b)
+    sendingData(message_c)
+}
+
+// calculate quotient
 function calculateShare(number, left = false) {
     var value = 0;
     if(left == true) {
@@ -184,77 +235,96 @@ function calculateShare(number, left = false) {
     return value/100;
 }
 
-//
-function sendMotorManagement(angleDistance) {
-    var value_b;
-    var value_c;
-    var value_ges;
-    var message_b;
-    var message_c;
-
-    if(angleDistance.angle > 180) {
-        value_b = - 0.50;
-        value_c = - 0.50;
-    } else {
-        value_b = calculateShare(angleDistance.angle, true);          // Werte zwischen 0 - 1
-        value_c = calculateShare(angleDistance.angle);         // Werte zwischen 0 - 1
-    }
-    value_ges = angleDistance.distance/150 * 100;          // Werte zwischen 0 - 100;
-
-    // // Debug
-    // console.log('Linker Motor: ' + value_b);
-    // console.log('Rechter Motor: ' + value_c);
-    // console.log('Geschwindigkeit: ' + value_ges);
-
-    message_b = {
-        port_b: "B",
-        values_b: value_b * value_ges,
-    }
-    message_c = {
-        port_c: "C",
-        value_c: value_c * value_ges,
-    }
-
-    sendingData(message_b)
-    sendingData(message_c)
-}
-
-// Wenn der Stoßsensor aktiv wird
-function runIntoWall() {
-  var oldhtml = document.getElementById('background');
-  oldhtml.style.background="red";
-  setTimeout(function() {
-    oldhtml.style.background="#dedede";
-  }, 1000);
-}
-
+// All incomming messages are sorted and the correspondig function were called
 function handleMessages(message) {
     console.log(message);
+
+    switch (message.port) {
+        case "a":
+        runIntoWall(message);
+            break;
+        case "b":
+            handleSonar(message);
+            break;
+        case "c":
+            handleGyroSensor(message);
+            break;
+        default:
+            console.log("Nichts passendes gefunden!")
+    }
 }
 
-// // Sending data to roboter
-// function sendingToRoboter(mode = null, direction = null) {
-//     var message = null;
-//     if (direction != null) {
-//         message = {
-//             'port': port,
-//             'mode': mode,
-//             'value': direction,
-//
-//         }
-//     } else if (mode != null) {
-//         message = {
-//             'port': port,
-//             'mode': mode,
-//         }
-//     } else {
-//         message = {
-//             'port': port,
-//         }
-//     }
-//
-//     sendingData(message)
-// }
+function handleTast(message) {
+    runIntoWall(message.value);
+}
+
+// if taster send a message
+function runIntoWall(value) {
+    var background = document.getElementById('background');
+    if(value[0] === 1) {
+        background.style.background="red";
+    } else {
+        background.style.background="#dedede";
+    }
+}
+
+function handleSonar(message) {
+    savePoint(message.value)
+    if (sensorAuswertung == 0) {
+        drawImpedimentCanvas(70)        // radius is 70
+        drawPoints(points)
+    } else if (sensorAuswertung == 2) { // option = 'Beide'
+        drawImpedimentCanvas(70)        // radius is 70
+        drawPoints(points)
+        drawPoint(xy_gyro, '#000000')
+    }
+}
+
+function savePoint(value) {
+    var xy = getXY(value[1], toRadiant(value[0] -90))       // 0 Angle, 1 Value
+    points[pointNr++%20] = xy;
+}
+
+function toRadiant (angle) {
+  return angle * (Math.PI / 180);
+}
+
+function getXY(value, angle) {
+    var pointAb = value * 70/2550;
+    var y = Math.sin(angle) * pointAb;
+    var x = Math.cos(angle) * pointAb;
+
+    return {x, y};
+}
+
+function drawPoints(xy) {
+    for (var i = 0; i < xy.length; i++) {
+        drawPoint(xy[i], '#fbba00');
+    }
+}
+
+function drawPoint(xy, color) {
+    canvasAbstandContext.fillStyle = color;
+    canvasAbstandContext.fillRect(xy.x + 148,xy.y + 71.5,5,5);
+}
+
+function handleGyroSensor(message) {
+    xy_gyro = getXY(2550, toRadiant(message.value - 90))
+    if (sensorAuswertung == 1) {
+        drawImpedimentCanvas(70)        // radius is 70
+        drawPoint(xy_gyro, '#000000')
+    } else if (sensorAuswertung == 2) { // option = 'Beide'
+        drawImpedimentCanvas(70)        // radius is 70
+        drawPoint(xy_gyro, '#000000')
+        drawPoints(points)
+    }
+}
+
+// objects are inactiv at start: first message -> activ
+function handleButton() {
+    button_start.disabled = 0;
+    button_stop.disabled = 0;
+}
 
 /************
 WebRTC Connection
@@ -273,13 +343,30 @@ const sensor_dc = pc.createDataChannel('sensors', {
     negotiated: true,
     id: 1,
 })
-// Sorgt dafür, dass die pars-Funktion nur bei den ersten Daten einmal aufgerufen wird.
-var INTITIALPAGE = 0
+
+const ping_dc = pc.createDataChannel('ping', {
+    negotiated: true,
+    id: 2,
+})
 
 // Messages api Data Channel
 api_dc.onmessage = (event) => {
     console.log(event.data);
 
+    if (INTITIALPAGE == 0) {
+        handleButton();
+        INTITIALPAGE = 1
+    } else {
+        try {
+            handleMessages(JSON.parse(event.data));
+        } catch (e) {
+            console.error("Es wurde kein JSON Object geschickt!");
+        };
+    }
+};
+
+// Messages sensor Data Channel
+sensor_dc.onmessage = (event) => {
     try {
         handleMessages(JSON.parse(event.data));
     } catch (e) {
