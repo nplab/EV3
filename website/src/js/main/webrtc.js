@@ -7,9 +7,9 @@ class WebRTCPeerConnection {
         // Setzen einer default Konfiguration
         if (configuration === null) {
             configuration = {
-                // iceServers: [{
-                //     // urls: 'stun:stun.services.mozilla.com',
-                // }],
+                iceServers: [{
+                    urls: ["stun:stun.l.google.com:19302",        "stun:stun1.l.google.com:19302"],
+                }],
             };
         }
 
