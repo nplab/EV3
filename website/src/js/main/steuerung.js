@@ -12,6 +12,7 @@ var distance = null;
 var angle = null;
 var sensorAuswertung = 0;
 var xy_gyro;
+var breakSending = 0;
 // var for paint points
 var points = []
 var pointNr = 0
@@ -40,11 +41,14 @@ Event Listener
 // Canvas
 window.addEventListener('load', startupCanvas, false);
 canvasSteuerung.addEventListener('mousemove', function(evt) {
-    if(ALLOWSENDING == true) {
-        var mousePos = getMousePos(canvasSteuerung, evt);
-        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
-        sendMotorManagement(angleDistance)
+    if ((breakSending++%40) == 1) {
+        if(ALLOWSENDING == true) {
+            var mousePos = getMousePos(canvasSteuerung, evt);
+            angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
+            sendMotorManagement(angleDistance)
+        }
     }
+    console.log(breakSending);
 }, false);
 
 $(document).keyup(function(e) {
