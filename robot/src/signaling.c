@@ -80,7 +80,10 @@ wrtcr_rc sigserv_send(char *msg) {
   } else if ((unsigned int)sent_len != msg_len + sizeof(uint32_t)) {
     handle_errno("Could not send complete message to signaling server", false);
     rc=WRTCR_FAILURE;
+  } else {
+    ZF_LOGD("Send message to signaling server: %s", msg);
   }
+
   free(buf);
   return rc;
 }
