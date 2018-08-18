@@ -12,6 +12,7 @@ var distance = null;
 var angle = null;
 var sensorAuswertung = 0;
 var xy_gyro;
+var breakSending = 0;
 // var for paint points
 var points = []
 var pointNr = 0
@@ -41,9 +42,11 @@ Event Listener
 window.addEventListener('load', startupCanvas, false);
 canvasSteuerung.addEventListener('mousemove', function(evt) {
     if(ALLOWSENDING == true) {
-        var mousePos = getMousePos(canvasSteuerung, evt);
-        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
-        sendMotorManagement(angleDistance)
+        if ((breakSending++%40) == 1) {
+            var mousePos = getMousePos(canvasSteuerung, evt);
+            angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
+            sendMotorManagement(angleDistance)
+        }
     }
 }, false);
 
@@ -55,6 +58,21 @@ $(document).keyup(function(e) {
 
 select_sensorAuswertung.onchange = function() {
     sensorAuswertung =  this.value; // Select for canvas
+
+}
+
+/************
+Button
+************/
+
+button_start.onclick = function () {
+    // activ Canvas Event Listener
+    ALLOWSENDING = true;
+
+    console.log(sensorAuswertung);
+
+    // Click on button -> select is disabled
+    select_sensorAuswertung.disabled = 1;
 
     switch (sensorAuswertung) {
         case "0":
@@ -72,32 +90,14 @@ select_sensorAuswertung.onchange = function() {
         default:
             console.log("Konnte nichts Starten");
     }
-
-}
-
-
-/************
-Button
-************/
-
-button_start.onclick = function () {
-    // activ Canvas Event Listener
-    ALLOWSENDING = true;
-
-    // erst nach dem Klick auf den Button kann der Drop Down geändert werden.
-    select_sensorAuswertung.disabled = 0;
-
-    // activ all sensor
-    sendingData({"port": "a", "mode": "start"});
-    sendingData({"port": "b", "mode": "start"});
-    sendingData({"port": "c", "mode": "stop"}); // value gibt die Frequenz an
-
-
 }
 
 button_stop.onclick = function () {
     // inactiv Canvas Event Listener
     ALLOWSENDING = false
+
+    // Click on button -> select is enabled
+    select_sensorAuswertung.disabled = 0;
 
     // inactive all sensor
     sendingData({"port": "a", "mode": "stop"});
@@ -324,6 +324,7 @@ function handleGyroSensor(message) {
 function handleButton() {
     button_start.disabled = 0;
     button_stop.disabled = 0;
+    select_sensorAuswertung.disabled = 0;
 }
 
 /************

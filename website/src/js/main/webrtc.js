@@ -8,7 +8,7 @@ class WebRTCPeerConnection {
         if (configuration === null) {
             configuration = {
                 iceServers: [{
-                    urls: ["stun:stun.l.google.com:19302",        "stun:stun1.l.google.com:19302"],
+                    urls: wrtcr_conf.stun_servs,
                 }],
             };
         }
@@ -146,4 +146,3 @@ function sendingData(data) {
     }
 
 }
-

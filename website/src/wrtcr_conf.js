@@ -9,7 +9,6 @@ var wrtcr_conf = {
     },
     "stun_servs": [
         "stun:stun.l.google.com:19302",
-        'stun:stun.services.mozilla.com',
     ],
     "turn_servs": [
     ]
