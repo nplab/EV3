@@ -8,7 +8,8 @@ class WebRTCPeerConnection {
         if (configuration === null) {
             configuration = {
                 iceServers: [{
-                    urls: 'stun:stun.services.mozilla.com',
+                    urls: wrtcr_conf.stun_servs[0],
+                    urls: wrtcr_conf.stun_servs[1],
                 }],
             };
         }
@@ -32,9 +33,13 @@ class WebRTCPeerConnection {
         pc.onconnectionstatechange = () => {
             console.log('Connection state:', pc.connectionState);
         };
-        pc.onicecandidate = (event) => {
-            console.log('Local ICE candidate:', event.candidate);
-            sendMessage(pc.localDescription);
+        pc.onicecandidate = function(event) {
+            if(event.candidate === null){
+                sendMessage({"candidate": ""});
+            }else{
+                sendMessage(event.candidate);
+                console.log('Local ICE candidate:', event.candidate);
+            }
         };
         pc.onicecandidateerror = (event) => {
             console.error('ICE candidate error:', event);
@@ -99,7 +104,12 @@ class WebRTCPeerConnection {
 
         // Apply local description
         await this.pc.setLocalDescription(description);
+        sendMessage(description);
         console.log('Local description:', description);
+    }
+
+    async handleRemoteICECandidate(candidate){
+        await this.pc.addIceCandidate(new RTCIceCandidate(candidate));
     }
 
     async close(){
@@ -116,6 +126,13 @@ function handleOffer(message) {
     .catch((error) => console.error(error));
 }
 
+// Handle einer Offer-Nachricht
+function handleICECandidate(message) {
+    pc.handleRemoteICECandidate(message, true)
+        .catch((error) => console.error(error));
+}
+
+
 // Senden des Nachrichten in den DataChannel
 function sendingData(data) {
     console.log(data);
@@ -130,4 +147,3 @@ function sendingData(data) {
     }
 
 }
-

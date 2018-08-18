@@ -14,7 +14,7 @@ socket.on('info', function (data) {
 socket.on('signaling', function(data) {
     console.log('Client received message:', data);
     if (data === 'READY###') {
-        return
+        return;
     }
     try {
         receiveMessages(JSON.parse(data))
@@ -27,19 +27,21 @@ socket.on('signaling', function(data) {
 socket.emit('signaling', "Message to Server: Connection successfull");
 
 
-// Handle Nachrichten. Nur eine Offer-Nachricht wird weitergeleitet.
+// Handle Nachrichten
 function receiveMessages (message) {
-
     if (message.type === 'offer') {
-        handleOffer(message)
-    } else if (message === 'bye') {
+        handleOffer(message);
+    } else if( message.candidate){
+        handleICECandidate(message);
+    }
+    else if (message === 'bye') {
         // TODO, Falls eine Nachricht gesendet werden soll.
     }
 }
 
 // Senden einer Nachricht an den Siganling Server
 function sendMessage(message){
-    console.log('Client sending message:');
+    console.log('Website sending message:');
     console.log(JSON.stringify(message));
     socket.emit('signaling', JSON.stringify(message));
 }
