@@ -9,9 +9,7 @@ var wrtcr_conf = {
     },
     "stun_servs": [
         "stun:stun.l.google.com:19302",
-        "stun:stun1.l.google.com:19302"
     ],
     "turn_servs": [
-        "turn:turn.threema.ch:443"
     ]
 }

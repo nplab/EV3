@@ -60,7 +60,7 @@ wrtcr_rc cleanup_robot(){
   while( (key = map_next(&port_map, &iterator))){
     if( *key >= 'A'){ //if this a motor, stop it
       sn = *map_get(&port_map, key);
-      set_tacho_command_inx(sn, TACHO_STOP);     
+      set_tacho_command_inx(sn, TACHO_STOP);
     }
   }
 

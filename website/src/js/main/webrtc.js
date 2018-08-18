@@ -8,8 +8,7 @@ class WebRTCPeerConnection {
         if (configuration === null) {
             configuration = {
                 iceServers: [{
-                    urls: wrtcr_conf.stun_servs[0],
-                    urls: wrtcr_conf.stun_servs[1],
+                    urls: wrtcr_conf.stun_servs,
                 }],
             };
         }

@@ -51,9 +51,9 @@ int main(int argc, char *argv[]) {
 
 void clean_exit(){
   ZF_LOGI("Starting teardown procedure");
-  data_channel_shutdown();
   cleanup_meta_devices();
   cleanup_robot();
+  data_channel_shutdown();
   sigserv_disconnect();
   delete_config();
   
