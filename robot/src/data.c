@@ -120,7 +120,7 @@ wrtcr_rc initialise_client(){
 
   EORE(rawrtc_data_channel_parameters_create(
                                            &dc_parameters, client_info.data_channel_sensors->label,
-                                           RAWRTC_DATA_CHANNEL_TYPE_UNRELIABLE_ORDERED_RETRANSMIT, 0, NULL, true, 1), "Could not create sensors data channel parameters");
+                                           RAWRTC_DATA_CHANNEL_TYPE_UNRELIABLE_UNORDERED_RETRANSMIT, 0, NULL, true, 1), "Could not create sensors data channel parameters");
 
   //create actual data channel
   EORE(rawrtc_peer_connection_create_data_channel(
