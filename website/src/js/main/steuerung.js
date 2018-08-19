@@ -319,11 +319,13 @@ function handleGyroSensor(message) {
 }
 
 // objects are inactiv at start: first message -> activ
-function handleButton() {
-    button_start.disabled = 0;
-    button_stop.disabled = 0;
-    select_sensorAuswertung.disabled = 0;
+function handleButton(val) {
+    button_start.disabled = val;
+    button_stop.disabled = val;
+    select_sensorAuswertung.disabled = val;
 }
+
+handleButton(1);
 
 /************
 WebRTC Connection
@@ -353,7 +355,7 @@ api_dc.onmessage = (event) => {
     console.log(event.data);
 
     if (INTITIALPAGE == 0) {
-        handleButton();
+        handleButton(0);
         INTITIALPAGE = 1
     } else {
         try {
