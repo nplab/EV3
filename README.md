@@ -121,7 +121,7 @@ A third data channel called `ping` is used to monitor the connection. The websit
 
 ## Configuration File
 
-The configuration file `wrtcr_conf.json` contains the following options:
+The configuration files `robot/wrtcr_conf.json` and `website/src/wrtcr_conf.js` contain the following options:
 
 | name                  | type             | meaning                                                                                                      |
 |-----------------------|------------------|--------------------------------------------------------------------------------------------------------------|
