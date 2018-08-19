@@ -457,6 +457,7 @@ int handle_remote_ICE_candidate(cJSON *candidate_json){
 
   ZF_LOGD("Adding remote ICE candidate");
   EORE(rawrtc_peer_connection_add_ice_candidate(client_info.connection, candidate), "Could not set remote ICE candidate");
+  mem_deref(candidate);
   return 0;
 }
 
