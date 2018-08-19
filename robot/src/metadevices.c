@@ -156,14 +156,12 @@ void* collision_routine(void *ign __attribute__ ((unused))){
   sleeptime.tv_nsec = 500 * 1000 * 1000;
 
   int cur_value;
-  char msg[30];
 
   while(true){
     if(!get_sensor_value( 0, collision_sn, &cur_value)){
       ZF_LOGE("Could not get value from collision sensor");
     } else if( cur_value != last_value ){
-      snprintf(msg, sizeof(msg), "{\"port\": \"%s\", \"value\":[%d]}", collision_port, cur_value);
-      POE(send_message_on_sensor_channel(msg), "Could not send collision sensor message");
+      POE(send_message_on_sensor_channel(collision_port, cur_value), "Could not send collision sensor message");
       last_value = cur_value;
     }
     nanosleep(&sleeptime, NULL);
@@ -274,7 +272,6 @@ void* sonar_routine(void *ign __attribute__ ((unused))){
   int8_t direction = 1;
   uint8_t state;
   int left_limit, pos;
-  char msg[35];
   float value;
 
   while(true){
@@ -296,8 +293,7 @@ void* sonar_routine(void *ign __attribute__ ((unused))){
       ZF_LOGE("Could not get value from sonar sensor");
       continue;
     }
-    snprintf(msg, sizeof(msg), "{\"port\": \"%s\", \"value\":[%d, %d]}", sonar_port, (int)(pos*sonar_deg_factor), (int)value);
-    POE(send_message_on_sensor_channel(msg), "Could not send sonar sensor message");
+    POE(send_long_message_on_sensor_channel(sonar_port, (int)(pos*sonar_deg_factor), (int)value), "Could not send sonar sensor message");
 
     //move and get value
     POSGE(set_tacho_position_sp( sonar_motor_sn, direction*step_degree) && set_tacho_command_inx(sonar_motor_sn, TACHO_RUN_TO_REL_POS), "Could not make sonar motor move", true);
@@ -372,14 +368,12 @@ void* compass_routine(void *interval){
   sleeptime.tv_nsec = *(int*)interval * 1000 * 1000;
 
   int value;
-  char msg[30];
 
   while(true){
     if(!get_sensor_value( 0, compass_sn, &value)){
       ZF_LOGE("Could not get value from compass sensor");
     } else {
-      snprintf(msg, sizeof(msg), "{\"port\": \"%s\", \"value\":[%d]}", compass_port, value);
-      POE(send_message_on_sensor_channel(msg), "Could not send compass sensor message");
+      POE(send_message_on_sensor_channel(compass_port, value), "Could not send compass sensor message");
     }
     nanosleep(&sleeptime, NULL);
   }
@@ -394,7 +388,7 @@ void* ping_routine(void *ping_ts ){
   sleeptime.tv_sec = 1;
   sleeptime.tv_nsec = 0;
 
-  //if last ping timestamp is older than three seconds, quit
+  //if last ping timestamp is too old, quit
   do{
     nanosleep(&sleeptime, NULL);
     time(&now);

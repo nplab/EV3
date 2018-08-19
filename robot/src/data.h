@@ -45,8 +45,9 @@ wrtcr_rc send_message_on_ping_channel(char *msg);
 //send string msg on the api channel
 wrtcr_rc send_message_on_api_channel(char *msg);
 
-//send string msg on the sensors channel
-wrtcr_rc send_message_on_sensor_channel(char *msg);
+//send msg with given port and value(s) on the sensor channel
+wrtcr_rc send_message_on_sensor_channel(char *port, int value1);
+wrtcr_rc send_long_message_on_sensor_channel(char *port, int value1, int value2);
 
 //print an ice candidate
 void print_ice_candidate(struct rawrtc_ice_candidate* const candidate, char const* const url, struct rawrtc_peer_connection_ice_candidate* const pc_candidate, struct client* const client);

@@ -377,7 +377,19 @@ sensor_dc.onmessage = (event) => {
 
 // Messages sensor Data Channel
 sensor_dc.onmessage = (event) => {
-    handleMessages(JSON.parse(event.data));
+    msg = JSON.parse(event.data);
+    if ( typeof sensor_dc.onmessage.idx == 'undefined' ) {//if this is the first time this function is called, create "static" variable
+        sensor_dc.onmessage.idx = msg.idx;
+    } else {
+        if (msg.idx <= sensor_dc.onmessage.idx){ //if this message is older than the newest one, ignore it
+            console.log("Discarded old sensor message.")
+            return;
+        } else { //else, remember it as the new news
+            sensor_dc.onmessage.idx = msg.idx;
+        }
+    }
+    
+    handleMessages(msg);
 }
 
 ping_dc.onopen = (event) => {
