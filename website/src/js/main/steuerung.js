@@ -10,7 +10,7 @@ var centerX = 150;
 var centerY = 73;
 var distance = null;
 var angle = null;
-var sensorAuswertung = 0;
+var sensorAuswertung = "0";
 var xy_gyro;
 var breakSending = 0;
 // var for paint points
@@ -23,6 +23,7 @@ var INTITIALPAGE = 0;
 var button_start = document.getElementById("start_button");
 var button_stop = document.getElementById("stop_button");
 var select_sensorAuswertung = document.getElementById("sensorAuswertung");
+select_sensorAuswertung.value = "0";
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -40,13 +41,11 @@ Event Listener
 
 // Canvas
 window.addEventListener('load', startupCanvas, false);
-canvasSteuerung.addEventListener('mousemove', function(evt) {
+canvasSteuerung.addEventListener('click', function(evt) {
     if(ALLOWSENDING == true) {
-        if ((breakSending++%40) == 1) {
-            var mousePos = getMousePos(canvasSteuerung, evt);
-            angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
-            sendMotorManagement(angleDistance)
-        }
+        var mousePos = getMousePos(canvasSteuerung, evt);
+        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
+        sendMotorManagement(angleDistance)
     }
 }, false);
 
@@ -58,7 +57,6 @@ $(document).keyup(function(e) {
 
 select_sensorAuswertung.onchange = function() {
     sensorAuswertung =  this.value; // Select for canvas
-
 }
 
 /************
@@ -69,15 +67,15 @@ button_start.onclick = function () {
     // activ Canvas Event Listener
     ALLOWSENDING = true;
 
-    console.log(sensorAuswertung);
-
     // Click on button -> select is disabled
     select_sensorAuswertung.disabled = 1;
+
+    sendingData({"port": "a", "mode": "start"});
 
     switch (sensorAuswertung) {
         case "0":
             sendingData({"port": "b", "mode": "start"});
-            sendingData({"port": "c", "mode": "stop"}); // value gibt die Frequenz an
+            sendingData({"port": "c", "mode": "stop"}); 
             break;
         case "1":
             sendingData({"port": "b", "mode": "stop"});
@@ -241,7 +239,7 @@ function handleMessages(message) {
 
     switch (message.port) {
         case "a":
-        runIntoWall(message);
+            runIntoWall(message);
             break;
         case "b":
             handleSonar(message);
@@ -254,14 +252,10 @@ function handleMessages(message) {
     }
 }
 
-function handleTast(message) {
-    runIntoWall(message.value);
-}
-
 // if taster send a message
-function runIntoWall(value) {
+function runIntoWall(msg) {
     var background = document.getElementById('background');
-    if(value[0] === 1) {
+    if(msg.value[0] === 1) {
         background.style.background="red";
     } else {
         background.style.background="#dedede";
@@ -321,11 +315,13 @@ function handleGyroSensor(message) {
 }
 
 // objects are inactiv at start: first message -> activ
-function handleButton() {
-    button_start.disabled = 0;
-    button_stop.disabled = 0;
-    select_sensorAuswertung.disabled = 0;
+function handleButton(val) {
+    button_start.disabled = val;
+    button_stop.disabled = val;
+    select_sensorAuswertung.disabled = val;
 }
+
+handleButton(1);
 
 /************
 WebRTC Connection
@@ -355,7 +351,7 @@ api_dc.onmessage = (event) => {
     console.log(event.data);
 
     if (INTITIALPAGE == 0) {
-        handleButton();
+        handleButton(0);
         INTITIALPAGE = 1
     } else {
         try {
@@ -364,15 +360,6 @@ api_dc.onmessage = (event) => {
             console.error("Es wurde kein JSON Object geschickt!");
         };
     }
-};
-
-// Messages sensor Data Channel
-sensor_dc.onmessage = (event) => {
-    try {
-        handleMessages(JSON.parse(event.data));
-    } catch (e) {
-        console.error("Es wurde kein JSON Object geschickt!");
-    };
 };
 
 // Messages sensor Data Channel
