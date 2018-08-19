@@ -10,7 +10,7 @@ var centerX = 150;
 var centerY = 73;
 var distance = null;
 var angle = null;
-var sensorAuswertung = 0;
+var sensorAuswertung = "0";
 var xy_gyro;
 var breakSending = 0;
 // var for paint points
@@ -23,6 +23,7 @@ var INTITIALPAGE = 0;
 var button_start = document.getElementById("start_button");
 var button_stop = document.getElementById("stop_button");
 var select_sensorAuswertung = document.getElementById("sensorAuswertung");
+select_sensorAuswertung.value = "0";
 
 // Start des Canvas Elements
 function startupCanvas() {
@@ -56,7 +57,6 @@ $(document).keyup(function(e) {
 
 select_sensorAuswertung.onchange = function() {
     sensorAuswertung =  this.value; // Select for canvas
-
 }
 
 /************
@@ -67,8 +67,6 @@ button_start.onclick = function () {
     // activ Canvas Event Listener
     ALLOWSENDING = true;
 
-    console.log(sensorAuswertung);
-
     // Click on button -> select is disabled
     select_sensorAuswertung.disabled = 1;
 
@@ -77,7 +75,7 @@ button_start.onclick = function () {
     switch (sensorAuswertung) {
         case "0":
             sendingData({"port": "b", "mode": "start"});
-            sendingData({"port": "c", "mode": "stop"}); // value gibt die Frequenz an
+            sendingData({"port": "c", "mode": "stop"}); 
             break;
         case "1":
             sendingData({"port": "b", "mode": "stop"});
