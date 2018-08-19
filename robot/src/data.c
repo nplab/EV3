@@ -2,10 +2,14 @@
 #include <time.h>
 #include "data.h"
 
+//connection configuration
 static struct client client_info = {0};
 static struct rawrtc_peer_connection_configuration *configuration;
+//vars for ping checking
 static pthread_t ping_thread_id;
 static time_t ping_ts;
+//index of sensor messages
+static unsigned long sensor_idx = 0;
 
 //initialisation and shutdown functions
 wrtcr_rc initialise_client();
@@ -579,9 +583,25 @@ wrtcr_rc send_message_on_api_channel(char *msg){
   return WRTCR_SUCCESS;
 }
 
-wrtcr_rc send_message_on_sensor_channel(char *msg){
+wrtcr_rc send_message_on_sensor_channel(char *port, int value1){
+  static char msg[100];
+  sensor_idx++;
+
+  snprintf(msg, sizeof(msg), "{\"idx\": %lu, \"port\": \"%s\", \"value\": [%d]}", sensor_idx, port, value1);
   if(send_message_on_data_channel(client_info.data_channel_sensors->channel, msg) != WRTCR_SUCCESS){
-    ZF_LOGE("Could not send message on sensors channel");
+    ZF_LOGE("Could not send message on sensor channel");
+    return WRTCR_FAILURE;
+  }
+  return WRTCR_SUCCESS;
+}
+
+wrtcr_rc send_long_message_on_sensor_channel(char *port, int value1, int value2){
+  static char msg[120];
+  sensor_idx++;
+
+  snprintf(msg, sizeof(msg), "{\"idx\": %lu, \"port\": \"%s\", \"value\": [%d, %d]}", sensor_idx, port, value1, value2);
+  if(send_message_on_data_channel(client_info.data_channel_sensors->channel, msg) != WRTCR_SUCCESS){
+    ZF_LOGE("Could not send message on sensor channel");
     return WRTCR_FAILURE;
   }
   return WRTCR_SUCCESS;
