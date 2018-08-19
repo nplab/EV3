@@ -40,13 +40,11 @@ Event Listener
 
 // Canvas
 window.addEventListener('load', startupCanvas, false);
-canvasSteuerung.addEventListener('mousemove', function(evt) {
+canvasSteuerung.addEventListener('click', function(evt) {
     if(ALLOWSENDING == true) {
-        if ((breakSending++%40) == 1) {
-            var mousePos = getMousePos(canvasSteuerung, evt);
-            angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
-            sendMotorManagement(angleDistance)
-        }
+        var mousePos = getMousePos(canvasSteuerung, evt);
+        angleDistance = getDistanceAngle(mousePos.x, mousePos.y);
+        sendMotorManagement(angleDistance)
     }
 }, false);
 
