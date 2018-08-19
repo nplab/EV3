@@ -74,6 +74,8 @@ button_start.onclick = function () {
     // Click on button -> select is disabled
     select_sensorAuswertung.disabled = 1;
 
+    sendingData({"port": "a", "mode": "start"});
+
     switch (sensorAuswertung) {
         case "0":
             sendingData({"port": "b", "mode": "start"});
@@ -241,7 +243,7 @@ function handleMessages(message) {
 
     switch (message.port) {
         case "a":
-        runIntoWall(message);
+            runIntoWall(message);
             break;
         case "b":
             handleSonar(message);
@@ -254,14 +256,10 @@ function handleMessages(message) {
     }
 }
 
-function handleTast(message) {
-    runIntoWall(message.value);
-}
-
 // if taster send a message
-function runIntoWall(value) {
+function runIntoWall(msg) {
     var background = document.getElementById('background');
-    if(value[0] === 1) {
+    if(msg.value[0] === 1) {
         background.style.background="red";
     } else {
         background.style.background="#dedede";
@@ -364,15 +362,6 @@ api_dc.onmessage = (event) => {
             console.error("Es wurde kein JSON Object geschickt!");
         };
     }
-};
-
-// Messages sensor Data Channel
-sensor_dc.onmessage = (event) => {
-    try {
-        handleMessages(JSON.parse(event.data));
-    } catch (e) {
-        console.error("Es wurde kein JSON Object geschickt!");
-    };
 };
 
 // Messages sensor Data Channel
