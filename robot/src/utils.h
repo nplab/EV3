@@ -36,6 +36,7 @@ typedef enum WebRTCRobot_ReturnCode {
 
 extern int errno;
 extern int h_errno;
+extern const char *hstrerror(int errnum);
 
 //print message, followed by string representation of current errno, optionally exit program
 extern void handle_errno(const char *msg, bool exit_program);
